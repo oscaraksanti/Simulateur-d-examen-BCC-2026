@@ -220,6 +220,14 @@ Le timer repose sur des timestamps (`debut`) persistés : un rechargement de pag
 - Redirection 308 de sys-bcc-26.vercel.app vers le sous-domaine, réglée dans le domaine du projet Vercel (API `PATCH /v9/projects/sys-bcc-26/domains/sys-bcc-26.vercel.app`).
 - /admin : connexion par lien magique (plus de mot de passe), panneau « E-mails automatiques » (clé Resend → Vault, test).
 
+### Session 6 — 29/10/2026 (films de présentation 16:9 et 9:16)
+- `video/presentation/` : film HyperFrames de ~59 s en deux formats (`film/` 16:9, `film-9x16/` généré). Script
+  `SCRIPT-VOIX-OFF.md` lu par le propriétaire (voix off réelle choisie plutôt qu'une voix IA).
+- Calage : `node film/outils/caler.mjs voix <fichier>` puis `appliquer`, puis `npx hyperframes render` dans chaque projet.
+- Aperçus rendus avec une voix guide (macOS « Thomas ») dans `video/presentation/rendus/` (ignoré par git).
+- À faire à réception de la voix : caler, vérifier les planches (`snapshot --review`), rendre en `--quality delivery`,
+  publier les MP4 (ex. `public/promo/`) et les proposer sur le site.
+
 ### Pistes pour la suite
 - Remplacer les placeholders de captures du README par de vraies captures.
 - Enrichir les banques (objectif : 100+ questions par filière) et ajouter des cas (2 par session de travail).
