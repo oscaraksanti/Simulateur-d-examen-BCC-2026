@@ -1,0 +1,176 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: #f8f9fb;
+      color: #0b1220;
+      font-family: Inter, sans-serif;
+      overflow: hidden;
+    }
+    .s4-titre {
+      position: absolute;
+      left: 54px;
+      right: 54px;
+      top: 196px;
+      font-size: 66px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+    }
+    .s4-mot {
+      display: inline-block;
+      margin-right: 0.22em;
+    }
+    .s4-accent {
+      color: #0062cc;
+    }
+    #s4-anneau {
+      position: absolute;
+      left: 250px;
+      top: 360px;
+      width: 580px;
+      height: 580px;
+    }
+    #s4-anneau svg {
+      position: absolute;
+      inset: 0;
+      transform: rotate(-90deg);
+    }
+    #s4-centre {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #s4-note {
+      font-size: 168px;
+      font-weight: 700;
+      letter-spacing: -0.05em;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    #s4-sur {
+      margin-top: 6px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 44px;
+      color: #5d6577;
+    }
+    #s4-mention {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 980px;
+      text-align: center;
+      font-size: 48px;
+      font-weight: 700;
+      color: #0062cc;
+      letter-spacing: -0.02em;
+    }
+    #s4-graphe {
+      position: absolute;
+      left: 90px;
+      right: 90px;
+      top: 760px;
+      height: 520px;
+      display: flex;
+      align-items: flex-end;
+      gap: 40px;
+      border-bottom: 3px solid #e6e8ed;
+    }
+    .s4-col {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 14px;
+    }
+    .s4-val {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 32px;
+      font-weight: 700;
+    }
+    .s4-barre {
+      width: 100%;
+      border-radius: 18px 18px 0 0;
+      background: #d9dde5;
+    }
+    .s4-barre.s4-derniere {
+      background: #0b1220;
+    }
+    #s4-etiquettes {
+      position: absolute;
+      left: 90px;
+      right: 90px;
+      top: 1296px;
+      display: flex;
+      gap: 40px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 28px;
+      color: #5d6577;
+    }
+    #s4-etiquettes span {
+      flex: 1;
+      text-align: center;
+    }
+  </style>
+  <div data-hf-id="hf-q5j8" id="root" data-composition-id="s4" data-width="1080" data-height="1920">
+    <h2 data-hf-id="hf-cm2m" id="s4-t1" class="s4-titre"><span data-hf-id="hf-n2r4" class="s4-mot">Ta</span><span data-hf-id="hf-xi0p" class="s4-mot">note,</span><span data-hf-id="hf-nmzv" class="s4-mot">tout</span><span data-hf-id="hf-fc4s" class="s4-mot">de</span><span data-hf-id="hf-1j9x" class="s4-mot s4-accent">suite.</span></h2>
+    <h2 data-hf-id="hf-8nyl" id="s4-t2" class="s4-titre"><span data-hf-id="hf-xcrg" class="s4-mot">Simulation</span><span data-hf-id="hf-169h" class="s4-mot">après</span><span data-hf-id="hf-5cha" class="s4-mot s4-accent">simulation.</span></h2>
+    <div data-hf-id="hf-9ln9" id="s4-anneau">
+      <svg data-hf-id="hf-pjex" viewBox="0 0 580 580">
+        <circle data-hf-id="hf-3v3w" cx="290" cy="290" r="250" fill="none" stroke="#e9ecf1" stroke-width="40" />
+        <circle data-hf-id="hf-o4yy" id="s4-arc" cx="290" cy="290" r="250" fill="none" stroke="#0b1220" stroke-width="40" stroke-linecap="round" stroke-dasharray="1570.8" stroke-dashoffset="1570.8" />
+      </svg>
+      <div data-hf-id="hf-gjj8" id="s4-centre">
+        <span data-hf-id="hf-hehw" id="s4-note">0</span>
+        <span data-hf-id="hf-bnox" id="s4-sur">/20</span>
+      </div>
+    </div>
+    <p data-hf-id="hf-v3g3" id="s4-mention">Bon niveau</p>
+    <div data-hf-id="hf-jrg0" id="s4-graphe">
+      <div data-hf-id="hf-ln5o" class="s4-col"><span data-hf-id="hf-s5z5" class="s4-val">9</span><div data-hf-id="hf-9leu" class="s4-barre" style="height: 225px"></div></div>
+      <div data-hf-id="hf-um0k" class="s4-col"><span data-hf-id="hf-4a00" class="s4-val">10,5</span><div data-hf-id="hf-e6yt" class="s4-barre" style="height: 262px"></div></div>
+      <div data-hf-id="hf-tf3h" class="s4-col"><span data-hf-id="hf-be9t" class="s4-val">12</span><div data-hf-id="hf-teig" class="s4-barre" style="height: 300px"></div></div>
+      <div data-hf-id="hf-ttei" class="s4-col"><span data-hf-id="hf-rwvd" class="s4-val">13,5</span><div data-hf-id="hf-eoim" class="s4-barre" style="height: 337px"></div></div>
+      <div data-hf-id="hf-vsxn" class="s4-col"><span data-hf-id="hf-m4bw" class="s4-val">14,5</span><div data-hf-id="hf-xk5e" class="s4-barre s4-derniere" id="s4-cinquieme" style="height: 362px"></div></div>
+    </div>
+    <div data-hf-id="hf-rata" id="s4-etiquettes"><span data-hf-id="hf-0hxu">n°1</span><span data-hf-id="hf-0w8v">n°2</span><span data-hf-id="hf-1ajw">n°3</span><span data-hf-id="hf-1oux">n°4</span><span data-hf-id="hf-235y">n°5</span></div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      const note = { v: 0 };
+      tl.fromTo("#s4-t1 .s4-mot", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.13, stagger: 0.07, ease: "power2.out" }, 0.1);
+      tl.fromTo("#s4-anneau", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.5, ease: "expo.out" }, 0.05);
+      // Le paiement : l'anneau se trace et la note compte, à vitesse normale.
+      tl.fromTo("#s4-arc", { strokeDashoffset: 1570.8 }, { strokeDashoffset: 1570.8 * (1 - 14.5 / 20), duration: 1.5, ease: "power3.out" }, 0.45);
+      tl.to(note, {
+        v: 14.5,
+        duration: 1.5,
+        ease: "power3.out",
+        onUpdate: () => {
+          const v = Math.round(note.v * 2) / 2;
+          document.querySelector("#s4-note").textContent = String(v).replace(".", ",");
+        },
+      }, 0.45);
+      tl.fromTo("#s4-mention", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "power2.out" }, 1.95);
+      // L'anneau se range vers le haut ; la courbe de progression pousse dessous.
+      tl.to("#s4-t1", { opacity: 0, filter: "blur(8px)", duration: 0.18, ease: "power3.in" }, 2.85);
+      tl.to(["#s4-mention", "#s4-sur"], { opacity: 0, duration: 0.15, ease: "power3.in" }, 2.85);
+      tl.to("#s4-anneau", { scale: 0.44, x: 0, y: -125, duration: 0.55, ease: "power2.inOut", transformOrigin: "50% 50%" }, 2.9);
+      tl.fromTo("#s4-t2 .s4-mot", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.13, stagger: 0.07, ease: "power2.out" }, 3.05);
+      tl.fromTo("#s4-graphe", { opacity: 0 }, { opacity: 1, duration: 0.2 }, 3.1);
+      tl.fromTo(".s4-barre", { scaleY: 0, transformOrigin: "50% 100%" }, { scaleY: 1, duration: 0.6, stagger: 0.1, ease: "expo.out" }, 3.15);
+      tl.fromTo(".s4-val", { opacity: 0 }, { opacity: 1, duration: 0.2, stagger: 0.1 }, 3.35);
+      tl.fromTo("#s4-etiquettes", { opacity: 0 }, { opacity: 1, duration: 0.25 }, 3.3);
+      // Sortie : tout sauf la 5ᵉ barre disparaît ; elle porte la marque dans la scène suivante.
+      tl.to(["#s4-t2", "#s4-anneau", "#s4-etiquettes", ".s4-val"], { opacity: 0, filter: "blur(8px)", duration: 0.2, ease: "power3.in" }, 5.0);
+      tl.to(".s4-barre:not(.s4-derniere)", { scaleY: 0, duration: 0.25, ease: "power3.in" }, 5.0);
+      window.__timelines["s4"] = tl;
+    })();
+  </script>
+</template>

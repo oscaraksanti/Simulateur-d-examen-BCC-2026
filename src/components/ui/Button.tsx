@@ -5,11 +5,11 @@ type Variante = 'primaire' | 'secondaire' | 'fantome' | 'danger' | 'whatsapp' | 
 type Taille = 'sm' | 'md' | 'lg';
 
 const base =
-  'inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-[background-color,box-shadow,transform,color,border-color] duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 select-none text-center leading-tight';
+  'inline-flex items-center justify-center gap-2 rounded-xl font-semibold tracking-[-0.01em] transition-[background-color,box-shadow,transform,color,border-color] duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 select-none text-center leading-tight';
 
 const variantes: Record<Variante, string> = {
-  primaire: 'bg-primary-strong text-on-primary shadow-soft hover:brightness-110',
-  secondaire: 'border border-border bg-surface text-ink hover:border-primary hover:text-primary-strong',
+  primaire: 'bg-ink text-bg shadow-soft hover:bg-ink/88',
+  secondaire: 'border border-border bg-surface text-ink hover:border-ink/30',
   fantome: 'text-ink hover:bg-surface-2',
   danger: 'bg-danger text-white hover:brightness-110',
   whatsapp: 'bg-[#128C4B] text-white shadow-soft hover:bg-[#0F7A41]',

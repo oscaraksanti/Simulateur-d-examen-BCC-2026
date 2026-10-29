@@ -7,14 +7,18 @@ Document de passation pour toute IA ou développeur qui reprend le projet. À me
 Application web **open source, 100 % statique**, en **français**, qui aide les candidats congolais à préparer les tests de
 recrutement informatique de la Banque Centrale du Congo (BCC), filières **Data Analyse** et **Cybersécurité**.
 Dépôt : https://github.com/oscaraksanti/Simulateur-d-examen-BCC-2026 — auteur : Oscar Aksanti (formations4data).
-Site en ligne (GitHub Pages) : https://oscaraksanti.github.io/Simulateur-d-examen-BCC-2026/
+Production (Vercel, projet `sys-bcc-26` relié au dépôt, déploiement auto sur push `main`) : https://sys-bcc-26.vercel.app
+Miroir GitHub Pages : https://oscaraksanti.github.io/Simulateur-d-examen-BCC-2026/
 
 ### Règles non négociables (à respecter dans toute évolution)
 1. **Jamais déguisé en officiel** : pas de logo/sceau/charte/photos BCC, rien téléchargé ni lié depuis bcc.cd hormis le
    lien texte vers le site officiel. Bandeau permanent `DisclaimerBanner` (dans `layout.tsx`) obligatoire. Aucun formulaire
    ne doit ressembler à une candidature officielle. Les couleurs viennent du drapeau RDC, pas de la charte BCC.
-2. **Zéro backend** : contenu codé en dur dans `src/data/`, données utilisateur dans `localStorage` via `src/lib/storage.ts`
-   (try/catch partout). Aucun appel réseau sortant hormis les liens cliqués (et `@vercel/analytics`, actif seulement sur Vercel).
+2. **Site statique + backend facultatif** : contenu codé en dur dans `src/data/`, état local dans `localStorage`
+   (`src/lib/storage.ts`, try/catch partout). Depuis la v1.1, si `NEXT_PUBLIC_SUPABASE_URL` et
+   `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` sont définies, inscriptions / résultats / avis sont envoyés à Supabase
+   (`src/lib/remote.ts`). Sans ces variables, l'app reste 100 % locale. Consentement explicite obligatoire à l'inscription,
+   page `/confidentialite` à tenir à jour. JAMAIS de clé `service_role` dans le front.
 3. **Français partout** (UI, contenu, commentaires, README). Tutoiement du candidat.
 4. **TypeScript strict, aucun `any`, zéro erreur ESLint**, `npm run build` doit passer.
 5. **Exactitude des faits BCC** : les questions `culture_bcc` ne s'appuient QUE sur `src/data/bccFacts.ts` (source unique
@@ -37,7 +41,7 @@ Site en ligne (GitHub Pages) : https://oscaraksanti.github.io/Simulateur-d-exame
 npm run dev          # http://localhost:3000
 npm run lint         # ESLint (doit être vide)
 npm run typecheck    # tsc --noEmit
-npm test             # Vitest : 228 tests (scoring, sampling, share, intégrité des données)
+npm test             # Vitest : 234 tests (scoring, sampling, share, remote, intégrité des données)
 npm run build        # prebuild → scripts/generate-og.ts → next build → out/
 npm start            # sert out/ (npx serve)
 ```
@@ -46,12 +50,29 @@ Prévisualisation locale du build : `python3 -m http.server 4173 --directory out
 Variables : `NEXT_PUBLIC_SITE_URL` (URL publique, utilisée dans les textes de partage et `metadataBase`),
 `NEXT_PUBLIC_BASE_PATH` (vide sur Vercel, `/Simulateur-d-examen-BCC-2026` sur GitHub Pages — fixé par le workflow).
 
+## 3 bis. Données (Supabase)
+
+- Schéma : `supabase/migrations/0001_init.sql` (idempotent). Tables `candidats`, `tentatives`, `feedbacks`, `admins`.
+- RLS partout ; `anon` n'a AUCUN droit direct sur les tables ; écritures via fonctions `security definer` validées :
+  `enregistrer_candidat` (upsert par UUID généré sur l'appareil), `enregistrer_tentative`, `envoyer_avis`,
+  `stats_publiques` (agrégats sans données perso, affichés sur l'accueil au-delà de 20 inscrits) ;
+  lecture réservée aux admins (`est_admin()`, `stats_admin()`).
+- Testé sur Postgres 16 local avec des rôles `anon`/`authenticated` et un `auth.uid()` simulés (accès refusés, validations,
+  agrégats admin, ré-exécution idempotente). Pour retester : initdb dans un dossier temporaire, démarrer avec
+  `LC_ALL=en_US.UTF-8` et `-c unix_socket_directories=''` (chemin de socket trop long dans le scratchpad).
+- Client : `src/lib/remote.ts` — import dynamique de supabase-js, file d'attente `simbcc:file-attente-v1` rejouée au
+  chargement (`viderFile`), erreurs 22/23/42 = définitives (abandon), autres = retentées (8 max).
+- Admin : `/admin` (noindex) — connexion e-mail/mot de passe Supabase, KPI, histogrammes 30 jours, distribution des notes,
+  compétences faibles agrégées, souhaits, tables candidats/résultats/avis, export CSV, suppression (droit à l'effacement).
+
 ## 4. Architecture
 
 ```
 src/app/
   layout.tsx            polices, SEO/OG FR, script anti-flash du thème, ExamProvider, ToastProvider, Disclaimer, Header, Footer
-  page.tsx              Écran 1 : hero, inscription (InscriptionBloc), méthode 5 simulations, recrutement 2026, infographies
+  page.tsx              Écran 1 (refonte premium v1.1) : hero + HeroMockup animé, bandeau compétences, méthode, bento,
+                        question d'essai (BCC-001), chiffres, culture BCC, inscription (#commencer), FAQ, appel final
+  avis/ confidentialite/ admin/   BONUS v1.1 : formulaire d'avis, politique de confidentialité, tableau de bord privé
   examen/page.tsx       → components/exam/ExamSession (dashboard puis QCM)
   cas-pratiques/page.tsx→ components/cases/CasesSession
   resultats/page.tsx    → components/results/ResultsView
@@ -89,6 +110,9 @@ src/components/
   results/  ResultsView, ScoreHero (comptage animé), ScoreBreakdown, RadarBySkill (SVG maison), ProgressionChart,
             CorrectionList (filtres erreurs/justes/toutes), ResourcesOscar, ShareCard (1080×1350), ShareButtons
   training/ TrainingSession
+  landing/  HeroMockup (fenêtre produit animée), SkillsMarquee, Bento, TryQuestion, LiveStats, CountUp
+  feedback/ AvisForm (note, souhaits, message ; repli WhatsApp si Supabase absent)
+  admin/    AdminApp, Graphiques (histogramme mono-série avec info-bulles, barres horizontales)
   illustrations/ BanknotePattern, NetworkGraph, ShieldPulse, PaymentFlowInfographic (prop vertical), PolicyRateTimeline
 scripts/generate-og.ts  public/og-image.png 1200×630 (police locale, ne casse pas le build si l'image existe déjà)
 .github/workflows/deploy-pages.yml  lint → typecheck → test → build → Pages
@@ -152,9 +176,28 @@ Le timer repose sur des timestamps (`debut`) persistés : un rechargement de pag
 - Push : les identifiants git par défaut de la machine sont refusés (403) ; pousser avec
   `git -c credential.helper= -c "credential.helper=!gh auth git-credential" push`.
 
+### Session 3 — 29/10/2026 (v1.1 « premium & production »)
+- Refonte complète de l'accueil (direction « fintech éditoriale » : Inter optique, encre quasi noire, un seul accent bleu,
+  le produit réel comme visuel). Jetons de couleur affinés (clair/sombre), boutons primaires encre, en-tête/pied/bandeau revus,
+  variante Tailwind `dark:` alignée sur le thème effectif (`@custom-variant dark`).
+- Collecte Supabase (schéma + RLS + fonctions testés), consentements à l'inscription, WhatsApp facultatif, champ piège anti-robots,
+  avis utilisateurs, page confidentialité, tableau de bord admin.
+- Vidéo promo HyperFrames verticale (dossier `video/`, `SPEC.md`, `REVIEW.md`), rendu publié dans `public/promo/` et proposé
+  sur la page de résultats. Muette (pas de source musicale connectée). Higgsfield : le connecteur ne génère pas de médias.
+- Vercel : le projet existant `sys-bcc-26` (relié au dépôt) est la production ; `NEXT_PUBLIC_SITE_URL` y est défini.
+  Les projets `sys-bcc` et `sys-bcc-2026` (créés par l'utilisateur, preset « Other », vides) n'ont pas été touchés.
+- 234 tests verts ; lint, typecheck et build OK.
+
+### À faire côté propriétaire (bloquant pour la collecte)
+1. Créer le projet Supabase, exécuter la migration, créer le compte admin + `insert into public.admins` (voir README).
+2. Ajouter `NEXT_PUBLIC_SUPABASE_URL` et `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` sur Vercel (`sys-bcc-26`) et dans les
+   variables GitHub Actions, puis redéployer.
+
 ### Pistes pour la suite
 - Remplacer les placeholders de captures du README par de vraies captures.
 - Enrichir les banques (objectif : 100+ questions par filière) et ajouter des cas (2 par session de travail).
 - Mettre à jour `bccFacts.ts` après chaque CPM (taux directeur) en conservant source + date ; ajuster `VERIFIE_LE`.
-- Option : export PDF de la correction ; mode « examen long » (60 questions) ; statistiques anonymes via `ref`.
+- Option : export PDF de la correction ; mode « examen long » (60 questions) ; e-mails de suivi (Resend) aux inscrits
+  ayant coché le consentement ; domaine personnalisé ; fond musical de la vidéo via `/media-use` (connexion HeyGen).
+- Les écrans intérieurs (examen, cas, résultats) gardent le style v1 : les aligner sur la nouvelle direction de l'accueil.
 - Lighthouse non mesuré en CI : à lancer manuellement sur le déploiement (cible ≥ 95).

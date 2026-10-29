@@ -43,3 +43,7 @@ next-env.d.ts
 
 # outils locaux
 .claude/
+
+# vidéo HyperFrames : artefacts et rendus locaux
+video/.hyperframes/
+video/renders/

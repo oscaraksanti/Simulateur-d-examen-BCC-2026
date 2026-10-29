@@ -1,0 +1,143 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: #f8f9fb;
+      color: #0b1220;
+      font-family: Inter, sans-serif;
+      overflow: hidden;
+    }
+    #s3-titre {
+      position: absolute;
+      left: 54px;
+      right: 54px;
+      top: 196px;
+      font-size: 66px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+    }
+    .s3-mot {
+      display: inline-block;
+      margin-right: 0.22em;
+    }
+    .s3-accent {
+      color: #0062cc;
+    }
+    #s3-panneau {
+      position: absolute;
+      left: 54px;
+      top: 320px;
+      width: 972px;
+      padding: 44px;
+      background: #ffffff;
+      border: 2px solid #e6e8ed;
+      border-radius: 34px;
+      box-shadow: 0 24px 64px rgba(11, 18, 32, 0.1);
+    }
+    #s3-verdict {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      font-size: 38px;
+      font-weight: 700;
+      color: #047857;
+      letter-spacing: -0.02em;
+    }
+    #s3-verdict span.s3-pastille {
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      background: #0e9f6e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #s3-verdict svg {
+      width: 32px;
+      height: 32px;
+    }
+    #s3-explication {
+      margin-top: 22px;
+      font-size: 36px;
+      line-height: 1.4;
+      color: #1d2638;
+    }
+    #s3-pourquoi {
+      margin-top: 30px;
+      font-size: 30px;
+      font-weight: 700;
+      color: #5d6577;
+    }
+    .s3-ligne {
+      display: flex;
+      gap: 18px;
+      margin-top: 20px;
+      font-size: 33px;
+      line-height: 1.38;
+      color: #3c4557;
+    }
+    .s3-lettre {
+      flex: none;
+      width: 50px;
+      height: 50px;
+      border-radius: 13px;
+      border: 2px solid #e6e8ed;
+      font-family: "JetBrains Mono", monospace;
+      font-weight: 700;
+      font-size: 28px;
+      color: #5d6577;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #s3-retenir {
+      margin-top: 28px;
+      padding: 22px 26px;
+      border-radius: 22px;
+      background: #fff8d6;
+      border: 2px solid rgba(247, 198, 0, 0.55);
+      font-size: 34px;
+      line-height: 1.4;
+    }
+    code {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.92em;
+      font-weight: 700;
+    }
+  </style>
+  <div data-hf-id="hf-vizh" id="root" data-composition-id="s3" data-width="1080" data-height="1920">
+    <h2 data-hf-id="hf-ofat" id="s3-titre">
+      <span data-hf-id="hf-2y4r" class="s3-mot">Chaque</span><span data-hf-id="hf-p0n1" class="s3-mot">erreur</span><span data-hf-id="hf-ip8v" class="s3-mot s3-accent">expliquée.</span>
+    </h2>
+    <div data-hf-id="hf-ocdw" id="s3-panneau">
+      <p data-hf-id="hf-jxq6" id="s3-verdict">
+        <span data-hf-id="hf-cgqy" class="s3-pastille"><svg data-hf-id="hf-4zvk" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path data-hf-id="hf-s5bw" d="M5 12.5l4.5 4.5L19 7.5" /></svg></span>
+        Bonne réponse : B
+      </p>
+      <p data-hf-id="hf-1zc8" id="s3-explication">
+        Un filtre sur un agrégat se fait avec <code data-hf-id="hf-2hgl">HAVING</code> après <code data-hf-id="hf-x60c">GROUP BY</code>. <code data-hf-id="hf-6lx3">WHERE</code> ne peut pas contenir <code data-hf-id="hf-njpw">SUM()</code>.
+      </p>
+      <p data-hf-id="hf-oksy" id="s3-pourquoi">Pourquoi les autres réponses sont fausses</p>
+      <div data-hf-id="hf-ib4c" class="s3-ligne" id="s3-a"><span data-hf-id="hf-fxyd" class="s3-lettre">A</span><span data-hf-id="hf-pmbd">WHERE est évalué ligne par ligne : SUM() y est interdit, la requête échoue.</span></div>
+      <div data-hf-id="hf-p8hy" class="s3-ligne" id="s3-c"><span data-hf-id="hf-gqkf" class="s3-lettre">C</span><span data-hf-id="hf-rj4m">On regroupe par montant au lieu de la banque.</span></div>
+      <div data-hf-id="hf-xwdt" class="s3-ligne" id="s3-d"><span data-hf-id="hf-hxhi" class="s3-lettre">D</span><span data-hf-id="hf-z5qn">Filtre chaque opération, pas le total par banque.</span></div>
+      <p data-hf-id="hf-zjv3" id="s3-retenir"><strong data-hf-id="hf-2l6n">À retenir :</strong> un seuil sur <code data-hf-id="hf-2jsc">SUM()</code> va toujours dans <code data-hf-id="hf-2915">HAVING</code>.</p>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#s3-panneau", { scale: 1.08, opacity: 0, filter: "blur(12px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.6, ease: "expo.out" }, 0);
+      tl.fromTo("#s3-titre .s3-mot", { color: "#c9ced8" }, { color: (i) => (i === 2 ? "#0062cc" : "#0b1220"), duration: 0.18, stagger: 0.09, ease: "power1.out" }, 0.2);
+      tl.fromTo("#s3-titre", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 0.15);
+      tl.fromTo(["#s3-explication"], { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.25, ease: "power2.out" }, 0.45);
+      tl.fromTo(["#s3-pourquoi"], { opacity: 0 }, { opacity: 1, duration: 0.2 }, 1.2);
+      tl.fromTo(["#s3-a", "#s3-c", "#s3-d"], { opacity: 0, x: -24, filter: "blur(6px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.4, stagger: 0.35, ease: "expo.out" }, 1.3);
+      tl.fromTo("#s3-retenir", { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.5, ease: "expo.out" }, 2.25);
+      // Sortie : même scène, le fond ne coupe pas (flou d'échange).
+      tl.to(["#s3-panneau", "#s3-titre"], { opacity: 0, filter: "blur(8px)", duration: 0.2, ease: "power3.in" }, 4.95);
+      window.__timelines["s3"] = tl;
+    })();
+  </script>
+</template>

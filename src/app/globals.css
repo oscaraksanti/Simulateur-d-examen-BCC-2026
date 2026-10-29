@@ -1,83 +1,95 @@
 @import 'tailwindcss';
 
+/* La variante dark: suit le thème effectif (préférence système ou choix manuel). */
+@custom-variant dark {
+  :root[data-theme='dark'] & {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) & {
+      @slot;
+    }
+  }
+}
+
 /* =========================================================================
    Design tokens — « Fintech sobre, inspiration RDC »
    Couleurs inspirées du drapeau de la RDC (bleu ciel, jaune, rouge), PAS de la charte BCC.
    ========================================================================= */
 :root {
-  --bg: #f7f9fc;
+  --bg: #f8f9fb;
   --surface: #ffffff;
-  --surface-2: #f0f4fa;
-  --ink: #0b1b33;
-  --muted: #5b6b82;
+  --surface-2: #f2f4f7;
+  --ink: #0b1220;
+  --muted: #5d6577;
   --primary: #0077e6;
-  --primary-strong: #0066c7; /* boutons et liens : contraste AA garanti */
+  --primary-strong: #0062cc; /* liens et accents texte : contraste AA garanti */
   --on-primary: #ffffff;
-  --primary-soft: #e6f1fd;
+  --primary-soft: #ebf3fe;
   --accent: #f7c600;
-  --accent-soft: #fff7d1;
-  --on-accent: #0b1b33;
+  --accent-soft: #fff8d6;
+  --on-accent: #0b1220;
   --danger: #ce1021;
-  --danger-soft: #fdecee;
+  --danger-soft: #fdeef0;
   --success: #0e9f6e;
   --success-ink: #047857;
-  --success-soft: #e7f7f1;
-  --border: #e3e8f0;
+  --success-soft: #e8f7f1;
+  --border: #e6e8ed;
   --ring: #0077e6;
-  --shadow: 0 1px 2px rgb(11 27 51 / 0.04), 0 4px 16px rgb(11 27 51 / 0.05);
-  --shadow-lg: 0 2px 4px rgb(11 27 51 / 0.04), 0 12px 40px rgb(11 27 51 / 0.08);
+  --shadow: 0 1px 2px rgb(11 18 32 / 0.04), 0 2px 8px rgb(11 18 32 / 0.04);
+  --shadow-lg: 0 1px 2px rgb(11 18 32 / 0.04), 0 8px 24px rgb(11 18 32 / 0.06), 0 24px 64px rgb(11 18 32 / 0.08);
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --bg: #07111f;
-    --surface: #0e1a2b;
-    --surface-2: #13233a;
-    --ink: #e8eef7;
-    --muted: #9aabc2;
-    --primary: #3d9bff;
-    --primary-strong: #59a9ff;
+    --bg: #090c12;
+    --surface: #10141c;
+    --surface-2: #171c26;
+    --ink: #eceff4;
+    --muted: #99a2b3;
+    --primary: #4c9dff;
+    --primary-strong: #6aaeff;
     --on-primary: #04101f;
-    --primary-soft: #11294a;
+    --primary-soft: #13233d;
     --accent: #f7c600;
-    --accent-soft: #3a3005;
-    --on-accent: #0b1b33;
+    --accent-soft: #352c06;
+    --on-accent: #0b1220;
     --danger: #ff5a67;
     --danger-soft: #3a1016;
     --success: #34d399;
     --success-ink: #34d399;
     --success-soft: #0b2e24;
-    --border: #1e2f47;
-    --ring: #59a9ff;
-    --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 4px 16px rgb(0 0 0 / 0.25);
-    --shadow-lg: 0 2px 4px rgb(0 0 0 / 0.3), 0 12px 40px rgb(0 0 0 / 0.35);
+    --border: #232a37;
+    --ring: #6aaeff;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 2px 8px rgb(0 0 0 / 0.25);
+    --shadow-lg: 0 1px 2px rgb(0 0 0 / 0.4), 0 12px 40px rgb(0 0 0 / 0.45);
     color-scheme: dark;
   }
 }
 
 :root[data-theme='dark'] {
-  --bg: #07111f;
-  --surface: #0e1a2b;
-  --surface-2: #13233a;
-  --ink: #e8eef7;
-  --muted: #9aabc2;
-  --primary: #3d9bff;
-  --primary-strong: #59a9ff;
+  --bg: #090c12;
+  --surface: #10141c;
+  --surface-2: #171c26;
+  --ink: #eceff4;
+  --muted: #99a2b3;
+  --primary: #4c9dff;
+  --primary-strong: #6aaeff;
   --on-primary: #04101f;
-  --primary-soft: #11294a;
+  --primary-soft: #13233d;
   --accent: #f7c600;
-  --accent-soft: #3a3005;
-  --on-accent: #0b1b33;
+  --accent-soft: #352c06;
+  --on-accent: #0b1220;
   --danger: #ff5a67;
   --danger-soft: #3a1016;
   --success: #34d399;
   --success-ink: #34d399;
   --success-soft: #0b2e24;
-  --border: #1e2f47;
-  --ring: #59a9ff;
-  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 4px 16px rgb(0 0 0 / 0.25);
-  --shadow-lg: 0 2px 4px rgb(0 0 0 / 0.3), 0 12px 40px rgb(0 0 0 / 0.35);
+  --border: #232a37;
+  --ring: #6aaeff;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 2px 8px rgb(0 0 0 / 0.25);
+  --shadow-lg: 0 1px 2px rgb(0 0 0 / 0.4), 0 12px 40px rgb(0 0 0 / 0.45);
   color-scheme: dark;
 }
 
@@ -118,8 +130,16 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-sans);
-  font-feature-settings: 'cv11', 'ss01';
+  font-feature-settings: 'cv11', 'ss01', 'ss03';
+  font-optical-sizing: auto;
+  text-rendering: optimizeLegibility;
   overflow-x: hidden;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
 }
 
 ::selection {
@@ -223,6 +243,31 @@ body {
 
 .anim-fade-up {
   animation: fade-up 0.6s 0.1s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.anim-marquee {
+  animation: marquee 48s linear infinite;
+}
+.anim-marquee-inverse {
+  animation: marquee 56s linear infinite reverse;
+}
+
+/* Grille de fond très légère (hero) */
+.fond-grille {
+  background-image:
+    linear-gradient(to right, var(--border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 30%, transparent 75%);
 }
 
 .anim-pulse-ring {

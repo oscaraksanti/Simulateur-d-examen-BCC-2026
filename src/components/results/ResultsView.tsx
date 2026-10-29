@@ -2,7 +2,8 @@
 
 import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeftRight, BarChart3, BookOpenCheck, Radar, RotateCcw, Share2, Target, TrendingUp } from 'lucide-react';
+import { ArrowLeftRight, BarChart3, BookOpenCheck, MessageSquareHeart, Radar, RotateCcw, Share2, Target, TrendingUp } from 'lucide-react';
+import { AvisForm } from '@/components/feedback/AvisForm';
 import { OBJECTIF_SIMULATIONS, useExam } from '@/context/ExamContext';
 import { useGarde } from '@/context/useGarde';
 import { questionParId } from '@/data/quizData';
@@ -157,6 +158,16 @@ export function ResultsView() {
           <Titre icone={Share2}>Partager mon résultat</Titre>
           <div className="mt-5">
             <ShareButtons prenom={prenom} note={r.noteSur20} filiere={r.filiere} mention={m} />
+          </div>
+        </Card>
+      </Reveal>
+
+      <Reveal>
+        <Card padding="lg">
+          <Titre icone={MessageSquareHeart}>Ton avis sur le simulateur</Titre>
+          <p className="mt-1 text-sm text-muted">30 secondes pour nous dire ce qui t&apos;aiderait le plus. Chaque retour est lu.</p>
+          <div className="mt-5">
+            <AvisForm contexte="resultats" compact />
           </div>
         </Card>
       </Reveal>

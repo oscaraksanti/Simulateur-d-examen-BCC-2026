@@ -25,7 +25,7 @@ export function PolicyRateTimeline() {
   d += ` H${finAxe}`;
 
   return (
-    <figure className="w-full">
+    <figure className="@container w-full">
       <svg viewBox={`0 0 ${L} ${H}`} className="h-auto w-full" role="img" aria-labelledby="ptr-titre ptr-desc">
         <title id="ptr-titre">Taux directeur de la BCC en 2026</title>
         <desc id="ptr-desc">
@@ -66,9 +66,9 @@ export function PolicyRateTimeline() {
           </g>
         ))}
       </svg>
-      <figcaption className="mt-3 grid gap-2 text-sm sm:grid-cols-3">
+      <figcaption className="mt-3 grid gap-2 text-sm @xl:grid-cols-3">
         {points.slice(1).map((p) => (
-          <div key={p.date} className="rounded-xl border border-border bg-surface-2 px-3 py-2">
+          <div key={p.date} className="flex items-baseline justify-between gap-3 rounded-xl border border-border bg-surface-2 px-3 py-2 @xl:block">
             <p className="font-semibold text-ink">{p.libelle}</p>
             <p className="text-muted">
               <span className="font-mono text-ink">{pct(p.taux)}</span> · {p.commentaire}

@@ -68,10 +68,16 @@ export interface CasPratique {
 }
 
 export interface Candidat {
+  /** UUID généré sur l'appareil : identifiant du candidat côté base de données. */
+  id: string;
   nom: string;
   email: string;
   filiere: Filiere;
   creeLe: string;
+  /** Numéro WhatsApp facultatif (format international). */
+  whatsapp?: string;
+  /** Accepte d'être recontacté (conseils, nouvelles sessions). */
+  consentementContact?: boolean;
 }
 
 export interface ScoreDetail {

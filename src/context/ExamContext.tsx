@@ -6,6 +6,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, type ReactNode } from 'react';
 import { CLES, ecrire, lire, supprimer, toutEffacer } from '@/lib/storage';
+import { nouvelId, synchroniserCandidat, synchroniserTentative, viderFile } from '@/lib/remote';
 import type {
   Candidat,
   Filiere,
@@ -244,14 +245,19 @@ export function ExamProvider({ children }: { children: ReactNode }) {
   // Hydratation depuis localStorage (après montage : rendu statique identique côté serveur).
   useEffect(() => {
     const persiste = lire<EtatPersiste>(CLES.etat, { examen: null, cas: null, resultat: null }, estEtatPersiste);
+    const stocke = lire<Candidat | null>(CLES.candidat, null, (v): v is Candidat | null => v === null || estCandidat(v));
+    // Les profils créés avant la v1.1 n'ont pas d'identifiant : on en attribue un.
+    const candidat = stocke && !stocke.id ? { ...stocke, id: nouvelId() } : stocke;
     dispatch({
       type: 'HYDRATER',
       etat: {
-        candidat: lire<Candidat | null>(CLES.candidat, null, (v): v is Candidat | null => v === null || estCandidat(v)),
+        candidat,
         historique: lire<Tentative[]>(CLES.historique, [], estHistorique),
         ...persiste,
       },
     });
+    // Renvoie les données restées en attente (réseau coupé lors d'une visite précédente).
+    void viderFile();
   }, []);
 
   // Persistance à chaque changement.
@@ -263,7 +269,11 @@ export function ExamProvider({ children }: { children: ReactNode }) {
     ecrire(CLES.historique, etat.historique);
   }, [etat]);
 
-  const inscrire = useCallback((candidat: Candidat) => dispatch({ type: 'INSCRIRE', candidat }), []);
+  const inscrire = useCallback((candidat: Candidat) => {
+    const ref = lire<{ ref?: string } | null>(CLES.ref, null);
+    synchroniserCandidat(candidat, typeof ref?.ref === 'string' ? ref.ref : null);
+    dispatch({ type: 'INSCRIRE', candidat });
+  }, []);
   const demarrerExamen = useCallback((graine: string, questionIds: string[]) => {
     memoriserVus(CLES.questionsVues, questionIds);
     dispatch({ type: 'DEMARRER_EXAMEN', graine, questionIds, maintenant: Date.now() });
@@ -293,7 +303,8 @@ export function ExamProvider({ children }: { children: ReactNode }) {
     (resultat: ResultatExamen) => {
       const filiere = etat.examen?.filiere ?? etat.candidat?.filiere ?? 'data';
       const date = new Date().toISOString();
-      const tentativeId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+      const tentativeId = nouvelId();
+      if (etat.candidat) synchroniserTentative(tentativeId, etat.candidat.id, filiere, resultat);
       dispatch({
         type: 'TERMINER_CAS',
         maintenant: Date.now(),
@@ -312,10 +323,16 @@ export function ExamProvider({ children }: { children: ReactNode }) {
         },
       });
     },
-    [etat.examen?.filiere, etat.candidat?.filiere],
+    [etat.examen?.filiere, etat.candidat],
   );
   const nouvelleTentative = useCallback(() => dispatch({ type: 'NOUVELLE_TENTATIVE' }), []);
-  const changerFiliere = useCallback((filiere: Filiere) => dispatch({ type: 'CHANGER_FILIERE', filiere }), []);
+  const changerFiliere = useCallback(
+    (filiere: Filiere) => {
+      if (etat.candidat) synchroniserCandidat({ ...etat.candidat, filiere }, null);
+      dispatch({ type: 'CHANGER_FILIERE', filiere });
+    },
+    [etat.candidat],
+  );
   const reinitialiser = useCallback(() => {
     toutEffacer();
     dispatch({ type: 'REINITIALISER' });

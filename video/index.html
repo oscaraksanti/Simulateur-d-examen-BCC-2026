@@ -1,0 +1,115 @@
+<!doctype html>
+<html
+  lang="fr"
+  data-resolution="portrait"
+  data-composition-variables='[{"id":"site","type":"string","label":"Adresse du site","default":"sys-bcc-26.vercel.app","maxLength":48}]'
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --ground: #f8f9fb;
+        --ink: #0b1220;
+        --font-display: Inter, sans-serif;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: var(--ground);
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        font-family: var(--font-display);
+      }
+      #fond {
+        position: absolute;
+        inset: 0;
+        background: var(--ground);
+      }
+    </style>
+  </head>
+  <body>
+    <div data-hf-id="hf-4mls"
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="25.5"
+      data-width="1080"
+      data-height="1920"
+    >
+      <div data-hf-id="hf-motu" id="fond"></div>
+      <div data-hf-id="hf-efrz"
+        id="s1"
+        data-composition-id="s1"
+        data-composition-src="compositions/s1-accroche.html"
+        data-start="0"
+        data-duration="3.6"
+        data-track-index="1"
+        data-track-kind="graphics"
+        data-width="1080"
+        data-height="1920"
+      ></div>
+      <div data-hf-id="hf-sz5k"
+        id="s2"
+        data-composition-id="s2"
+        data-composition-src="compositions/s2-examen.html"
+        data-start="3.6"
+        data-duration="6"
+        data-track-index="1"
+        data-track-kind="graphics"
+        data-width="1080"
+        data-height="1920"
+      ></div>
+      <div data-hf-id="hf-6mq6"
+        id="s3"
+        data-composition-id="s3"
+        data-composition-src="compositions/s3-explication.html"
+        data-start="9.6"
+        data-duration="5.2"
+        data-track-index="1"
+        data-track-kind="graphics"
+        data-width="1080"
+        data-height="1920"
+      ></div>
+      <div data-hf-id="hf-dfyh"
+        id="s4"
+        data-composition-id="s4"
+        data-composition-src="compositions/s4-note.html"
+        data-start="14.8"
+        data-duration="5.4"
+        data-track-index="1"
+        data-track-kind="graphics"
+        data-width="1080"
+        data-height="1920"
+      ></div>
+      <div data-hf-id="hf-bf9q"
+        id="s5"
+        data-composition-id="s5"
+        data-composition-src="compositions/s5-fin.html"
+        data-start="20.2"
+        data-duration="5.3"
+        data-track-index="1"
+        data-track-kind="graphics"
+        data-width="1080"
+        data-height="1920"
+        data-variable-values='{"site":"sys-bcc-26.vercel.app"}'
+      ></div>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>

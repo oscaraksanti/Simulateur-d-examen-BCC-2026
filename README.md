@@ -16,6 +16,8 @@ sourcée, mode entraînement et fiches de révision.
 - [Captures](#captures)
 - [Installation](#installation)
 - [Ajouter des questions](#ajouter-des-questions)
+- [Collecte des données avec Supabase](#collecte-des-données-avec-supabase)
+- [Vidéo promo (HyperFrames)](#vidéo-promo-hyperframes)
 - [Déploiement sur Vercel (3 étapes)](#déploiement-sur-vercel-3-étapes)
 - [Déploiement sur GitHub Pages](#déploiement-sur-github-pages)
 - [Architecture](#architecture)
@@ -32,7 +34,11 @@ sourcée, mode entraînement et fiches de révision.
 | **4. Résultats** (`/resultats`) | Note /20 animée + mention, barres par section, radar des compétences (SVG maison), courbe de progression, correction détaillée (pourquoi la bonne réponse, pourquoi pas les autres), ressources d'Oscar Aksanti, partage viral et carte de score téléchargeable (1080×1350). |
 | **Entraînement** (`/entrainement`) | Séries ciblées par filière, section et compétence, correction immédiate. Lien direct depuis les « priorités de révision ». |
 | **Fiches** (`/fiches`) | Mémo culture BCC sourcé, formules data, repères cyber, méthode pour le jour J, alerte anti-arnaque. |
+| **Avis** (`/avis`) | Note de satisfaction, fonctionnalités souhaitées, message libre (aussi en fin de résultats). |
+| **Confidentialité** (`/confidentialite`) | Données collectées, finalités, droits des candidats. |
+| **Administration** (`/admin`, privé) | Inscrits, simulations, notes, compétences faibles, souhaits, avis, export CSV, suppression sur demande. |
 
+- **Production** : [sys-bcc-26.vercel.app](https://sys-bcc-26.vercel.app) (Vercel) et GitHub Pages.
 - **Banques** : 185 questions (60 Data, 60 Cyber, 25 culture BCC, 40 logique) et 8 cas pratiques (4 par filière).
 - **Tirage intelligent** : chaque simulation privilégie les questions et cas jamais vus, et alterne les compétences.
 - **Objectif 5 simulations** : suivi de progression et historique local (courbe des notes).
@@ -102,7 +108,51 @@ cohérence des cas pratiques (`pointsMax`, permutations d'ordre). Lance `npm tes
 
 Les cas pratiques sont dans [`src/data/casesData.ts`](src/data/casesData.ts) (scénarios fictifs, 10 à 20 points chacun).
 
+## Collecte des données avec Supabase
+
+Sans configuration, tout reste dans le navigateur. Avec Supabase, le simulateur enregistre les **inscriptions**
+(nom, e-mail, WhatsApp facultatif, filière, consentements), les **résultats** de chaque simulation et les **avis**,
+et tu les consultes dans un **tableau de bord privé** (`/admin`).
+
+Sécurité : RLS activée sur toutes les tables, aucun accès direct pour le public (écritures uniquement via des fonctions
+SQL validées), lecture réservée aux comptes listés dans `public.admins`. Les envois passent par une file d'attente
+locale et sont retentés si le réseau coupe.
+
+1. Crée un projet sur [supabase.com](https://supabase.com) (région la plus proche de tes utilisateurs, ex. Europe).
+2. **SQL Editor** → colle et exécute [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql).
+3. **Authentication → Users → Add user** : crée ton compte administrateur (e-mail + mot de passe).
+   Puis, dans le SQL Editor :
+   ```sql
+   insert into public.admins (user_id)
+   select id from auth.users where email = 'ton-email@exemple.com';
+   ```
+4. **Authentication → Providers → Email** : désactive « Allow new users to sign up » (seul l'admin a un compte).
+5. **Project Settings → API** : copie `Project URL` et la `Publishable key` (ou l'ancienne `anon key`), puis ajoute-les :
+   - Vercel : `NEXT_PUBLIC_SUPABASE_URL` et `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (Settings → Environment Variables), puis redéploie ;
+   - GitHub Pages : mêmes noms dans Settings → Secrets and variables → Actions → **Variables**.
+6. Ouvre `/admin` et connecte-toi.
+
+Ces deux valeurs sont publiques par nature (elles sont lisibles dans le navigateur) : la protection repose sur la RLS.
+Ne mets **jamais** la clé `service_role` / `secret` dans le front.
+
+## Vidéo promo (HyperFrames)
+
+Le dossier [`video/`](video/) contient une vidéo verticale de 25 s (1080×1920) composée en HTML avec
+[HyperFrames](https://hyperframes.heygen.com) : accroche, vraie question du simulateur, explication, note, appel à l'action.
+Le rendu est publié dans `public/promo/` et proposé au téléchargement sur la page de résultats (statut WhatsApp).
+
+```bash
+cd video
+npx hyperframes preview      # éditer dans le Studio
+npx hyperframes render --quality delivery -o renders/simulateur-bcc-promo-9x16.mp4
+```
+
+L'adresse affichée en fin de vidéo est la variable `site` de `video/index.html`.
+
 ## Déploiement sur Vercel (3 étapes)
+
+Le projet Vercel `sys-bcc-26` est déjà relié à ce dépôt : chaque push sur `main` redéploie
+[sys-bcc-26.vercel.app](https://sys-bcc-26.vercel.app). Pour une nouvelle installation :
 
 1. Importe le dépôt sur [vercel.com/new](https://vercel.com/new) (framework détecté : Next.js).
 2. Ajoute la variable d'environnement `NEXT_PUBLIC_SITE_URL` (ex. `https://simulateur-bcc.vercel.app`). Laisse
@@ -129,16 +179,19 @@ Le workflow [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-page
 
 ```
 src/
-├── app/            # Routes (App Router) : /, /examen, /cas-pratiques, /resultats, /entrainement, /fiches
-├── components/     # layout, ui, onboarding, exam, cases, results, training, illustrations (SVG maison)
+├── app/            # Routes : /, /examen, /cas-pratiques, /resultats, /entrainement, /fiches, /avis, /confidentialite, /admin
+├── components/     # layout, ui, landing, onboarding, exam, cases, results, training, feedback, admin, illustrations
 ├── context/        # ExamContext (useReducer + localStorage) et garde de navigation
 ├── data/           # quizData, casesData, bccFacts (source unique de vérité), resources
-├── lib/            # scoring, sampling (tirage seedé), share, storage, types
+├── lib/            # scoring, sampling (tirage seedé), share, storage, remote (Supabase), types
 └── __tests__/      # Vitest
-scripts/generate-og.ts  # og-image.png 1200×630 (satori + resvg, police locale)
+scripts/generate-og.ts    # og-image.png 1200×630 (satori + resvg, police locale)
+supabase/migrations/      # schéma, RLS, fonctions (testé sur Postgres 16)
+video/                    # vidéo promo HyperFrames (SPEC.md, REVIEW.md, compositions/)
 ```
 
-Aucun backend : tout le contenu est statique et les données du candidat restent dans `localStorage`.
+Site 100 % statique. Les données du candidat sont gardées dans `localStorage` et, si Supabase est configuré,
+synchronisées via `src/lib/remote.ts` (file d'attente hors ligne, fonctions SQL validées).
 
 ## Contribuer
 

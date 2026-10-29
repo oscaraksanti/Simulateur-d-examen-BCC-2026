@@ -16,6 +16,7 @@ interface ShareButtonsProps {
 }
 
 const ECHELLE = 0.26;
+const BASE_PATH = (process.env.NEXT_PUBLIC_BASE_PATH ?? '').replace(/\/+$/, '');
 
 async function copier(texte: string): Promise<boolean> {
   try {
@@ -122,6 +123,29 @@ export function ShareButtons({ prenom, note, filiere, mention }: ShareButtonsPro
           >
             Copier le message
           </Button>
+        </div>
+        <div className="flex items-center gap-4 rounded-2xl border border-border bg-surface-2/60 p-3">
+          <video
+            src={`${BASE_PATH}/promo/simulateur-bcc-promo-9x16.mp4`}
+            poster={`${BASE_PATH}/promo/affiche.jpg`}
+            preload="none"
+            controls
+            muted
+            playsInline
+            className="h-32 w-[72px] shrink-0 rounded-lg bg-surface object-cover"
+            aria-label="Vidéo de présentation du simulateur (25 secondes, sans son)"
+          />
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-ink">La vidéo de 25 s pour ton statut</p>
+            <p className="mt-0.5 text-[13px] text-muted">Format vertical, prête pour WhatsApp, TikTok ou Instagram.</p>
+            <a
+              href={`${BASE_PATH}/promo/simulateur-bcc-promo-9x16.mp4`}
+              download="simulateur-bcc.mp4"
+              className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-strong hover:underline"
+            >
+              <Download aria-hidden className="size-4" /> Télécharger la vidéo
+            </a>
+          </div>
         </div>
         <div className="flex flex-wrap items-center gap-2 text-sm">
           <span className="text-muted">Aussi sur :</span>

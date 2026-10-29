@@ -9,7 +9,7 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { urlSite } from '@/lib/share';
 
-const inter = Inter({ variable: '--font-inter', subsets: ['latin'], display: 'swap' });
+const inter = Inter({ variable: '--font-inter', subsets: ['latin'], display: 'swap', axes: ['opsz'] });
 const jetbrains = JetBrains_Mono({ variable: '--font-jetbrains', subsets: ['latin'], display: 'swap' });
 
 const SITE = urlSite();

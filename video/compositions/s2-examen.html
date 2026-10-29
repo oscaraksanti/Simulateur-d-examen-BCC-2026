@@ -1,0 +1,227 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: #f8f9fb;
+      color: #0b1220;
+      font-family: Inter, sans-serif;
+      overflow: hidden;
+    }
+    #s2-titre {
+      position: absolute;
+      left: 54px;
+      right: 54px;
+      top: 196px;
+      font-size: 66px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+    }
+    .s2-mot {
+      display: inline-block;
+      margin-right: 0.22em;
+    }
+    .s2-accent {
+      color: #0062cc;
+    }
+    #s2-camera {
+      position: absolute;
+      inset: 0;
+    }
+    #s2-carte {
+      position: absolute;
+      left: 54px;
+      top: 320px;
+      width: 972px;
+      padding: 44px;
+      background: #ffffff;
+      border: 2px solid #e6e8ed;
+      border-radius: 34px;
+      box-shadow: 0 24px 64px rgba(11, 18, 32, 0.1);
+    }
+    #s2-entete {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 28px;
+      color: #5d6577;
+    }
+    #s2-chrono {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 20px;
+      border: 2px solid #e6e8ed;
+      border-radius: 16px;
+      color: #0b1220;
+      font-weight: 700;
+      font-size: 32px;
+    }
+    #s2-chrono svg {
+      width: 30px;
+      height: 30px;
+    }
+    #s2-barre {
+      margin-top: 22px;
+      height: 10px;
+      border-radius: 10px;
+      background: #f2f4f7;
+      overflow: hidden;
+    }
+    #s2-barre-plein {
+      width: 29%;
+      height: 100%;
+      background: #0077e6;
+      border-radius: 10px;
+    }
+    #s2-question {
+      margin-top: 30px;
+      font-size: 38px;
+      line-height: 1.28;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    #s2-question code {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 30px;
+      font-weight: 700;
+      color: #0062cc;
+      background: #f2f4f7;
+      border-radius: 10px;
+      padding: 2px 10px;
+    }
+    #s2-options {
+      margin-top: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .s2-option {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 20px 22px;
+      border: 2px solid #e6e8ed;
+      border-radius: 22px;
+      background: #ffffff;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 28px;
+      line-height: 1.36;
+    }
+    .s2-lettre {
+      position: relative;
+      flex: none;
+      width: 50px;
+      height: 50px;
+      border-radius: 14px;
+      background: #f2f4f7;
+      color: #5d6577;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #s2-coche {
+      position: absolute;
+      inset: 0;
+      border-radius: 14px;
+      background: #0e9f6e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+    }
+    #s2-coche svg {
+      width: 30px;
+      height: 30px;
+    }
+    #s2-opt-b-fond {
+      position: absolute;
+      inset: -2px;
+      border-radius: 22px;
+      border: 3px solid #0e9f6e;
+      background: #e8f7f1;
+      opacity: 0;
+    }
+    .s2-texte {
+      position: relative;
+      word-break: break-word;
+    }
+    #s2-curseur {
+      position: absolute;
+      right: 150px;
+      top: 50%;
+      width: 64px;
+      height: 64px;
+      margin-top: -10px;
+      filter: drop-shadow(0 6px 10px rgba(11, 18, 32, 0.25));
+    }
+  </style>
+  <div data-hf-id="hf-bmd6" id="root" data-composition-id="s2" data-width="1080" data-height="1920">
+    <h2 data-hf-id="hf-5lao" id="s2-titre">
+      <span data-hf-id="hf-t9nr" class="s2-mot">24</span><span data-hf-id="hf-rcv4" class="s2-mot">questions.</span><span data-hf-id="hf-db6w" class="s2-mot s2-accent">30</span><span data-hf-id="hf-zh62" class="s2-mot s2-accent">minutes.</span>
+    </h2>
+    <div data-hf-id="hf-8yoi" id="s2-camera">
+      <div data-hf-id="hf-3gru" id="s2-carte">
+        <div data-hf-id="hf-fvcu" id="s2-entete">
+          <span data-hf-id="hf-xrks">Question 7 / 24 · SQL</span>
+          <span data-hf-id="hf-ncsz" id="s2-chrono">
+            <svg data-hf-id="hf-ql45" viewBox="0 0 24 24" fill="none" stroke="#5d6577" stroke-width="2" stroke-linecap="round"><circle data-hf-id="hf-1iwn" cx="12" cy="12" r="9" /><path data-hf-id="hf-zcgb" d="M12 7v5l3 2" /></svg>
+            <span data-hf-id="hf-e2vr" id="s2-chrono-t">18:42</span>
+          </span>
+        </div>
+        <div data-hf-id="hf-zdzx" id="s2-barre"><div data-hf-id="hf-qagy" id="s2-barre-plein"></div></div>
+        <p data-hf-id="hf-8kxe" id="s2-question">
+          La table <code data-hf-id="hf-460a">paiements</code> contient les ordres du jour. Quelle requête renvoie les banques dont le volume total dépasse 5 milliards de CDF ?
+        </p>
+        <div data-hf-id="hf-1zu7" id="s2-options">
+          <div data-hf-id="hf-h2ns" class="s2-option" id="s2-opt-a"><span data-hf-id="hf-6110" class="s2-lettre">A</span><span data-hf-id="hf-5sjv" class="s2-texte">SELECT banque_emettrice FROM paiements WHERE SUM(montant_cdf) &gt; 5e9</span></div>
+          <div data-hf-id="hf-bj8e" class="s2-option" id="s2-opt-b" data-layout-allow-overflow>
+            <div data-hf-id="hf-c2nr" id="s2-opt-b-fond"></div>
+            <span data-hf-id="hf-4u3x" class="s2-lettre">B<span data-hf-id="hf-rbje" id="s2-coche"><svg data-hf-id="hf-4zvk" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path data-hf-id="hf-s5bw" d="M5 12.5l4.5 4.5L19 7.5" /></svg></span></span>
+            <span data-hf-id="hf-suzx" class="s2-texte">SELECT banque_emettrice, SUM(montant_cdf) FROM paiements GROUP BY banque_emettrice HAVING SUM(montant_cdf) &gt; 5e9</span>
+            <svg data-hf-id="hf-qjkn" id="s2-curseur" viewBox="0 0 32 32" data-layout-ignore>
+              <path data-hf-id="hf-db6j" d="M6 3l19 12.2-8.3 1.7 4.6 9.3-3.6 1.8-4.6-9.4L6 24.5z" fill="#0b1220" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" />
+            </svg>
+          </div>
+          <div data-hf-id="hf-lsfm" class="s2-option" id="s2-opt-c"><span data-hf-id="hf-58ey" class="s2-lettre">C</span><span data-hf-id="hf-a92m" class="s2-texte">SELECT banque_emettrice FROM paiements GROUP BY montant_cdf HAVING montant_cdf &gt; 5e9</span></div>
+          <div data-hf-id="hf-30px" class="s2-option" id="s2-opt-d"><span data-hf-id="hf-77y3" class="s2-lettre">D</span><span data-hf-id="hf-z9z7" class="s2-texte">SELECT DISTINCT banque_emettrice FROM paiements WHERE montant_cdf &gt; 5e9</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      // Arrivée : la carte entre légèrement grande et se pose (suite du chrono qui a envahi le cadre).
+      tl.fromTo("#s2-carte", { scale: 1.06, opacity: 0, filter: "blur(10px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.7, ease: "expo.out" }, 0);
+      tl.fromTo("#s2-titre .s2-mot", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.13, stagger: 0.07, ease: "power2.out" }, 0.3);
+      tl.fromTo(".s2-option", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.25, stagger: 0.06, ease: "power2.out" }, 0.45);
+      // Le chrono tourne pendant toute la scène.
+      const compte = { s: 1122 };
+      tl.to(compte, {
+        s: 1116,
+        duration: 6,
+        ease: "none",
+        onUpdate: () => {
+          const s = Math.round(compte.s);
+          document.querySelector("#s2-chrono-t").textContent = String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
+        },
+      }, 0);
+      // Le curseur entre par le bas à droite et vient sur la réponse B.
+      tl.fromTo("#s2-curseur", { x: 420, y: 760, opacity: 1 }, { x: 0, y: 0, duration: 1.2, ease: "power3.out" }, 1.6);
+      // Clic à 3,0 s : la réponse passe au vert à la même image.
+      tl.to("#s2-curseur", { scale: 0.82, duration: 0.08, ease: "power2.in" }, 3.0);
+      tl.to("#s2-curseur", { scale: 1, duration: 0.16, ease: "power2.out" }, 3.08);
+      tl.set(["#s2-opt-b-fond", "#s2-coche"], { opacity: 1 }, 3.0);
+      tl.to(["#s2-opt-a", "#s2-opt-c", "#s2-opt-d"], { opacity: 0.35, duration: 0.3, ease: "power2.out" }, 3.4);
+      tl.to("#s2-curseur", { x: 300, y: 500, opacity: 0, duration: 0.4, ease: "power3.in" }, 4.3);
+      // Zoom à travers la bonne réponse vers son explication.
+      tl.to("#s2-titre", { opacity: 0, filter: "blur(8px)", duration: 0.18, ease: "power3.in" }, 5.4);
+      tl.to("#s2-camera", { scale: 1.7, filter: "blur(14px)", opacity: 0, duration: 0.55, ease: "power3.in", transformOrigin: "50% 62%" }, 5.42);
+      window.__timelines["s2"] = tl;
+    })();
+  </script>
+</template>

@@ -11,6 +11,8 @@ export const CLES = {
   casVus: 'cas-vus',
   ref: 'ref',
   theme: 'theme',
+  fileAttente: 'file-attente-v1',
+  avisEnvoye: 'avis-envoye',
 } as const;
 
 export type CleStockage = (typeof CLES)[keyof typeof CLES];

@@ -1,56 +1,78 @@
 import Link from 'next/link';
-import { MessageCircle, PlayCircle } from 'lucide-react';
 import { OSCAR } from '@/data/resources';
 import { LogoMark } from './Logo';
 
+const colonnes = [
+  {
+    titre: 'Se préparer',
+    liens: [
+      { href: '/examen/', libelle: 'Examen blanc' },
+      { href: '/entrainement/', libelle: 'Entraînement' },
+      { href: '/fiches/', libelle: 'Fiches de révision' },
+    ],
+  },
+  {
+    titre: 'Le projet',
+    liens: [
+      { href: '/avis/', libelle: 'Donner mon avis' },
+      { href: '/confidentialite/', libelle: 'Confidentialité' },
+      { href: 'https://github.com/oscaraksanti/Simulateur-d-examen-BCC-2026', libelle: 'Code source', externe: true },
+    ],
+  },
+  {
+    titre: OSCAR.nom,
+    liens: [
+      { href: OSCAR.youtube, libelle: 'YouTube', externe: true },
+      { href: `https://wa.me/${OSCAR.whatsappNumero}`, libelle: 'WhatsApp', externe: true },
+    ],
+  },
+];
+
 export function Footer() {
   return (
-    <footer className="mt-16 border-t border-border bg-surface">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr]">
+    <footer className="border-t border-border bg-surface">
+      <div className="mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
         <div>
-          <div className="flex items-center gap-2.5">
+          <Link href="/" className="inline-flex items-center gap-2.5">
             <LogoMark className="size-7" />
-            <span className="font-bold text-ink">Simulateur BCC</span>
+            <span className="font-semibold tracking-[-0.02em] text-ink">Simulateur BCC</span>
+          </Link>
+          <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted">
+            L&apos;examen blanc gratuit pour préparer le recrutement en Data Analyse et Cybersécurité. Conçu par {OSCAR.nom}, {OSCAR.marque}.
+          </p>
+        </div>
+        {colonnes.map((c) => (
+          <div key={c.titre}>
+            <h2 className="text-[13px] font-medium text-ink">{c.titre}</h2>
+            <ul className="mt-4 space-y-3 text-sm">
+              {c.liens.map((l) => (
+                <li key={l.href}>
+                  {'externe' in l && l.externe ? (
+                    <a href={l.href} target="_blank" rel="noopener noreferrer" className="text-muted transition-colors hover:text-ink">
+                      {l.libelle}
+                    </a>
+                  ) : (
+                    <Link href={l.href} className="text-muted transition-colors hover:text-ink">
+                      {l.libelle}
+                    </Link>
+                  )}
+                </li>
+              ))}
+            </ul>
           </div>
-          <p className="mt-3 max-w-md text-sm leading-relaxed text-muted">
-            Outil de préparation indépendant, non affilié à la Banque Centrale du Congo. Aucune donnée n&apos;est
-            transmise à la BCC ni à un serveur : tout reste sur ton appareil. Les candidatures officielles se font
-            uniquement via{' '}
-            <a href="https://www.bcc.cd" target="_blank" rel="noopener noreferrer" className="font-medium text-primary-strong underline-offset-2 hover:underline">
+        ))}
+      </div>
+      <div className="border-t border-border">
+        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-6 text-xs leading-relaxed text-muted sm:px-6 md:flex-row md:justify-between">
+          <p>
+            Outil indépendant, non affilié à la Banque Centrale du Congo. Candidatures officielles uniquement sur{' '}
+            <a href="https://www.bcc.cd" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-ink">
               bcc.cd
             </a>
             .
           </p>
+          <p>Licence MIT · Faits BCC vérifiés au 29/10/2026</p>
         </div>
-        <div>
-          <h2 className="text-sm font-semibold text-ink">Se préparer</h2>
-          <ul className="mt-3 space-y-2 text-sm text-muted">
-            <li><Link className="hover:text-ink" href="/examen/">Examen blanc chronométré</Link></li>
-            <li><Link className="hover:text-ink" href="/entrainement/">Entraînement par compétence</Link></li>
-            <li><Link className="hover:text-ink" href="/fiches/">Fiches de révision &amp; jour J</Link></li>
-          </ul>
-        </div>
-        <div>
-          <h2 className="text-sm font-semibold text-ink">Conçu par {OSCAR.nom}</h2>
-          <p className="mt-1 text-sm text-muted">{OSCAR.marque}</p>
-          <ul className="mt-3 space-y-2 text-sm">
-            <li>
-              <a href={OSCAR.youtube} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-muted hover:text-ink">
-                <PlayCircle aria-hidden className="size-4" /> YouTube @oscaraksanti
-              </a>
-            </li>
-            <li>
-              <a href={`https://wa.me/${OSCAR.whatsappNumero}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-muted hover:text-ink">
-                <MessageCircle aria-hidden className="size-4" /> WhatsApp
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div className="border-t border-border">
-        <p className="mx-auto max-w-6xl px-4 py-4 text-xs text-muted sm:px-6">
-          Projet open source sous licence MIT · Contenu pédagogique original · Faits BCC vérifiés au 29/10/2026.
-        </p>
       </div>
     </footer>
   );
