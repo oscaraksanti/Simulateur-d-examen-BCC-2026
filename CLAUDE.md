@@ -217,7 +217,7 @@ Le timer repose sur des timestamps (`debut`) persistés : un rechargement de pag
 
 ### Session 5 — 29/10/2026 (domaine en ligne, lien magique, clé Resend)
 - CNAME ajouté par le propriétaire ; certificat TLS émis (`vercel certs issue`) : https://simulateur-bcc.datalendo.com répond.
-- `vercel.json` : redirection permanente de sys-bcc-26.vercel.app vers le sous-domaine.
+- Redirection 308 de sys-bcc-26.vercel.app vers le sous-domaine, réglée dans le domaine du projet Vercel (API `PATCH /v9/projects/sys-bcc-26/domains/sys-bcc-26.vercel.app`).
 - /admin : connexion par lien magique (plus de mot de passe), panneau « E-mails automatiques » (clé Resend → Vault, test).
 
 ### Pistes pour la suite
