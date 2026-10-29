@@ -38,7 +38,7 @@ sourcée, mode entraînement et fiches de révision.
 | **Confidentialité** (`/confidentialite`) | Données collectées, finalités, droits des candidats. |
 | **Administration** (`/admin`, privé) | Inscrits, simulations, notes, compétences faibles, souhaits, avis, export CSV, suppression sur demande. |
 
-- **Production** : [sys-bcc-26.vercel.app](https://sys-bcc-26.vercel.app) (Vercel) et GitHub Pages.
+- **Production** : [simulateur-bcc.datalendo.com](https://simulateur-bcc.datalendo.com) (Vercel) — un outil [Datalendo](https://datalendo.com).
 - **Banques** : 185 questions (60 Data, 60 Cyber, 25 culture BCC, 40 logique) et 8 cas pratiques (4 par filière).
 - **Tirage intelligent** : chaque simulation privilégie les questions et cas jamais vus, et alterne les compétences.
 - **Objectif 5 simulations** : suivi de progression et historique local (courbe des notes).
@@ -110,30 +110,39 @@ Les cas pratiques sont dans [`src/data/casesData.ts`](src/data/casesData.ts) (sc
 
 ## Collecte des données avec Supabase
 
-Sans configuration, tout reste dans le navigateur. Avec Supabase, le simulateur enregistre les **inscriptions**
-(nom, e-mail, WhatsApp facultatif, filière, consentements), les **résultats** de chaque simulation et les **avis**,
-et tu les consultes dans un **tableau de bord privé** (`/admin`).
+**En production**, le simulateur utilise le projet Supabase **`datalendo`**, dans un schéma **isolé** `simulateur_bcc`
+(aucune table Datalendo n'est touchée). Il enregistre les **inscriptions** (nom, e-mail, WhatsApp facultatif, filière,
+consentements), les **résultats** de chaque simulation et les **avis**, et envoie deux e-mails : **bienvenue** et
+**récapitulatif de résultats**. Tu consultes tout dans le **tableau de bord privé** `/admin` avec ton compte Datalendo.
 
-Sécurité : RLS activée sur toutes les tables, aucun accès direct pour le public (écritures uniquement via des fonctions
-SQL validées), lecture réservée aux comptes listés dans `public.admins`. Les envois passent par une file d'attente
-locale et sont retentés si le réseau coupe.
+Sécurité : schéma non exposé par l'API, RLS sur toutes les tables, aucun accès direct ; écritures et lectures uniquement
+via des fonctions `public.sbcc_*` validées ; lectures réservées aux comptes listés dans `simulateur_bcc.admins`.
+Les envois depuis le navigateur passent par une file d'attente locale et sont retentés si le réseau coupe.
 
-1. Crée un projet sur [supabase.com](https://supabase.com) (région la plus proche de tes utilisateurs, ex. Europe).
-2. **SQL Editor** → colle et exécute [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql).
-3. **Authentication → Users → Add user** : crée ton compte administrateur (e-mail + mot de passe).
-   Puis, dans le SQL Editor :
+### Installation (nouvel environnement)
+1. Exécute [`supabase/migrations/0001_simulateur_bcc.sql`](supabase/migrations/0001_simulateur_bcc.sql) dans le SQL Editor.
+2. Donne les droits d'administration à un compte existant :
    ```sql
-   insert into public.admins (user_id)
+   insert into simulateur_bcc.admins (user_id)
    select id from auth.users where email = 'ton-email@exemple.com';
    ```
-4. **Authentication → Providers → Email** : désactive « Allow new users to sign up » (seul l'admin a un compte).
-5. **Project Settings → API** : copie `Project URL` et la `Publishable key` (ou l'ancienne `anon key`), puis ajoute-les :
-   - Vercel : `NEXT_PUBLIC_SUPABASE_URL` et `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (Settings → Environment Variables), puis redéploie ;
-   - GitHub Pages : mêmes noms dans Settings → Secrets and variables → Actions → **Variables**.
-6. Ouvre `/admin` et connecte-toi.
+3. Variables (Vercel → Settings → Environment Variables, et GitHub → Settings → Variables pour Pages) :
+   `NEXT_PUBLIC_SUPABASE_URL` et `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (valeurs publiques par nature ; ne mets **jamais**
+   la clé `service_role` / `secret` dans le front).
 
-Ces deux valeurs sont publiques par nature (elles sont lisibles dans le navigateur) : la protection repose sur la RLS.
-Ne mets **jamais** la clé `service_role` / `secret` dans le front.
+### E-mails (Resend)
+Les e-mails partent de la base (extension `pg_net`) vers l'API Resend. La clé est lue dans le **Vault** Supabase ;
+tant qu'elle est absente, les e-mails sont seulement journalisés (« clé absente » dans `/admin`). Pour l'activer, dans
+le SQL Editor du projet `datalendo` :
+```sql
+select vault.create_secret('re_xxxxxxxx', 'sbcc_resend_api_key', 'Clé Resend du Simulateur BCC');
+```
+Expéditeur, adresse de réponse et adresse du site sont réglables sans redéploiement :
+```sql
+update simulateur_bcc.parametres set valeur = 'Simulateur BCC · Datalendo <noreply@datalendo.com>' where cle = 'expediteur';
+```
+L'expéditeur doit appartenir à un domaine vérifié dans Resend. Limites anti-abus : une bienvenue par adresse,
+5 récapitulatifs par adresse et par 24 h.
 
 ## Vidéo promo (HyperFrames)
 
@@ -152,7 +161,8 @@ L'adresse affichée en fin de vidéo est la variable `site` de `video/index.html
 ## Déploiement sur Vercel (3 étapes)
 
 Le projet Vercel `sys-bcc-26` est déjà relié à ce dépôt : chaque push sur `main` redéploie
-[sys-bcc-26.vercel.app](https://sys-bcc-26.vercel.app). Pour une nouvelle installation :
+[simulateur-bcc.datalendo.com](https://simulateur-bcc.datalendo.com) (DNS : CNAME `simulateur-bcc` chez le registrar de
+datalendo.com). Pour une nouvelle installation :
 
 1. Importe le dépôt sur [vercel.com/new](https://vercel.com/new) (framework détecté : Next.js).
 2. Ajoute la variable d'environnement `NEXT_PUBLIC_SITE_URL` (ex. `https://simulateur-bcc.vercel.app`). Laisse
@@ -186,7 +196,7 @@ src/
 ├── lib/            # scoring, sampling (tirage seedé), share, storage, remote (Supabase), types
 └── __tests__/      # Vitest
 scripts/generate-og.ts    # og-image.png 1200×630 (satori + resvg, police locale)
-supabase/migrations/      # schéma, RLS, fonctions (testé sur Postgres 16)
+supabase/migrations/      # schéma simulateur_bcc, RLS, fonctions sbcc_*, e-mails (testé sur Postgres 16)
 video/                    # vidéo promo HyperFrames (SPEC.md, REVIEW.md, compositions/)
 ```
 

@@ -7,7 +7,9 @@ Document de passation pour toute IA ou développeur qui reprend le projet. À me
 Application web **open source, 100 % statique**, en **français**, qui aide les candidats congolais à préparer les tests de
 recrutement informatique de la Banque Centrale du Congo (BCC), filières **Data Analyse** et **Cybersécurité**.
 Dépôt : https://github.com/oscaraksanti/Simulateur-d-examen-BCC-2026 — auteur : Oscar Aksanti — marque **Datalendo** (https://datalendo.com ; ne plus utiliser « formations4data »).
-Production (Vercel, projet `sys-bcc-26` relié au dépôt, déploiement auto sur push `main`) : https://sys-bcc-26.vercel.app
+Production (Vercel, projet `sys-bcc-26` de l'équipe `oscar-d5ae`, relié au dépôt, déploiement auto sur push `main`) :
+https://simulateur-bcc.datalendo.com (sous-domaine ; DNS de datalendo.com chez Namecheap → CNAME
+`simulateur-bcc` → `2ed21d291092ad3a.vercel-dns-016.com`). Ancienne adresse toujours active : https://sys-bcc-26.vercel.app
 Miroir GitHub Pages : https://oscaraksanti.github.io/Simulateur-d-examen-BCC-2026/
 
 ### Règles non négociables (à respecter dans toute évolution)
@@ -50,20 +52,26 @@ Prévisualisation locale du build : `python3 -m http.server 4173 --directory out
 Variables : `NEXT_PUBLIC_SITE_URL` (URL publique, utilisée dans les textes de partage et `metadataBase`),
 `NEXT_PUBLIC_BASE_PATH` (vide sur Vercel, `/Simulateur-d-examen-BCC-2026` sur GitHub Pages — fixé par le workflow).
 
-## 3 bis. Données (Supabase)
+## 3 bis. Données (Supabase) — projet « datalendo » (ref `ezmbnbboqywqnprgtprg`, eu-west-1)
 
-- Schéma : `supabase/migrations/0001_init.sql` (idempotent). Tables `candidats`, `tentatives`, `feedbacks`, `admins`.
-- RLS partout ; `anon` n'a AUCUN droit direct sur les tables ; écritures via fonctions `security definer` validées :
-  `enregistrer_candidat` (upsert par UUID généré sur l'appareil), `enregistrer_tentative`, `envoyer_avis`,
-  `stats_publiques` (agrégats sans données perso, affichés sur l'accueil au-delà de 20 inscrits) ;
-  lecture réservée aux admins (`est_admin()`, `stats_admin()`).
-- Testé sur Postgres 16 local avec des rôles `anon`/`authenticated` et un `auth.uid()` simulés (accès refusés, validations,
-  agrégats admin, ré-exécution idempotente). Pour retester : initdb dans un dossier temporaire, démarrer avec
-  `LC_ALL=en_US.UTF-8` et `-c unix_socket_directories=''` (chemin de socket trop long dans le scratchpad).
-- Client : `src/lib/remote.ts` — import dynamique de supabase-js, file d'attente `simbcc:file-attente-v1` rejouée au
-  chargement (`viderFile`), erreurs 22/23/42 = définitives (abandon), autres = retentées (8 max).
-- Admin : `/admin` (noindex) — connexion e-mail/mot de passe Supabase, KPI, histogrammes 30 jours, distribution des notes,
-  compétences faibles agrégées, souhaits, tables candidats/résultats/avis, export CSV, suppression (droit à l'effacement).
+- L'org Supabase est limitée à 2 projets gratuits (`excelai`, `datalendo`) : le simulateur vit dans le projet **datalendo**,
+  schéma **isolé `simulateur_bcc`** (non exposé par PostgREST ; schémas exposés : public, graphql_public, datalendo).
+  NE JAMAIS toucher aux schémas `public`/`datalendo` existants (682 utilisateurs Datalendo).
+- Migration : `supabase/migrations/0001_simulateur_bcc.sql` (appliquée le 29/10/2026 sous le nom `simulateur_bcc_init`).
+  Tables : candidats, tentatives, feedbacks, admins, emails (journal), parametres (expediteur, repondre_a, site, whatsapp).
+- API (toutes `security definer`, `search_path = ''`) : publiques `sbcc_enregistrer_candidat`, `sbcc_enregistrer_tentative`,
+  `sbcc_envoyer_avis`, `sbcc_stats_publiques`, `sbcc_est_admin` ; admin (authenticated + contrôle) `sbcc_stats_admin`,
+  `sbcc_admin_candidats`, `sbcc_admin_tentatives`, `sbcc_admin_avis`, `sbcc_admin_emails`, `sbcc_admin_supprimer_candidat`.
+  Les avertissements « security definer executable » du linter Supabase sur ces fonctions sont attendus (API voulue).
+- Admin : le compte Datalendo `oscaraksanti@gmail.com` (e-mail + mot de passe) est dans `simulateur_bcc.admins`.
+- E-mails : `pg_net` → Resend. Clé lue dans Vault (`sbcc_resend_api_key`) ; tant qu'elle manque, statut `cle_absente`.
+  La clé existe déjà côté Vercel (projet datalendo, `RESEND_API_KEY`) mais n'a PAS été copiée : c'est au propriétaire de
+  l'ajouter au Vault (ne jamais manipuler soi-même une clé de production). Limites : 1 bienvenue/adresse, 5 résultats/24 h.
+- Clés publiques (Vercel + variables GitHub) : `NEXT_PUBLIC_SUPABASE_URL=https://ezmbnbboqywqnprgtprg.supabase.co`,
+  `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_…` ; `NEXT_PUBLIC_SITE_URL=https://simulateur-bcc.datalendo.com`.
+- Test local du SQL : Postgres 16 Homebrew avec des stubs (rôles anon/authenticated, `auth.uid()`, `vault.decrypted_secrets`,
+  `net.http_post`) ; démarrer avec `LC_ALL=en_US.UTF-8` et `-c unix_socket_directories=''`.
+- Client : `src/lib/remote.ts` (file d'attente `simulateur_bcc`… côté navigateur : clé `simbcc:file-attente-v1`).
 
 ## 4. Architecture
 
@@ -188,10 +196,20 @@ Le timer repose sur des timestamps (`debut`) persistés : un rechargement de pag
   Les projets `sys-bcc` et `sys-bcc-2026` (créés par l'utilisateur, preset « Other », vides) n'ont pas été touchés.
 - 234 tests verts ; lint, typecheck et build OK.
 
-### À faire côté propriétaire (bloquant pour la collecte)
-1. Créer le projet Supabase, exécuter la migration, créer le compte admin + `insert into public.admins` (voir README).
-2. Ajouter `NEXT_PUBLIC_SUPABASE_URL` et `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` sur Vercel (`sys-bcc-26`) et dans les
-   variables GitHub Actions, puis redéployer.
+### Session 4 — 29/10/2026 (Datalendo, Supabase en production, e-mails)
+- Marque « formations4data » remplacée par **Datalendo** (liens vers https://datalendo.com) : pied de page, FAQ, appel final,
+  confidentialité, ressources (nouvelle carte « Formations Datalendo »), métadonnées, licence, carte de partage, image OG, vidéo.
+- Sous-domaine `simulateur-bcc.datalendo.com` attaché au projet Vercel (vérifié) ; `NEXT_PUBLIC_SITE_URL` mis à jour.
+- Supabase : schéma isolé dans le projet datalendo, testé localement puis appliqué ; API publique vérifiée en réel
+  (stats publiques OK, stats admin refusées à anon, schéma non exposé).
+- E-mails de bienvenue et de résultats (HTML table, compatible clients mail), journal + onglet « E-mails » dans /admin.
+- Vidéo re-rendue (adresse + « par Datalendo »).
+
+### À faire côté propriétaire
+1. Namecheap → Advanced DNS : CNAME `simulateur-bcc` → `2ed21d291092ad3a.vercel-dns-016.com`.
+2. Supabase (projet datalendo) → SQL Editor : `select vault.create_secret('<clé Resend>', 'sbcc_resend_api_key', 'Clé Resend du Simulateur BCC');`
+3. Vérifier que l'expéditeur `noreply@datalendo.com` est autorisé (domaine datalendo.com vérifié dans Resend), sinon
+   `update simulateur_bcc.parametres set valeur = '…' where cle = 'expediteur';`
 
 ### Pistes pour la suite
 - Remplacer les placeholders de captures du README par de vraies captures.
