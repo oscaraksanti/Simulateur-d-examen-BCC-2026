@@ -1,0 +1,48 @@
+{
+  "name": "simulateur-bcc",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "prebuild": "npm run generate-og",
+    "generate-og": "tsx scripts/generate-og.ts",
+    "build": "next build",
+    "start": "npx serve out",
+    "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1",
+    "framer-motion": "^14.7.1",
+    "html-to-image": "^1.11.13",
+    "lucide-react": "^1.64.0",
+    "next": "16.4.3",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@fontsource/inter": "^5.3.0",
+    "@resvg/resvg-js": "^2.6.2",
+    "@tailwindcss/turbopack": "^4",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6.1.2",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.3",
+    "jsdom": "^29.1.1",
+    "satori": "^0.63.2",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.15",
+    "typescript": "^5",
+    "vitest": "^5.0.5"
+  },
+  "description": "Simulateur BCC — Prépa Data & Cyber : examen blanc indépendant pour préparer le recrutement de la Banque Centrale du Congo.",
+  "license": "MIT",
+  "author": "Oscar Aksanti (formations4data)"
+}

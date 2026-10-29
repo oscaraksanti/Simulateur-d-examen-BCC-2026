@@ -1,0 +1,14 @@
+/** Logo original du simulateur (bouclier + graphe). Ce n'est PAS le logo de la BCC. */
+export function LogoMark({ className = 'size-8' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" className={className} aria-hidden>
+      <path d="M16 2.5 4.5 6.8v8.4c0 7.2 4.9 12.4 11.5 14.3 6.6-1.9 11.5-7.1 11.5-14.3V6.8L16 2.5Z" fill="var(--primary-strong)" />
+      <path d="M16 2.5v27c6.6-1.9 11.5-7.1 11.5-14.3V6.8L16 2.5Z" fill="#000" opacity=".12" />
+      <path d="m9.5 19.5 4.2-4.6 3.4 2.6 5.4-6.3" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="9.5" cy="19.5" r="1.7" fill="#F7C600" />
+      <circle cx="13.7" cy="14.9" r="1.7" fill="#fff" />
+      <circle cx="17.1" cy="17.5" r="1.7" fill="#fff" />
+      <circle cx="22.5" cy="11.2" r="1.9" fill="#F7C600" />
+    </svg>
+  );
+}
