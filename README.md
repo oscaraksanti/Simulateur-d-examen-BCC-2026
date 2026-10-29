@@ -130,19 +130,15 @@ Les envois depuis le navigateur passent par une file d'attente locale et sont re
    `NEXT_PUBLIC_SUPABASE_URL` et `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (valeurs publiques par nature ; ne mets **jamais**
    la clé `service_role` / `secret` dans le front).
 
-### E-mails (Resend)
-Les e-mails partent de la base (extension `pg_net`) vers l'API Resend. La clé est lue dans le **Vault** Supabase ;
-tant qu'elle est absente, les e-mails sont seulement journalisés (« clé absente » dans `/admin`). Pour l'activer, dans
-le SQL Editor du projet `datalendo` :
-```sql
-select vault.create_secret('re_xxxxxxxx', 'sbcc_resend_api_key', 'Clé Resend du Simulateur BCC');
-```
-Expéditeur, adresse de réponse et adresse du site sont réglables sans redéploiement :
-```sql
-update simulateur_bcc.parametres set valeur = 'Simulateur BCC · Datalendo <noreply@datalendo.com>' where cle = 'expediteur';
-```
-L'expéditeur doit appartenir à un domaine vérifié dans Resend. Limites anti-abus : une bienvenue par adresse,
-5 récapitulatifs par adresse et par 24 h.
+### Administration et e-mails
+- **Connexion** à `/admin` par **lien magique** (comme sur Datalendo) : saisis ton e-mail, clique le lien reçu.
+  Aucun compte ne peut être créé depuis cette page (`shouldCreateUser: false`). L'adresse
+  `https://simulateur-bcc.datalendo.com/**` doit figurer dans Supabase → Authentication → URL Configuration → Redirect URLs.
+- **E-mails automatiques** (bienvenue + récapitulatif de résultats) via **Resend**, envoyés par la base (`pg_net`).
+  Dans `/admin` → « E-mails automatiques » : colle la clé Resend (elle part directement dans le **Vault** Supabase et
+  n'est jamais réaffichée), puis « E-mail de test ». Expéditeur `noreply@datalendo.com`, réponses vers
+  `contact@datalendo.com` (modifiables dans `simulateur_bcc.parametres`). Le domaine de l'expéditeur doit être vérifié
+  dans Resend. Limites anti-abus : une bienvenue par adresse, 5 récapitulatifs par adresse et par 24 h.
 
 ## Vidéo promo (HyperFrames)
 

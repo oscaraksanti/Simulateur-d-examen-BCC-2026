@@ -1,0 +1,11 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "sys-bcc-26.vercel.app" }],
+      "destination": "https://simulateur-bcc.datalendo.com/:path*",
+      "permanent": true
+    }
+  ]
+}

@@ -63,10 +63,15 @@ Variables : `NEXT_PUBLIC_SITE_URL` (URL publique, utilisée dans les textes de p
   `sbcc_envoyer_avis`, `sbcc_stats_publiques`, `sbcc_est_admin` ; admin (authenticated + contrôle) `sbcc_stats_admin`,
   `sbcc_admin_candidats`, `sbcc_admin_tentatives`, `sbcc_admin_avis`, `sbcc_admin_emails`, `sbcc_admin_supprimer_candidat`.
   Les avertissements « security definer executable » du linter Supabase sur ces fonctions sont attendus (API voulue).
-- Admin : le compte Datalendo `oscaraksanti@gmail.com` (e-mail + mot de passe) est dans `simulateur_bcc.admins`.
+- Admin : le compte Datalendo `oscaraksanti@gmail.com` est dans `simulateur_bcc.admins`. Connexion par **lien magique**
+  (`signInWithOtp`, `shouldCreateUser: false`, `flowType: 'implicit'`) — Datalendo n'utilise pas de mots de passe.
+  Exige `https://simulateur-bcc.datalendo.com/**` dans les Redirect URLs Supabase (sinon le lien renvoie vers datalendo.com).
 - E-mails : `pg_net` → Resend. Clé lue dans Vault (`sbcc_resend_api_key`) ; tant qu'elle manque, statut `cle_absente`.
-  La clé existe déjà côté Vercel (projet datalendo, `RESEND_API_KEY`) mais n'a PAS été copiée : c'est au propriétaire de
-  l'ajouter au Vault (ne jamais manipuler soi-même une clé de production). Limites : 1 bienvenue/adresse, 5 résultats/24 h.
+  La clé Vercel du projet datalendo (`RESEND_API_KEY`) est de type « Sensitive » : illisible, impossible à copier.
+  Le propriétaire la saisit dans /admin (panneau « E-mails automatiques ») → `sbcc_admin_definir_cle_resend` → Vault ;
+  bouton « E-mail de test » → `sbcc_admin_email_test`. Migration `0002_admin_email.sql` (appliquée : `simulateur_bcc_admin_email`).
+  Expéditeur noreply@datalendo.com, réponses contact@datalendo.com (confirmé par le propriétaire). Limites : 1 bienvenue/adresse,
+  5 résultats/24 h, 10 tests/heure.
 - Clés publiques (Vercel + variables GitHub) : `NEXT_PUBLIC_SUPABASE_URL=https://ezmbnbboqywqnprgtprg.supabase.co`,
   `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_…` ; `NEXT_PUBLIC_SITE_URL=https://simulateur-bcc.datalendo.com`.
 - Test local du SQL : Postgres 16 Homebrew avec des stubs (rôles anon/authenticated, `auth.uid()`, `vault.decrypted_secrets`,
@@ -206,10 +211,14 @@ Le timer repose sur des timestamps (`debut`) persistés : un rechargement de pag
 - Vidéo re-rendue (adresse + « par Datalendo »).
 
 ### À faire côté propriétaire
-1. Namecheap → Advanced DNS : CNAME `simulateur-bcc` → `2ed21d291092ad3a.vercel-dns-016.com`.
-2. Supabase (projet datalendo) → SQL Editor : `select vault.create_secret('<clé Resend>', 'sbcc_resend_api_key', 'Clé Resend du Simulateur BCC');`
-3. Vérifier que l'expéditeur `noreply@datalendo.com` est autorisé (domaine datalendo.com vérifié dans Resend), sinon
-   `update simulateur_bcc.parametres set valeur = '…' where cle = 'expediteur';`
+1. ~~CNAME Namecheap~~ (fait).
+2. Supabase → Authentication → URL Configuration → Redirect URLs : ajouter `https://simulateur-bcc.datalendo.com/**`.
+3. /admin → coller la clé Resend → « E-mail de test ».
+
+### Session 5 — 29/10/2026 (domaine en ligne, lien magique, clé Resend)
+- CNAME ajouté par le propriétaire ; certificat TLS émis (`vercel certs issue`) : https://simulateur-bcc.datalendo.com répond.
+- `vercel.json` : redirection permanente de sys-bcc-26.vercel.app vers le sous-domaine.
+- /admin : connexion par lien magique (plus de mot de passe), panneau « E-mails automatiques » (clé Resend → Vault, test).
 
 ### Pistes pour la suite
 - Remplacer les placeholders de captures du README par de vraies captures.
