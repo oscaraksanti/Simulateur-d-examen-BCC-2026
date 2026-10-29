@@ -209,7 +209,7 @@ Signale toute erreur factuelle via une issue : l'exactitude prime sur le volume.
 
 Licence [MIT](LICENSE).
 
-**Conçu par Oscar Aksanti — formations4data**
+**Conçu par Oscar Aksanti — [Datalendo](https://datalendo.com)**
 - YouTube : [youtube.com/@oscaraksanti](https://youtube.com/@oscaraksanti)
 - WhatsApp : [wa.me/243971601855](https://wa.me/243971601855)
 

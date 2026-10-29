@@ -6,7 +6,7 @@ Document de passation pour toute IA ou développeur qui reprend le projet. À me
 
 Application web **open source, 100 % statique**, en **français**, qui aide les candidats congolais à préparer les tests de
 recrutement informatique de la Banque Centrale du Congo (BCC), filières **Data Analyse** et **Cybersécurité**.
-Dépôt : https://github.com/oscaraksanti/Simulateur-d-examen-BCC-2026 — auteur : Oscar Aksanti (formations4data).
+Dépôt : https://github.com/oscaraksanti/Simulateur-d-examen-BCC-2026 — auteur : Oscar Aksanti — marque **Datalendo** (https://datalendo.com ; ne plus utiliser « formations4data »).
 Production (Vercel, projet `sys-bcc-26` relié au dépôt, déploiement auto sur push `main`) : https://sys-bcc-26.vercel.app
 Miroir GitHub Pages : https://oscaraksanti.github.io/Simulateur-d-examen-BCC-2026/
 

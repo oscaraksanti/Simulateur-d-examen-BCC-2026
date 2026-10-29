@@ -20,8 +20,9 @@ const colonnes = [
     ],
   },
   {
-    titre: OSCAR.nom,
+    titre: OSCAR.marque,
     liens: [
+      { href: OSCAR.site, libelle: 'datalendo.com', externe: true },
       { href: OSCAR.youtube, libelle: 'YouTube', externe: true },
       { href: `https://wa.me/${OSCAR.whatsappNumero}`, libelle: 'WhatsApp', externe: true },
     ],
@@ -38,7 +39,11 @@ export function Footer() {
             <span className="font-semibold tracking-[-0.02em] text-ink">Simulateur BCC</span>
           </Link>
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted">
-            L&apos;examen blanc gratuit pour préparer le recrutement en Data Analyse et Cybersécurité. Conçu par {OSCAR.nom}, {OSCAR.marque}.
+            L&apos;examen blanc gratuit pour préparer le recrutement en Data Analyse et Cybersécurité. Conçu par {OSCAR.nom} pour{' '}
+            <a href={OSCAR.site} target="_blank" rel="noopener noreferrer" className="font-medium text-ink underline-offset-2 hover:underline">
+              {OSCAR.marque}
+            </a>
+            .
           </p>
         </div>
         {colonnes.map((c) => (
@@ -71,7 +76,13 @@ export function Footer() {
             </a>
             .
           </p>
-          <p>Licence MIT · Faits BCC vérifiés au 29/10/2026</p>
+          <p>
+            Un produit{' '}
+            <a href={OSCAR.site} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-ink">
+              Datalendo
+            </a>{' '}
+            · Licence MIT · Faits BCC vérifiés au 29/10/2026
+          </p>
         </div>
       </div>
     </footer>

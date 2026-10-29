@@ -25,7 +25,8 @@ export const metadata: Metadata = {
   title: { default: TITRE, template: '%s · Simulateur BCC' },
   description: DESCRIPTION,
   applicationName: 'Simulateur BCC',
-  authors: [{ name: 'Oscar Aksanti — formations4data', url: 'https://youtube.com/@oscaraksanti' }],
+  authors: [{ name: 'Oscar Aksanti — Datalendo', url: 'https://datalendo.com' }],
+  publisher: 'Datalendo',
   keywords: [
     'recrutement BCC 2026',
     'test BCC',

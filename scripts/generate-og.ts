@@ -78,7 +78,7 @@ async function main() {
     h(
       'div',
       { style: { display: 'flex', fontSize: 22, color: '#9AABC2' } },
-      'Outil de préparation indépendant, non affilié à la Banque Centrale du Congo.',
+      'Un outil Datalendo · indépendant, non affilié à la Banque Centrale du Congo.',
     ),
     ),
   );

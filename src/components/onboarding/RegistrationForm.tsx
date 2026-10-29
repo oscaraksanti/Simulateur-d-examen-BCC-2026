@@ -205,8 +205,8 @@ export function RegistrationForm({ filiereSuggeree }: { filiereSuggeree?: Filier
               className="mt-0.5 size-4 shrink-0 accent-[var(--ink)]"
             />
             <span>
-              J&apos;accepte que mes informations et mes résultats soient enregistrés par l&apos;équipe du Simulateur BCC
-              pour suivre ma préparation. Ils ne sont <strong className="font-semibold text-ink">jamais transmis à la BCC</strong>.{' '}
+              J&apos;accepte que mes informations et mes résultats soient enregistrés par Datalendo pour suivre ma
+              préparation, et de recevoir par e-mail le récapitulatif de mes simulations. Ils ne sont <strong className="font-semibold text-ink">jamais transmis à la BCC</strong>.{' '}
               <Link href="/confidentialite/" className="font-medium text-ink underline underline-offset-2">
                 Confidentialité
               </Link>

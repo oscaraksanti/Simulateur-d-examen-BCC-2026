@@ -45,5 +45,6 @@
   },
   "description": "Simulateur BCC — Prépa Data & Cyber : examen blanc indépendant pour préparer le recrutement de la Banque Centrale du Congo.",
   "license": "MIT",
-  "author": "Oscar Aksanti (formations4data)"
+  "author": "Oscar Aksanti (Datalendo)",
+  "homepage": "https://simulateur-bcc.datalendo.com"
 }

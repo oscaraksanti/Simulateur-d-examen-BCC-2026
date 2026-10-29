@@ -12,7 +12,11 @@ const sections: { titre: string; contenu: React.ReactNode }[] = [
     titre: 'Qui sommes-nous ?',
     contenu: (
       <>
-        Le Simulateur BCC est un outil de préparation <strong>indépendant</strong>, conçu par {OSCAR.nom} ({OSCAR.marque}). Il
+        Le Simulateur BCC est un outil de préparation <strong>indépendant</strong>, conçu par {OSCAR.nom} pour{' '}
+        <a href={OSCAR.site} target="_blank" rel="noopener noreferrer">
+          {OSCAR.marque}
+        </a>
+        . Il
         n&apos;est pas affilié à la Banque Centrale du Congo et ne constitue pas une candidature. Les candidatures officielles se
         font uniquement sur <a href="https://www.bcc.cd" target="_blank" rel="noopener noreferrer">bcc.cd</a>.
       </>
@@ -25,6 +29,7 @@ const sections: { titre: string; contenu: React.ReactNode }[] = [
         <li>À l&apos;inscription : nom, adresse e-mail, filière et, si tu le souhaites, numéro WhatsApp.</li>
         <li>À la fin de chaque simulation : ta note, tes scores par section et par compétence, la durée.</li>
         <li>Si tu donnes ton avis : ta note de satisfaction, tes souhaits et ton message.</li>
+        <li>Le journal des e-mails qui te sont envoyés (date, type, statut).</li>
         <li>La provenance du lien (ex. partage WhatsApp) pour mesurer la diffusion de l&apos;outil.</li>
       </ul>
     ),
@@ -35,6 +40,7 @@ const sections: { titre: string; contenu: React.ReactNode }[] = [
       <ul>
         <li>Suivre ta progression et améliorer les questions là où les candidats bloquent le plus.</li>
         <li>Mesurer l&apos;usage de l&apos;outil (nombre d&apos;inscrits, de simulations).</li>
+        <li>T&apos;envoyer un e-mail de bienvenue et le récapitulatif de chaque simulation (note, priorités de révision).</li>
         <li>
           Uniquement si tu as coché la case correspondante : t&apos;envoyer des conseils de préparation et l&apos;annonce des
           nouvelles sessions.
@@ -56,7 +62,7 @@ const sections: { titre: string; contenu: React.ReactNode }[] = [
     titre: 'Où sont-elles stockées ?',
     contenu: (
       <>
-        Dans une base de données sécurisée (Supabase), accessible uniquement à l&apos;administrateur du simulateur. Les échanges
+        Dans une base de données sécurisée (Supabase) opérée par Datalendo, accessible uniquement à l&apos;administrateur du simulateur. Les e-mails sont envoyés via Resend. Les échanges
         sont chiffrés (HTTPS). Ton historique de simulations est aussi conservé dans ton navigateur pour fonctionner hors ligne.
       </>
     ),

@@ -102,7 +102,7 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(function Sha
       <div style={{ position: 'absolute', left: 90, right: 90, bottom: 80 }}>
         <div style={{ fontSize: 34, fontWeight: 700 }}>Et toi, combien tu fais ? 👉 {site.replace(/^https?:\/\//, '').replace(/\/$/, '')}</div>
         <div style={{ marginTop: 18, fontSize: 24, color: C.doux }}>
-          Simulateur indépendant, non affilié à la Banque Centrale du Congo.
+          Un outil Datalendo · indépendant, non affilié à la Banque Centrale du Congo.
         </div>
       </div>
     </div>

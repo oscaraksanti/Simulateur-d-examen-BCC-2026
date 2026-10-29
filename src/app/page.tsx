@@ -51,7 +51,7 @@ const etapes = [
 const faq = [
   {
     q: 'Est-ce un site officiel de la Banque Centrale du Congo ?',
-    r: 'Non. C’est un outil de préparation indépendant, conçu par Oscar Aksanti (formations4data). Il ne transmet rien à la BCC et ne remplace pas ta candidature, qui se fait uniquement sur bcc.cd.',
+    r: 'Non. C’est un outil de préparation indépendant, conçu par Oscar Aksanti et Datalendo (datalendo.com). Il ne transmet rien à la BCC et ne remplace pas ta candidature, qui se fait uniquement sur bcc.cd.',
   },
   {
     q: 'Les questions sont-elles celles du vrai test ?',
@@ -67,7 +67,7 @@ const faq = [
   },
   {
     q: 'Est-ce vraiment gratuit ?',
-    r: 'Oui, entièrement. Le projet est open source. Si tu veux aller plus loin, Oscar propose des tutoriels gratuits sur YouTube et un accompagnement sur WhatsApp.',
+    r: 'Oui, entièrement. Le projet est open source. Si tu veux aller plus loin, Datalendo propose des formations complètes et Oscar publie des tutoriels gratuits sur YouTube.',
   },
   {
     q: 'Que deviennent mes données ?',
@@ -347,10 +347,20 @@ export default function Accueil() {
               Commencer maintenant
               <ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
-            <a href={OSCAR.youtube} target="_blank" rel="noopener noreferrer" className="inline-flex h-12 items-center gap-2 rounded-xl border border-white/15 px-6 text-[15px] font-semibold text-white transition hover:border-white/40">
-              Tutoriels gratuits sur YouTube <ArrowUpRight aria-hidden className="size-4" />
+            <a href={OSCAR.site} target="_blank" rel="noopener noreferrer" className="inline-flex h-12 items-center gap-2 rounded-xl border border-white/15 px-6 text-[15px] font-semibold text-white transition hover:border-white/40">
+              Formations Datalendo <ArrowUpRight aria-hidden className="size-4" />
             </a>
           </div>
+          <p className="mt-10 text-sm text-white/50">
+            Un outil{' '}
+            <a href={OSCAR.site} target="_blank" rel="noopener noreferrer" className="font-medium text-white/80 underline underline-offset-2 hover:text-white">
+              Datalendo
+            </a>{' '}
+            · Tutoriels gratuits sur{' '}
+            <a href={OSCAR.youtube} target="_blank" rel="noopener noreferrer" className="font-medium text-white/80 underline underline-offset-2 hover:text-white">
+              YouTube
+            </a>
+          </p>
         </div>
       </section>
     </>

@@ -1,8 +1,8 @@
 'use client';
 
 // Tableau de bord privé : inscriptions, résultats, avis.
-// Sécurité assurée côté base (RLS + fonction stats_admin) : cette page n'affiche rien
-// à un compte qui n'est pas listé dans public.admins.
+// Sécurité assurée côté base : toutes les lectures passent par les fonctions sbcc_admin_*,
+// qui refusent tout compte absent de simulateur_bcc.admins.
 
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import type { Session } from '@supabase/supabase-js';
@@ -21,6 +21,8 @@ interface StatsAdmin {
   note_moyenne: number | null;
   avis: number;
   avis_note_moyenne: number | null;
+  emails_envoyes: number;
+  emails_en_attente_de_cle: number;
   par_filiere: Record<string, number>;
   inscriptions_par_jour: { jour: string; n: number }[];
   simulations_par_jour: { jour: string; n: number }[];
@@ -37,6 +39,18 @@ interface LigneCandidat {
   filiere: 'data' | 'cyber';
   consentement_contact: boolean;
   source: string | null;
+  created_at: string;
+  simulations: number;
+  meilleure_note: number | null;
+}
+
+interface LigneEmail {
+  id: number;
+  type: 'bienvenue' | 'resultat';
+  destinataire: string;
+  sujet: string;
+  statut: 'envoye' | 'cle_absente' | 'limite';
+  code_http: number | null;
   created_at: string;
 }
 
@@ -59,7 +73,7 @@ interface LigneAvis {
   candidats: { nom: string; email: string } | null;
 }
 
-type Onglet = 'candidats' | 'resultats' | 'avis';
+type Onglet = 'candidats' | 'resultats' | 'avis' | 'emails';
 
 const dateCourte = (iso: string) =>
   new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
@@ -68,9 +82,21 @@ const nombre = (n: number) => n.toLocaleString('fr-FR');
 
 function csv(lignes: LigneCandidat[]): string {
   const echapper = (v: string) => `"${v.replace(/"/g, '""')}"`;
-  const entete = ['nom', 'email', 'whatsapp', 'filiere', 'accepte_contact', 'source', 'inscrit_le'];
+  const entete = ['nom', 'email', 'whatsapp', 'filiere', 'accepte_contact', 'source', 'simulations', 'meilleure_note', 'inscrit_le'];
   const corps = lignes.map((l) =>
-    [l.nom, l.email, l.whatsapp ?? '', l.filiere, l.consentement_contact ? 'oui' : 'non', l.source ?? '', l.created_at].map(echapper).join(','),
+    [
+      l.nom,
+      l.email,
+      l.whatsapp ?? '',
+      l.filiere,
+      l.consentement_contact ? 'oui' : 'non',
+      l.source ?? '',
+      String(l.simulations ?? 0),
+      l.meilleure_note === null ? '' : String(l.meilleure_note),
+      l.created_at,
+    ]
+      .map(echapper)
+      .join(','),
   );
   return '﻿' + [entete.join(','), ...corps].join('\n');
 }
@@ -116,7 +142,7 @@ function Connexion({ onErreur }: { onErreur: string | null }) {
   return (
     <div className="mx-auto max-w-sm px-4 py-24">
       <h1 className="text-2xl font-semibold tracking-tight text-ink">Espace administrateur</h1>
-      <p className="mt-2 text-sm text-muted">Accès réservé. Connecte-toi avec le compte créé dans Supabase.</p>
+      <p className="mt-2 text-sm text-muted">Accès réservé. Connecte-toi avec ton compte Datalendo (administrateur).</p>
       <form onSubmit={connecter} className="mt-8 space-y-4">
         <label className="block text-sm font-medium text-ink">
           E-mail
@@ -143,6 +169,7 @@ export function AdminApp() {
   const [candidats, setCandidats] = useState<LigneCandidat[]>([]);
   const [tentatives, setTentatives] = useState<LigneTentative[]>([]);
   const [avis, setAvis] = useState<LigneAvis[]>([]);
+  const [emails, setEmails] = useState<LigneEmail[]>([]);
   const [onglet, setOnglet] = useState<Onglet>('candidats');
   const [recherche, setRecherche] = useState('');
   const [chargement, setChargement] = useState(false);
@@ -171,23 +198,25 @@ export function AdminApp() {
     setChargement(true);
     setErreur(null);
     const supabase = await clientSupabase();
-    const { data: estAdmin } = await supabase.rpc('est_admin');
+    const { data: estAdmin } = await supabase.rpc('sbcc_est_admin');
     setAdmin(estAdmin === true);
     if (estAdmin !== true) {
       setChargement(false);
       return;
     }
-    const [s, c, t, a] = await Promise.all([
-      supabase.rpc('stats_admin'),
-      supabase.from('candidats').select('*').order('created_at', { ascending: false }).limit(1000),
-      supabase.from('tentatives').select('id, filiere, note_sur_20, duree_secondes, created_at, candidats(nom, email)').order('created_at', { ascending: false }).limit(300),
-      supabase.from('feedbacks').select('id, note, souhaits, message, contexte, created_at, candidats(nom, email)').order('created_at', { ascending: false }).limit(300),
+    const [s, c, t, a, e] = await Promise.all([
+      supabase.rpc('sbcc_stats_admin'),
+      supabase.rpc('sbcc_admin_candidats', { p_limite: 1000, p_decalage: 0 }),
+      supabase.rpc('sbcc_admin_tentatives', { p_limite: 300 }),
+      supabase.rpc('sbcc_admin_avis', { p_limite: 300 }),
+      supabase.rpc('sbcc_admin_emails', { p_limite: 200 }),
     ]);
-    if (s.error || c.error || t.error || a.error) setErreur('Chargement incomplet. Réessaie dans un instant.');
+    if (s.error || c.error || t.error || a.error || e.error) setErreur('Chargement incomplet. Réessaie dans un instant.');
     setStats((s.data as StatsAdmin | null) ?? null);
     setCandidats((c.data as LigneCandidat[] | null) ?? []);
-    setTentatives((t.data as unknown as LigneTentative[] | null) ?? []);
-    setAvis((a.data as unknown as LigneAvis[] | null) ?? []);
+    setTentatives((t.data as LigneTentative[] | null) ?? []);
+    setAvis((a.data as LigneAvis[] | null) ?? []);
+    setEmails((e.data as LigneEmail[] | null) ?? []);
     setChargement(false);
   }, []);
 
@@ -206,10 +235,11 @@ export function AdminApp() {
     const supabase = await clientSupabase();
     const tout: LigneCandidat[] = [];
     for (let debut = 0; ; debut += 1000) {
-      const { data, error } = await supabase.from('candidats').select('*').order('created_at', { ascending: false }).range(debut, debut + 999);
-      if (error || !data) break;
-      tout.push(...(data as LigneCandidat[]));
-      if (data.length < 1000) break;
+      const { data, error } = await supabase.rpc('sbcc_admin_candidats', { p_limite: 1000, p_decalage: debut });
+      const lignes = (data as LigneCandidat[] | null) ?? [];
+      if (error) break;
+      tout.push(...lignes);
+      if (lignes.length < 1000) break;
     }
     const url = URL.createObjectURL(new Blob([csv(tout)], { type: 'text/csv;charset=utf-8' }));
     const lien = document.createElement('a');
@@ -222,7 +252,7 @@ export function AdminApp() {
   const supprimer = async () => {
     if (!aSupprimer) return;
     const supabase = await clientSupabase();
-    const { error } = await supabase.from('candidats').delete().eq('id', aSupprimer.id);
+    const { error } = await supabase.rpc('sbcc_admin_supprimer_candidat', { p_id: aSupprimer.id });
     if (error) setErreur('Suppression impossible.');
     setASupprimer(null);
     void charger();
@@ -254,9 +284,9 @@ export function AdminApp() {
       <div className="mx-auto max-w-xl px-4 py-24">
         <h1 className="text-2xl font-semibold tracking-tight text-ink">Compte non autorisé</h1>
         <p className="mt-3 leading-relaxed text-muted">
-          Ce compte n&apos;est pas administrateur. Dans Supabase → SQL Editor, exécute :
+          Ce compte n&apos;est pas administrateur du simulateur. Dans Supabase (projet datalendo) → SQL Editor, exécute :
         </p>
-        <pre className="code-block mt-4 text-ink">{`insert into public.admins (user_id)\nvalues ('${session.user.id}');`}</pre>
+        <pre className="code-block mt-4 text-ink">{`insert into simulateur_bcc.admins (user_id)\nvalues ('${session.user.id}');`}</pre>
         <button type="button" onClick={deconnecter} className="mt-6 text-sm font-medium text-ink underline underline-offset-2">Se déconnecter</button>
       </div>
     );
@@ -293,6 +323,13 @@ export function AdminApp() {
             <Tuile libelle="Contacts autorisés" valeur={nombre(st.contacts_acceptes)} detail={`${nombre(st.avec_whatsapp)} avec WhatsApp`} />
             <Tuile libelle="Avis reçus" valeur={nombre(st.avis)} detail={st.avis_note_moyenne !== null ? `Satisfaction ${formatNote(Math.round(Number(st.avis_note_moyenne) * 10) / 10)}/5` : undefined} />
           </div>
+
+          {st.emails_en_attente_de_cle > 0 ? (
+            <p role="status" className="rounded-xl border border-accent/50 bg-accent-soft px-4 py-3 text-sm text-ink">
+              {nombre(st.emails_en_attente_de_cle)} e-mail(s) non envoyé(s) : la clé Resend n&apos;est pas encore enregistrée dans le
+              Vault Supabase (secret <code className="font-mono">sbcc_resend_api_key</code>). {nombre(st.emails_envoyes)} envoyé(s) au total.
+            </p>
+          ) : null}
 
           <div className="grid gap-4 lg:grid-cols-2">
             <Panneau titre="Inscriptions — 30 derniers jours">
@@ -362,6 +399,7 @@ export function AdminApp() {
                 ['candidats', `Candidats (${nombre(candidats.length)})`],
                 ['resultats', `Résultats (${nombre(tentatives.length)})`],
                 ['avis', `Avis (${nombre(avis.length)})`],
+                ['emails', `E-mails (${nombre(emails.length)})`],
               ] as const
             ).map(([id, libelle]) => (
               <button key={id} type="button" role="tab" aria-selected={onglet === id} onClick={() => setOnglet(id)} className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${onglet === id ? 'bg-ink text-bg' : 'text-muted hover:text-ink'}`}>
@@ -385,7 +423,7 @@ export function AdminApp() {
 
         <div className="scroll-fin overflow-x-auto">
           {onglet === 'candidats' ? (
-            <table className="w-full min-w-[760px] text-left text-sm">
+            <table className="w-full min-w-[900px] text-left text-sm">
               <thead className="text-xs uppercase tracking-wider text-muted">
                 <tr className="border-b border-border">
                   <th scope="col" className="px-4 py-3 font-medium">Nom</th>
@@ -394,6 +432,8 @@ export function AdminApp() {
                   <th scope="col" className="px-4 py-3 font-medium">Filière</th>
                   <th scope="col" className="px-4 py-3 font-medium">Contact</th>
                   <th scope="col" className="px-4 py-3 font-medium">Source</th>
+                  <th scope="col" className="px-4 py-3 text-right font-medium">Simulations</th>
+                  <th scope="col" className="px-4 py-3 text-right font-medium">Meilleure</th>
                   <th scope="col" className="px-4 py-3 font-medium">Inscrit le</th>
                   <th scope="col" className="px-4 py-3"><span className="sr-only">Actions</span></th>
                 </tr>
@@ -407,6 +447,8 @@ export function AdminApp() {
                     <td className="px-4 py-3 text-muted">{LIBELLES_FILIERE[c.filiere]}</td>
                     <td className="px-4 py-3 text-muted">{c.consentement_contact ? 'Oui' : 'Non'}</td>
                     <td className="px-4 py-3 font-mono text-xs text-muted">{c.source ?? '—'}</td>
+                    <td className="px-4 py-3 text-right font-mono text-muted tabular">{c.simulations ?? 0}</td>
+                    <td className="px-4 py-3 text-right font-mono text-ink tabular">{c.meilleure_note === null ? '—' : `${formatNote(Number(c.meilleure_note))}/20`}</td>
                     <td className="px-4 py-3 text-muted tabular">{dateCourte(c.created_at)}</td>
                     <td className="px-4 py-3 text-right">
                       <button type="button" onClick={() => setASupprimer(c)} aria-label={`Supprimer ${c.nom}`} className="rounded-lg p-1.5 text-muted hover:bg-danger-soft hover:text-danger">
@@ -415,7 +457,7 @@ export function AdminApp() {
                     </td>
                   </tr>
                 ))}
-                {filtres.length === 0 ? <tr><td colSpan={8} className="px-4 py-10 text-center text-muted">Aucun candidat.</td></tr> : null}
+                {filtres.length === 0 ? <tr><td colSpan={10} className="px-4 py-10 text-center text-muted">Aucun candidat.</td></tr> : null}
               </tbody>
             </table>
           ) : onglet === 'resultats' ? (
@@ -440,6 +482,50 @@ export function AdminApp() {
                   </tr>
                 ))}
                 {tentatives.length === 0 ? <tr><td colSpan={5} className="px-4 py-10 text-center text-muted">Aucune simulation.</td></tr> : null}
+              </tbody>
+            </table>
+          ) : onglet === 'emails' ? (
+            <table className="w-full min-w-[720px] text-left text-sm">
+              <thead className="text-xs uppercase tracking-wider text-muted">
+                <tr className="border-b border-border">
+                  <th scope="col" className="px-4 py-3 font-medium">Type</th>
+                  <th scope="col" className="px-4 py-3 font-medium">Destinataire</th>
+                  <th scope="col" className="px-4 py-3 font-medium">Sujet</th>
+                  <th scope="col" className="px-4 py-3 font-medium">Statut</th>
+                  <th scope="col" className="px-4 py-3 font-medium">Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {emails.map((m) => (
+                  <tr key={m.id} className="border-b border-border last:border-0">
+                    <td className="px-4 py-3 text-muted">{m.type === 'bienvenue' ? 'Bienvenue' : 'Résultat'}</td>
+                    <td className="px-4 py-3 text-ink">{m.destinataire}</td>
+                    <td className="max-w-xs truncate px-4 py-3 text-muted">{m.sujet}</td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`rounded-md px-2 py-0.5 text-xs font-medium ${
+                          m.statut === 'envoye' && (m.code_http === null || m.code_http < 300)
+                            ? 'bg-success-soft text-success-ink'
+                            : m.statut === 'limite'
+                              ? 'bg-surface-2 text-muted'
+                              : 'bg-danger-soft text-danger'
+                        }`}
+                      >
+                        {m.statut === 'envoye'
+                          ? m.code_http === null
+                            ? 'Envoyé'
+                            : m.code_http < 300
+                              ? `Livré à Resend (${m.code_http})`
+                              : `Refusé (${m.code_http})`
+                          : m.statut === 'limite'
+                            ? 'Limite atteinte'
+                            : 'Clé absente'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-muted tabular">{dateCourte(m.created_at)}</td>
+                  </tr>
+                ))}
+                {emails.length === 0 ? <tr><td colSpan={5} className="px-4 py-10 text-center text-muted">Aucun e-mail.</td></tr> : null}
               </tbody>
             </table>
           ) : (

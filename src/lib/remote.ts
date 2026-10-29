@@ -5,7 +5,7 @@
 //  * Hors ligne d'abord : chaque envoi passe par une file d'attente persistée (localStorage)
 //    et sera retenté au prochain chargement si le réseau manque (fréquent sur mobile).
 //  * Le client Supabase est chargé à la demande (import dynamique) pour garder l'accueil léger.
-//  * Écritures uniquement via des fonctions SQL validées (voir supabase/migrations/0001_init.sql).
+//  * Écritures uniquement via des fonctions SQL validées (voir supabase/migrations/0001_simulateur_bcc.sql).
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { CLES, ecrire, lire } from './storage';
@@ -80,10 +80,11 @@ interface Element {
   ajouteLe: string;
 }
 
+// Fonctions SQL du schéma isolé `simulateur_bcc` (projet Supabase Datalendo), préfixées sbcc_.
 const FONCTIONS: Record<Operation['type'], string> = {
-  candidat: 'enregistrer_candidat',
-  tentative: 'enregistrer_tentative',
-  avis: 'envoyer_avis',
+  candidat: 'sbcc_enregistrer_candidat',
+  tentative: 'sbcc_enregistrer_tentative',
+  avis: 'sbcc_envoyer_avis',
 };
 
 const MAX_FILE = 50;
@@ -191,7 +192,7 @@ export async function lireStatsPubliques(): Promise<StatsPubliques | null> {
   if (!syncConfiguree()) return null;
   try {
     const supabase = await clientSupabase();
-    const { data, error } = await supabase.rpc('stats_publiques');
+    const { data, error } = await supabase.rpc('sbcc_stats_publiques');
     if (error || typeof data !== 'object' || data === null) return null;
     const d = data as Record<string, unknown>;
     return typeof d.candidats === 'number' && typeof d.simulations === 'number'
