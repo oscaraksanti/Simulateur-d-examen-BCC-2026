@@ -1,0 +1,98 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #0b1220; color: #e8eef7; font-family: Inter, sans-serif; overflow: hidden; }
+    #ca-entete { position: absolute; left: 120px; right: 120px; top: 80px; display: flex; align-items: baseline; justify-content: space-between; gap: 30px; }
+    #ca-titre { font-size: 64px; font-weight: 700; letter-spacing: -0.045em; }
+    #ca-titre span { color: #8cc2ff; }
+    #ca-role { font-size: 30px; color: rgba(232,238,247,.6); white-space: nowrap; }
+    .ca-panneau { position: absolute; left: 120px; right: 120px; top: 210px; bottom: 70px; border-radius: 28px; border: 2px solid rgba(255,255,255,.1); background: #0e1a2b; overflow: hidden; }
+    .ca-barre { display: flex; align-items: center; justify-content: space-between; height: 76px; padding: 0 30px; border-bottom: 2px solid rgba(255,255,255,.08); font-size: 28px; }
+    .ca-barre b { font-weight: 700; }
+    .ca-tag { font-family: 'JetBrains Mono', monospace; font-size: 24px; padding: 6px 14px; border-radius: 10px; background: rgba(255,90,103,.15); color: #ff8a93; }
+    #ca-logs { padding: 18px 30px; font-family: 'JetBrains Mono', monospace; font-size: 28px; line-height: 1.85; }
+    .ca-l { display: flex; gap: 22px; white-space: nowrap; }
+    .ca-h { color: rgba(232,238,247,.35); }
+    .ca-ip { color: #8cc2ff; background: rgba(76,157,255,.14); padding: 0 8px; border-radius: 6px; }
+    .ca-req { color: rgba(232,238,247,.8); }
+    .ca-c { margin-left: auto; padding: 0 10px; border-radius: 6px; font-weight: 700; }
+    .ca-503 { background: rgba(255,90,103,.18); color: #ff8a93; }
+    .ca-401 { background: rgba(247,198,0,.15); color: #f7d44a; }
+    .ca-200 { background: rgba(52,211,153,.15); color: #6ee7b7; }
+    #ca-table { width: 100%; border-collapse: collapse; font-size: 28px; }
+    #ca-table th { text-align: left; font-weight: 600; color: rgba(232,238,247,.55); padding: 16px 30px; font-size: 24px; border-bottom: 2px solid rgba(255,255,255,.08); }
+    #ca-table td { padding: 14px 30px; border-bottom: 1px solid rgba(255,255,255,.06); white-space: nowrap; }
+    #ca-table td.m { text-align: right; font-family: 'JetBrains Mono', monospace; }
+    .ca-suspect td:first-child { box-shadow: inset 6px 0 0 #ff5a67; }
+    .ca-fond { position: relative; }
+    #ca-alerte { position: absolute; right: 40px; bottom: 36px; display: flex; align-items: center; gap: 14px; padding: 18px 26px; border-radius: 18px; background: #ff5a67; color: #0b1220; font-size: 30px; font-weight: 700; box-shadow: 0 20px 60px rgba(255,90,103,.25); }
+    @media (max-aspect-ratio: 1/1) {
+      #ca-entete { left: 60px; right: 60px; top: 220px; flex-direction: column; gap: 10px; }
+      #ca-titre { font-size: 72px; }
+      .ca-panneau { left: 40px; right: 40px; top: 470px; bottom: 640px; }
+      #ca-logs { font-size: 26px; padding: 14px 20px; }
+      .ca-req, .ca-h { display: none; }
+      .ca-col-canal, .ca-col-heure { display: none; }
+      #ca-table td, #ca-table th { padding: 12px 18px; }
+      #ca-alerte { left: 40px; right: 40px; bottom: 40px; justify-content: center; }
+    }
+  </style>
+  <div id="root" data-composition-id="s-cas" data-width="1920" data-height="1080"
+    data-composition-variables='[{"id":"t_attaque","type":"number","label":"Attaque","default":1.8},{"id":"t_virements","type":"number","label":"Virements","default":4.2},{"id":"t_fin","type":"number","label":"Fin","default":6}]'>
+    <div id="ca-entete">
+      <h2 id="ca-titre"><span>2.</span> Cas pratiques</h2>
+      <p id="ca-role">Analyste SOC N2 · Jeudi 09h05 · jour d’échéance</p>
+    </div>
+    <div class="ca-panneau" id="ca-p1">
+      <div class="ca-barre"><b>Portail interbancaire — journal d’accès</b><span class="ca-tag">503 en hausse</span></div>
+      <div id="ca-logs">
+        <div class="ca-l"><span class="ca-h">09:02:03</span><span class="ca-ip">203.0.113.14</span><span class="ca-req">POST /login</span><span class="ca-c ca-401">401</span></div>
+        <div class="ca-l"><span class="ca-h">09:02:04</span><span class="ca-ip">192.0.2.77</span><span class="ca-req">POST /api/virements</span><span class="ca-c ca-401">401</span></div>
+        <div class="ca-l"><span class="ca-h">09:02:11</span><span class="ca-ip">172.16.30.25</span><span class="ca-req">POST /api/virements</span><span class="ca-c ca-200">200</span></div>
+        <div class="ca-l"><span class="ca-h">09:03:30</span><span class="ca-ip">203.0.113.141</span><span class="ca-req">POST /login</span><span class="ca-c ca-503">503</span></div>
+        <div class="ca-l"><span class="ca-h">09:03:31</span><span class="ca-ip">192.0.2.150</span><span class="ca-req">POST /login</span><span class="ca-c ca-503">503</span></div>
+        <div class="ca-l"><span class="ca-h">09:03:31</span><span class="ca-ip">198.51.100.12</span><span class="ca-req">POST /api/virements</span><span class="ca-c ca-503">503</span></div>
+        <div class="ca-l"><span class="ca-h">09:04:40</span><span class="ca-ip">203.0.113.203</span><span class="ca-req">POST /login</span><span class="ca-c ca-503">503</span></div>
+        <div class="ca-l"><span class="ca-h">09:04:40</span><span class="ca-ip">192.0.2.33</span><span class="ca-req">POST /api/virements</span><span class="ca-c ca-503">503</span></div>
+        <div class="ca-l"><span class="ca-h">09:04:40</span><span class="ca-ip">198.51.100.97</span><span class="ca-req">POST /login</span><span class="ca-c ca-503">503</span></div>
+      </div>
+    </div>
+    <div class="ca-panneau" id="ca-p2">
+      <div class="ca-barre"><b>Switch national — flux de paiements</b><span class="ca-tag">Lundi 08h40</span></div>
+      <div class="ca-fond">
+        <table id="ca-table">
+          <thead><tr><th>ID</th><th>Bénéficiaire</th><th style="text-align:right">Montant (CDF)</th><th class="ca-col-heure">Heure</th></tr></thead>
+          <tbody>
+            <tr><td>TX-…1208</td><td>Ets Lumbu Pharma</td><td class="m">2 300 000</td><td class="ca-col-heure">09:12:58</td></tr>
+            <tr class="ca-suspect"><td>TX-…1209</td><td>Cpte 77-0193</td><td class="m">9 950 000</td><td class="ca-col-heure">09:14:03</td></tr>
+            <tr class="ca-suspect"><td>TX-…1211</td><td>Cpte 77-0193</td><td class="m">9 900 000</td><td class="ca-col-heure">09:15:37</td></tr>
+            <tr class="ca-suspect"><td>TX-…1213</td><td>Cpte 77-0193</td><td class="m">9 980 000</td><td class="ca-col-heure">09:17:12</td></tr>
+            <tr class="ca-suspect"><td>TX-…1215</td><td>Cpte 77-0193</td><td class="m">9 870 000</td><td class="ca-col-heure">09:18:48</td></tr>
+            <tr class="ca-suspect"><td>TX-…1217</td><td>Cpte 77-0193</td><td class="m">9 940 000</td><td class="ca-col-heure">09:20:41</td></tr>
+          </tbody>
+        </table>
+        <div id="ca-alerte"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#0b1220" stroke-width="2.4" stroke-linecap="round"><path d="M12 3 2 20h20L12 3Z" /><path d="M12 10v4M12 17h.01" /></svg>Fractionnement sous le seuil</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const v = window.__hyperframes.getVariables();
+      const ta = Number(v.t_attaque), tv = Number(v.t_virements), tf = Number(v.t_fin);
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#ca-titre", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "power2.out" }, 0.05);
+      tl.fromTo("#ca-role", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.25);
+      tl.set("#ca-p2", { opacity: 0 }, 0);
+      tl.fromTo("#ca-p1", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 0.2);
+      // Les lignes de log tombent en rafale quand la voix dit « une attaque ».
+      tl.fromTo("#ca-logs .ca-l", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.18, stagger: 0.12, ease: "power2.out" }, Math.max(0.5, ta - 0.6));
+      tl.fromTo("#ca-p1 .ca-tag", { opacity: 0 }, { opacity: 1, duration: 0.2 }, ta + 0.4);
+      // « des virements suspects » : glissé vers le flux de paiements, les lignes fractionnées se marquent.
+      tl.to("#ca-p1", { x: -160, opacity: 0, filter: "blur(12px)", duration: 0.22, ease: "power3.in" }, tv - 0.3);
+      tl.fromTo("#ca-p2", { x: 160, opacity: 0, filter: "blur(12px)" }, { x: 0, opacity: 1, filter: "blur(0px)", duration: 0.3, ease: "power3.out" }, tv - 0.1);
+      tl.fromTo(".ca-suspect td", { backgroundColor: "rgba(255,90,103,0)" }, { backgroundColor: "rgba(255,90,103,.13)", duration: 0.2, stagger: 0.03 }, tv + 0.5);
+      tl.fromTo("#ca-alerte", { opacity: 0, y: 20, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "back.out(1.6)" }, tv + 0.85);
+      tl.to(["#ca-entete", "#ca-p2"], { opacity: 0, filter: "blur(10px)", duration: 0.25, ease: "power3.in" }, tf - 0.27);
+      window.__timelines["s-cas"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,16 @@
+[
+  { "id": "accroche", "texte": "Le test de recrutement de la BCC… tu n'auras qu'un seul essai." },
+  { "id": "question", "texte": "Alors pourquoi ne pas le passer… avant le jour J ?" },
+  { "id": "revelation", "texte": "Voici le Simulateur BCC. Gratuit. Conçu par Datalendo." },
+  { "id": "filiere", "texte": "Tu choisis ta filière : Data Analyse, ou Cybersécurité." },
+  { "id": "examen", "texte": "Tu passes un examen blanc chronométré : technique, culture BCC, logique." },
+  { "id": "cas", "texte": "Puis tu gères de vrais cas pratiques : une attaque sur le portail interbancaire, des virements suspects." },
+  { "id": "note", "texte": "À la fin, ta note sur vingt." },
+  { "id": "explication", "texte": "Chaque réponse expliquée… et pourquoi les autres sont fausses." },
+  { "id": "radar", "texte": "Ton radar te dit exactement quoi réviser." },
+  { "id": "nouvelles", "texte": "Et chaque nouvel examen te pose de nouvelles questions." },
+  { "id": "cinq", "texte": "Passe-le cinq fois. Le jour du test, ce ne sera plus une surprise." },
+  { "id": "succes", "texte": "On te souhaite plein succès." },
+  { "id": "partage", "texte": "Et si un ami prépare le même test… envoie-lui le lien. On réussit mieux ensemble." },
+  { "id": "signature", "texte": "Simulateur BCC. Par Datalendo." }
+]

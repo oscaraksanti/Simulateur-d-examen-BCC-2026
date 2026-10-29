@@ -1,0 +1,48 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #f8f9fb; color: #0b1220; font-family: Inter, sans-serif; overflow: hidden; }
+    #xp-panneau { position: absolute; left: 330px; right: 330px; top: 80px; padding: 48px 56px; border-radius: 34px; background: #fff; border: 2px solid #e6e8ed; box-shadow: 0 30px 80px rgba(11,18,32,.10); }
+    #xp-verdict { display: flex; align-items: center; gap: 18px; font-size: 44px; font-weight: 700; color: #047857; letter-spacing: -0.03em; }
+    #xp-verdict i { width: 60px; height: 60px; border-radius: 18px; background: #0e9f6e; display: flex; align-items: center; justify-content: center; }
+    #xp-texte { margin-top: 22px; font-size: 34px; line-height: 1.45; color: #1d2638; }
+    code { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.9em; }
+    #xp-pourquoi { margin-top: 34px; font-size: 30px; font-weight: 700; color: #5d6577; }
+    .xp-l { display: flex; align-items: center; gap: 20px; margin-top: 16px; font-size: 32px; line-height: 1.35; color: #3c4557; }
+    .xp-l span:first-child { flex: none; width: 52px; height: 52px; border-radius: 14px; border: 2px solid #f0c3c8; background: #fdeef0; color: #ce1021; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 28px; }
+    #xp-retenir { margin-top: 30px; padding: 22px 28px; border-radius: 22px; background: #fff8d6; border: 2px solid rgba(247,198,0,.55); font-size: 32px; line-height: 1.4; }
+    @media (max-aspect-ratio: 1/1) {
+      #xp-panneau { left: 40px; right: 40px; top: 230px; padding: 44px 44px; }
+      #xp-texte { font-size: 36px; }
+      .xp-l { font-size: 34px; align-items: flex-start; }
+      #xp-retenir { font-size: 34px; }
+    }
+  </style>
+  <div id="root" data-composition-id="s-explication" data-width="1920" data-height="1080"
+    data-composition-variables='[{"id":"t_fausses","type":"number","label":"Fausses","default":1.6},{"id":"t_fin","type":"number","label":"Fin","default":4}]'>
+    <div id="xp-panneau">
+      <p id="xp-verdict"><i><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg></i>Bonne réponse : B</p>
+      <p id="xp-texte">Un filtre sur un agrégat se fait avec <code>HAVING</code> après <code>GROUP BY</code>. <code>WHERE</code> ne peut pas contenir <code>SUM()</code>.</p>
+      <p id="xp-pourquoi">Pourquoi les autres réponses sont fausses</p>
+      <div class="xp-l" id="xp-a"><span>A</span><span>WHERE est évalué ligne par ligne : SUM() y est interdit.</span></div>
+      <div class="xp-l" id="xp-c"><span>C</span><span>On regroupe par montant, pas par banque.</span></div>
+      <div class="xp-l" id="xp-d"><span>D</span><span>Filtre chaque opération, pas le total par banque.</span></div>
+      <p id="xp-retenir"><strong>À retenir :</strong> un seuil sur <code>SUM()</code> va toujours dans <code>HAVING</code>.</p>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const v = window.__hyperframes.getVariables();
+      const tx = Number(v.t_fausses), tf = Number(v.t_fin);
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#xp-panneau", { opacity: 0, scale: 1.05, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 0);
+      tl.fromTo("#xp-texte", { opacity: 0 }, { opacity: 1, duration: 0.25 }, 0.35);
+      tl.set(["#xp-pourquoi", "#xp-a", "#xp-c", "#xp-d", "#xp-retenir"], { opacity: 0 }, 0);
+      // « … et pourquoi les autres sont fausses » : chaque mauvaise réponse est réfutée, une par une.
+      tl.to("#xp-pourquoi", { opacity: 1, duration: 0.2 }, tx - 0.1);
+      tl.fromTo(["#xp-a", "#xp-c", "#xp-d"], { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.35, stagger: 0.28, ease: "expo.out" }, tx + 0.1);
+      tl.fromTo("#xp-retenir", { opacity: 0, scale: 0.97 }, { opacity: 1, scale: 1, duration: 0.4, ease: "expo.out" }, tx + 1.05);
+      tl.to("#xp-panneau", { opacity: 0, filter: "blur(10px)", duration: 0.2, ease: "power3.in" }, Math.max(tx + 1.6, tf - 0.22));
+      window.__timelines["s-explication"] = tl;
+    })();
+  </script>
+</template>

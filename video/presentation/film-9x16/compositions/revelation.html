@@ -1,0 +1,74 @@
+<!-- COPIE GÉNÉRÉE (9:16) depuis film/compositions par outils/caler.mjs : ne pas modifier ici. -->
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #f8f9fb; color: #0b1220; font-family: Inter, sans-serif; overflow: hidden; }
+    #rv-marque { position: absolute; left: 150px; top: 300px; width: 640px; }
+    #rv-ligne { display: flex; align-items: center; gap: 28px; }
+    #rv-logo { width: 140px; height: 140px; flex: none; }
+    #rv-nom { font-size: 104px; font-weight: 700; letter-spacing: -0.05em; line-height: 0.95; white-space: nowrap; }
+    #rv-pastilles { display: flex; gap: 16px; margin-top: 46px; }
+    .rv-pastille { display: inline-flex; align-items: center; gap: 12px; height: 72px; padding: 0 30px; border-radius: 999px; font-size: 34px; font-weight: 700; letter-spacing: -0.02em; }
+    #rv-gratuit { background: #0b1220; color: #fff; }
+    #rv-dl { background: #fff; border: 2px solid #e6e8ed; color: #0b1220; }
+    #rv-dl b { color: #0062cc; }
+    #rv-navigateur { position: absolute; left: 860px; top: 120px; width: 1280px; border-radius: 26px; overflow: hidden; background: #fff; border: 2px solid #e6e8ed; box-shadow: 0 40px 100px rgba(11,18,32,.16); }
+    #rv-barre { height: 58px; display: flex; align-items: center; gap: 12px; padding: 0 24px; background: #f2f4f7; border-bottom: 2px solid #e6e8ed; }
+    #rv-barre i { width: 14px; height: 14px; border-radius: 50%; background: #d6dae2; }
+    #rv-url { margin-left: 18px; height: 40px; padding: 0 22px; display: flex; align-items: center; border-radius: 10px; background: #fff; font-size: 28px; color: #5d6577; }
+    #rv-fenetre { position: relative; height: 780px; overflow: hidden; }
+    #rv-capture { display: block; width: 1900px; max-width: none; }
+    @media (max-aspect-ratio: 1/1) {
+      #rv-marque { left: 80px; top: 250px; width: 920px; }
+      #rv-logo { width: 130px; height: 130px; }
+      #rv-nom { font-size: 112px; }
+      #rv-navigateur { left: 50px; top: 720px; width: 1160px; }
+      #rv-fenetre { height: 620px; }
+      #rv-capture { width: 1700px; }
+    }
+  </style>
+  <div id="root" data-composition-id="s-revelation" data-width="1080" data-height="1920"
+    data-composition-variables='[{"id":"t_gratuit","type":"number","label":"Gratuit","default":1.5},{"id":"t_datalendo","type":"number","label":"Datalendo","default":3}]'>
+    <div id="rv-marque">
+      <div id="rv-ligne">
+        <svg id="rv-logo" viewBox="0 0 32 32">
+          <defs><clipPath id="rv-niv"><rect id="rv-niveau" x="0" y="32" width="32" height="32" /></clipPath></defs>
+          <path d="M16 2.5 4.5 6.8v8.4c0 7.2 4.9 12.4 11.5 14.3 6.6-1.9 11.5-7.1 11.5-14.3V6.8L16 2.5Z" fill="none" stroke="#0b1220" stroke-width="1" />
+          <g clip-path="url(#rv-niv)">
+            <path d="M16 2.5 4.5 6.8v8.4c0 7.2 4.9 12.4 11.5 14.3 6.6-1.9 11.5-7.1 11.5-14.3V6.8L16 2.5Z" fill="#0066c7" />
+            <path d="M16 2.5v27c6.6-1.9 11.5-7.1 11.5-14.3V6.8L16 2.5Z" fill="#000" opacity=".12" />
+          </g>
+          <path id="rv-trace" d="m9.5 19.5 4.2-4.6 3.4 2.6 5.4-6.3" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="20" stroke-dashoffset="20" />
+          <circle class="rv-point" cx="9.5" cy="19.5" r="1.7" fill="#F7C600" />
+          <circle class="rv-point" cx="22.5" cy="11.2" r="1.9" fill="#F7C600" />
+        </svg>
+        <p id="rv-nom">Simulateur<br />BCC</p>
+      </div>
+      <div id="rv-pastilles">
+        <span id="rv-gratuit" class="rv-pastille">Gratuit</span>
+        <span id="rv-dl" class="rv-pastille">par <b>Datalendo</b></span>
+      </div>
+    </div>
+    <div id="rv-navigateur" data-layout-allow-overflow>
+      <div id="rv-barre"><i></i><i></i><i></i><span id="rv-url">simulateur-bcc.datalendo.com</span></div>
+      <div id="rv-fenetre"><img id="rv-capture" src="assets/ecrans/accueil.png" alt="" /></div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const v = window.__hyperframes.getVariables();
+      const tg = Number(v.t_gratuit), td = Number(v.t_datalendo);
+      const tl = gsap.timeline({ paused: true });
+      // La marque se « remplit » (le bouclier se colore de bas en haut), puis le nom se dévoile.
+      tl.fromTo("#rv-niveau", { attr: { y: 32 } }, { attr: { y: 0 }, duration: 0.6, ease: "power2.out" }, 0.05);
+      tl.fromTo("#rv-trace", { strokeDashoffset: 20 }, { strokeDashoffset: 0, duration: 0.45, ease: "power2.out" }, 0.45);
+      tl.fromTo(".rv-point", { scale: 0, transformOrigin: "50% 50%" }, { scale: 1, duration: 0.3, stagger: 0.1, ease: "back.out(1.6)" }, 0.6);
+      tl.fromTo("#rv-nom", { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 0.7, ease: "power3.out" }, 0.25);
+      tl.fromTo("#rv-gratuit", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(1.7)" }, tg - 0.05);
+      tl.fromTo("#rv-dl", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(1.7)" }, td - 0.15);
+      // Le vrai site entre dans le cadre, puis on le parcourt.
+      tl.fromTo("#rv-navigateur", { y: 260, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, ease: "expo.out" }, 0.55);
+      tl.fromTo("#rv-capture", { x: -40, y: -60 }, { x: -60, y: -150, duration: 2.8, ease: "power1.inOut" }, 1.4);
+      window.__timelines["s-revelation"] = tl;
+    })();
+  </script>
+</template>

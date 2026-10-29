@@ -1,0 +1,60 @@
+<!-- COPIE GÉNÉRÉE (9:16) depuis film/compositions par outils/caler.mjs : ne pas modifier ici. -->
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #f8f9fb; color: #ffffff; font-family: Inter, sans-serif; overflow: hidden; }
+    #ci-flot { position: absolute; inset: 0; background: #0062cc; }
+    #ci-bloc { position: absolute; left: 150px; top: 170px; }
+    #ci-cinq { font-size: 560px; font-weight: 700; letter-spacing: -0.08em; line-height: 0.82; }
+    #ci-mot { margin-top: 30px; font-size: 92px; font-weight: 700; letter-spacing: -0.045em; }
+    #ci-graphe { position: absolute; left: 980px; right: 150px; top: 200px; height: 560px; display: flex; align-items: flex-end; gap: 34px; border-bottom: 4px solid rgba(255,255,255,.35); }
+    .ci-col { flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 14px; }
+    .ci-val { font-family: 'JetBrains Mono', monospace; font-size: 38px; font-weight: 700; }
+    .ci-barre { width: 100%; border-radius: 20px 20px 0 0; background: rgba(255,255,255,.35); }
+    .ci-barre.ci-derniere { background: #ffffff; }
+    #ci-legende { position: absolute; left: 980px; right: 150px; top: 800px; display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 30px; color: rgba(255,255,255,.75); }
+    #ci-phrase { position: absolute; left: 980px; right: 100px; top: 880px; font-size: 54px; font-weight: 700; letter-spacing: -0.035em; }
+    @media (max-aspect-ratio: 1/1) {
+      #ci-bloc { left: 90px; top: 230px; }
+      #ci-cinq { font-size: 520px; }
+      #ci-mot { font-size: 96px; margin-top: 10px; }
+      #ci-graphe { left: 90px; right: 90px; top: 900px; height: 360px; gap: 26px; }
+      #ci-legende { left: 90px; right: 90px; top: 1285px; }
+      #ci-phrase { left: 90px; right: 60px; top: 1380px; font-size: 58px; }
+    }
+  </style>
+  <div id="root" data-composition-id="s-cinq" data-width="1080" data-height="1920"
+    data-composition-variables='[{"id":"t_jour","type":"number","label":"Le jour","default":1.6},{"id":"t_fin","type":"number","label":"Fin","default":4.8}]'>
+    <div id="ci-flot"></div>
+    <div id="ci-bloc"><p id="ci-cinq">5×</p><p id="ci-mot">avant le jour J.</p></div>
+    <div id="ci-graphe">
+      <div class="ci-col"><span class="ci-val">9</span><div class="ci-barre" style="height: 230px"></div></div>
+      <div class="ci-col"><span class="ci-val">10,5</span><div class="ci-barre" style="height: 270px"></div></div>
+      <div class="ci-col"><span class="ci-val">12</span><div class="ci-barre" style="height: 310px"></div></div>
+      <div class="ci-col"><span class="ci-val">13,5</span><div class="ci-barre" style="height: 350px"></div></div>
+      <div class="ci-col"><span class="ci-val">15,5</span><div class="ci-barre ci-derniere" style="height: 400px"></div></div>
+    </div>
+    <div id="ci-legende"><span>n°1</span><span>n°2</span><span>n°3</span><span>n°4</span><span>n°5</span></div>
+    <p id="ci-phrase">Le jour J, tu connais déjà le terrain.</p>
+  </div>
+  <script>
+    (function () {
+      const v = window.__hyperframes.getVariables();
+      const tj = Number(v.t_jour), tf = Number(v.t_fin);
+      const portrait = window.innerHeight > window.innerWidth;
+      const tl = gsap.timeline({ paused: true });
+      // Inondation de couleur : le monde passe au bleu à l'impact.
+      tl.fromTo("#ci-flot", { clipPath: "circle(0% at 30% 45%)" }, { clipPath: "circle(150% at 30% 45%)", duration: 0.45, ease: "power2.inOut" }, 0);
+      tl.fromTo("#ci-cinq", { scale: 1.25, opacity: 0, filter: "blur(16px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.5, ease: "expo.out", transformOrigin: portrait ? "0% 50%" : "0% 60%" }, 0.12);
+      tl.fromTo("#ci-mot", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2 }, 0.55);
+      // « Le jour du test… » : la progression sur cinq simulations monte.
+      tl.set(["#ci-graphe", "#ci-legende", "#ci-phrase"], { opacity: 0 }, 0);
+      tl.to(["#ci-graphe", "#ci-legende"], { opacity: 1, duration: 0.2 }, Math.max(0.9, tj - 0.6));
+      tl.fromTo(".ci-barre", { scaleY: 0, transformOrigin: "50% 100%" }, { scaleY: 1, duration: 0.6, stagger: 0.1, ease: "expo.out" }, Math.max(0.9, tj - 0.55));
+      tl.fromTo(".ci-val", { opacity: 0 }, { opacity: 1, duration: 0.2, stagger: 0.1 }, Math.max(1.1, tj - 0.35));
+      tl.fromTo("#ci-phrase", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.25 }, tj + 0.3);
+      tl.to(["#ci-bloc", "#ci-graphe", "#ci-legende", "#ci-phrase"], { opacity: 0, filter: "blur(10px)", duration: 0.22, ease: "power3.in" }, Math.max(tj + 1.4, tf - 0.25));
+      tl.to("#ci-flot", { clipPath: "circle(0% at 50% 50%)", duration: 0.3, ease: "power2.in" }, Math.max(tj + 1.45, tf - 0.3));
+      window.__timelines["s-cinq"] = tl;
+    })();
+  </script>
+</template>

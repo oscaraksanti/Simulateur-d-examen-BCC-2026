@@ -1,0 +1,66 @@
+<!-- COPIE GÉNÉRÉE (9:16) depuis film/compositions par outils/caler.mjs : ne pas modifier ici. -->
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #ffffff; color: #0b1220; font-family: Inter, sans-serif; overflow: hidden; }
+    #ac-grille {
+      position: absolute; inset: 0;
+      background-image: linear-gradient(to right, rgba(11,18,32,.045) 2px, transparent 2px), linear-gradient(to bottom, rgba(11,18,32,.045) 2px, transparent 2px);
+      background-size: 80px 80px;
+      -webkit-mask-image: radial-gradient(ellipse 70% 70% at 30% 40%, #000 30%, transparent 80%);
+      mask-image: radial-gradient(ellipse 70% 70% at 30% 40%, #000 30%, transparent 80%);
+    }
+    #ac-bloc { position: absolute; left: 180px; top: 170px; right: 120px; }
+    #ac-intro { font-size: 46px; font-weight: 600; letter-spacing: -0.03em; color: #5d6577; }
+    #ac-ligne { display: flex; align-items: center; gap: 56px; margin-top: 10px; }
+    #ac-chiffre { position: relative; height: 560px; line-height: 560px; overflow: hidden; font-size: 600px; font-weight: 700; letter-spacing: -0.07em; font-variant-numeric: tabular-nums; }
+    #ac-bande { display: flex; flex-direction: column; }
+    #ac-bande span { display: block; height: 560px; }
+    #ac-textes { position: relative; width: 820px; height: 360px; }
+    .ac-texte { position: absolute; left: 0; top: 50%; transform: translateY(-50%); font-size: 132px; font-weight: 700; letter-spacing: -0.05em; line-height: 0.98; }
+    .ac-texte small { display: block; margin-top: 18px; font-size: 64px; letter-spacing: -0.035em; color: #5d6577; font-weight: 600; }
+    .ac-bleu { color: #0062cc; }
+    @media (max-aspect-ratio: 1/1) {
+      #ac-bloc { left: 80px; right: 60px; top: 330px; }
+      #ac-intro { font-size: 44px; }
+      #ac-ligne { flex-direction: column; align-items: flex-start; gap: 0; margin-top: 30px; }
+      #ac-chiffre { height: 560px; line-height: 560px; font-size: 600px; }
+      #ac-textes { width: 940px; height: 300px; }
+      .ac-texte { font-size: 124px; }
+      .ac-texte small { font-size: 60px; }
+    }
+  </style>
+  <div id="root" data-composition-id="s-accroche" data-width="1080" data-height="1920"
+    data-composition-variables='[{"id":"t_question","type":"number","label":"Question","default":4.3},{"id":"t_avant","type":"number","label":"Avant","default":5.8},{"id":"t_fin","type":"number","label":"Fin de scène","default":7.6}]'>
+    <div id="ac-grille"></div>
+    <div id="ac-bloc">
+      <p id="ac-intro">Le test de recrutement de la BCC</p>
+      <div id="ac-ligne">
+        <div id="ac-chiffre" data-layout-allow-overflow><div id="ac-bande"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div></div>
+        <div id="ac-textes" data-layout-allow-overlap>
+          <p id="ac-t1" class="ac-texte">seul essai.<small>Pas de deuxième chance.</small></p>
+          <p id="ac-t2" class="ac-texte">essais<small><span class="ac-bleu">avant</span> le jour J.</small></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const v = window.__hyperframes.getVariables();
+      const tq = Number(v.t_question), ta = Number(v.t_avant), tf = Number(v.t_fin);
+      const tl = gsap.timeline({ paused: true });
+      // Image 0 : « 1 seul essai. » déjà posé (vignette). Le sous-titre arrive avec la voix.
+      tl.fromTo("#ac-t1 small", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.25, ease: "power2.out" }, 1.6);
+      tl.set("#ac-t2", { opacity: 0 }, 0);
+      // « Alors pourquoi ne pas le passer… » : le 1 roule jusqu'à 5, comme un compteur.
+      tl.to("#ac-t1", { opacity: 0, filter: "blur(10px)", duration: 0.2, ease: "power3.in" }, tq + 0.1);
+      tl.fromTo("#ac-bande", { yPercent: 0 }, { yPercent: -80, duration: 1.1, ease: "power3.inOut" }, tq + 0.15);
+      tl.to("#ac-chiffre", { color: "#0062cc", duration: 0.5, ease: "power2.inOut" }, tq + 0.5);
+      tl.fromTo("#ac-t2", { opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.25, ease: "power2.out" }, tq + 1.0);
+      tl.fromTo("#ac-t2 small", { opacity: 0 }, { opacity: 1, duration: 0.2 }, ta - 0.05);
+      // Sortie : on plonge dans le 5 (zoom à travers).
+      tl.to(["#ac-intro", "#ac-textes"], { opacity: 0, filter: "blur(8px)", duration: 0.2, ease: "power3.in" }, tf - 0.6);
+      tl.to("#ac-chiffre", { scale: 9, filter: "blur(18px)", opacity: 0, duration: 0.55, ease: "power3.in", transformOrigin: "50% 50%" }, tf - 0.6);
+      window.__timelines["s-accroche"] = tl;
+    })();
+  </script>
+</template>

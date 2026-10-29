@@ -1,0 +1,109 @@
+<!-- COPIE GÉNÉRÉE (9:16) depuis film/compositions par outils/caler.mjs : ne pas modifier ici. -->
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #f8f9fb; color: #0b1220; font-family: Inter, sans-serif; overflow: hidden; }
+    #ex-onglets { position: absolute; left: 0; right: 0; top: 70px; display: flex; justify-content: center; gap: 14px; }
+    .ex-onglet { height: 76px; padding: 0 34px; display: flex; align-items: center; border-radius: 999px; font-size: 32px; font-weight: 700; letter-spacing: -0.02em; color: #8a93a3; background: #eef1f5; }
+    #ex-carte { position: absolute; left: 290px; right: 290px; top: 190px; height: 840px; padding: 48px 56px; border-radius: 34px; background: #fff; border: 2px solid #e6e8ed; box-shadow: 0 30px 80px rgba(11,18,32,.10); }
+    #ex-entete { display: flex; align-items: center; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 28px; color: #5d6577; }
+    #ex-chrono { display: flex; align-items: center; gap: 12px; padding: 10px 22px; border-radius: 14px; border: 2px solid #e6e8ed; font-size: 36px; font-weight: 700; color: #0b1220; }
+    #ex-chrono svg { width: 32px; height: 32px; }
+    #ex-barre { margin-top: 22px; height: 10px; border-radius: 10px; background: #f2f4f7; overflow: hidden; }
+    #ex-plein { height: 100%; width: 100%; background: #0077e6; border-radius: 10px; transform-origin: 0 50%; }
+    #ex-zone { position: relative; margin-top: 34px; height: 600px; }
+    .ex-q { position: absolute; inset: 0; }
+    .ex-enonce { font-size: 42px; line-height: 1.25; font-weight: 700; letter-spacing: -0.02em; }
+    .ex-enonce code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; color: #0062cc; background: #f2f4f7; padding: 2px 10px; border-radius: 10px; }
+    .ex-options { margin-top: 30px; display: grid; gap: 14px; }
+    .ex-option { position: relative; display: flex; align-items: center; gap: 20px; padding: 18px 22px; border: 2px solid #e6e8ed; border-radius: 20px; font-size: 30px; }
+    .ex-option.mono { font-family: 'JetBrains Mono', monospace; font-size: 26px; }
+    .ex-lettre { flex: none; width: 50px; height: 50px; border-radius: 14px; background: #f2f4f7; color: #5d6577; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 26px; }
+    .ex-choix { position: absolute; inset: -2px; border-radius: 20px; border: 3px solid #0077e6; background: rgba(0,119,230,.06); opacity: 0; }
+    @media (max-aspect-ratio: 1/1) {
+      #ex-onglets { top: 210px; flex-wrap: wrap; padding: 0 60px; gap: 12px; }
+      .ex-onglet { height: 70px; font-size: 30px; padding: 0 28px; }
+      #ex-carte { left: 50px; right: 50px; top: 400px; height: 940px; padding: 44px 44px; }
+      #ex-zone { height: 720px; }
+      .ex-enonce { font-size: 44px; }
+      .ex-option { font-size: 32px; }
+    }
+  </style>
+  <div id="root" data-composition-id="s-examen" data-width="1080" data-height="1920"
+    data-composition-variables='[{"id":"t_technique","type":"number","label":"Technique","default":2.2},{"id":"t_culture","type":"number","label":"Culture","default":3.2},{"id":"t_logique","type":"number","label":"Logique","default":4.3},{"id":"t_fin","type":"number","label":"Fin","default":6}]'>
+    <div id="ex-onglets">
+      <span class="ex-onglet" id="ex-o1">Technique</span>
+      <span class="ex-onglet" id="ex-o2">Culture BCC</span>
+      <span class="ex-onglet" id="ex-o3">Aptitudes logiques</span>
+    </div>
+    <div id="ex-carte">
+      <div id="ex-entete">
+        <span id="ex-numero">Question 7 / 24</span>
+        <span id="ex-chrono"><svg viewBox="0 0 24 24" fill="none" stroke="#5d6577" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg><span id="ex-temps">18:42</span></span>
+      </div>
+      <div id="ex-barre"><div id="ex-plein"></div></div>
+      <div id="ex-zone" data-layout-allow-overlap>
+        <div class="ex-q" id="ex-q1">
+          <p class="ex-enonce">La table <code>paiements</code> contient les ordres du jour. Quelle requête renvoie les banques dont le volume dépasse 5 milliards de CDF ?</p>
+          <div class="ex-options">
+            <div class="ex-option mono"><span class="ex-lettre">A</span>WHERE SUM(montant_cdf) &gt; 5e9</div>
+            <div class="ex-option mono"><div class="ex-choix"></div><span class="ex-lettre">B</span>GROUP BY banque_emettrice HAVING SUM(montant_cdf) &gt; 5e9</div>
+            <div class="ex-option mono"><span class="ex-lettre">C</span>GROUP BY montant_cdf HAVING montant_cdf &gt; 5e9</div>
+          </div>
+        </div>
+        <div class="ex-q" id="ex-q2">
+          <p class="ex-enonce">Selon la loi n°005/2002, quel est l’objectif principal de la politique monétaire de la BCC ?</p>
+          <div class="ex-options">
+            <div class="ex-option"><span class="ex-lettre">A</span>Maximiser les réserves de change</div>
+            <div class="ex-option"><div class="ex-choix"></div><span class="ex-lettre">B</span>Assurer la stabilité du niveau général des prix</div>
+            <div class="ex-option"><span class="ex-lettre">C</span>Financer le déficit budgétaire de l’État</div>
+          </div>
+        </div>
+        <div class="ex-q" id="ex-q3">
+          <p class="ex-enonce">Quel nombre complète la suite : 2 ; 6 ; 18 ; 54 ; … ?</p>
+          <div class="ex-options">
+            <div class="ex-option"><span class="ex-lettre">A</span>108</div>
+            <div class="ex-option"><span class="ex-lettre">B</span>90</div>
+            <div class="ex-option"><div class="ex-choix"></div><span class="ex-lettre">D</span>162</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const v = window.__hyperframes.getVariables();
+      const t1 = Number(v.t_technique), t2 = Number(v.t_culture), t3 = Number(v.t_logique), tf = Number(v.t_fin);
+      const tl = gsap.timeline({ paused: true });
+      // La carte entre légèrement grande et se pose ; le chrono tourne.
+      tl.fromTo("#ex-carte", { opacity: 0, scale: 1.05, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.6, ease: "expo.out" }, 0);
+      tl.fromTo(".ex-onglet", { opacity: 0 }, { opacity: 1, duration: 0.25, stagger: 0.06 }, 0.15);
+      const c = { s: 1122 };
+      tl.to(c, { s: 1122 - Math.round(tf * 3), duration: tf, ease: "none", onUpdate: () => {
+        const s = Math.round(c.s);
+        document.querySelector("#ex-temps").textContent = String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
+      } }, 0);
+      tl.fromTo("#ex-plein", { scaleX: 0.25 }, { scaleX: 0.42, duration: tf, ease: "none" }, 0);
+      tl.fromTo("#ex-chrono", { scale: 1 }, { scale: 1.12, duration: 0.25, ease: "power2.out", yoyo: true, repeat: 1, transformOrigin: "100% 50%" }, 0.6);
+      tl.set(["#ex-q2", "#ex-q3"], { opacity: 0 }, 0);
+      tl.fromTo("#ex-q1", { opacity: 0 }, { opacity: 1, duration: 0.2 }, 0.3);
+      // Chaque section nommée par la voix s'allume ; la question change (glissé avec flou).
+      const onglet = (id, t) => tl.to(id, { backgroundColor: "#0b1220", color: "#ffffff", duration: 0.2, ease: "power2.out" }, t);
+      const eteint = (id, t) => tl.to(id, { backgroundColor: "#eef1f5", color: "#8a93a3", duration: 0.2 }, t);
+      onglet("#ex-o1", t1 - 0.05);
+      tl.to("#ex-q1 .ex-choix", { opacity: 1, duration: 0.15 }, t1 + 0.35);
+      const swap = (sortant, entrant, t) => {
+        tl.to(sortant, { x: -120, opacity: 0, filter: "blur(10px)", duration: 0.2, ease: "power3.in" }, t - 0.12);
+        tl.fromTo(entrant, { x: 120, opacity: 0, filter: "blur(10px)" }, { x: 0, opacity: 1, filter: "blur(0px)", duration: 0.25, ease: "power3.out" }, t + 0.06);
+      };
+      eteint("#ex-o1", t2 - 0.05); onglet("#ex-o2", t2 - 0.05); swap("#ex-q1", "#ex-q2", t2);
+      tl.set("#ex-numero", { textContent: "Question 15 / 24" }, t2);
+      tl.to("#ex-q2 .ex-choix", { opacity: 1, duration: 0.15 }, t2 + 0.45);
+      eteint("#ex-o2", t3 - 0.05); onglet("#ex-o3", t3 - 0.05); swap("#ex-q2", "#ex-q3", t3);
+      tl.set("#ex-numero", { textContent: "Question 21 / 24" }, t3);
+      tl.to("#ex-q3 .ex-choix", { opacity: 1, duration: 0.15 }, t3 + 0.45);
+      // Sortie : coupe sèche vers le monde sombre des cas pratiques (préparée par un léger assombrissement).
+      tl.to("#root", { backgroundColor: "#c9ced8", duration: 0.1 }, tf - 0.1);
+      window.__timelines["s-examen"] = tl;
+    })();
+  </script>
+</template>

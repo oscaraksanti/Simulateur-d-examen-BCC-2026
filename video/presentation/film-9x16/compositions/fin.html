@@ -1,0 +1,59 @@
+<!-- COPIE GÉNÉRÉE (9:16) depuis film/compositions par outils/caler.mjs : ne pas modifier ici. -->
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #ffffff; color: #0b1220; font-family: Inter, sans-serif; overflow: hidden; }
+    #fn-bloc { position: absolute; left: 0; right: 0; top: 230px; display: flex; flex-direction: column; align-items: center; }
+    #fn-marque { display: flex; align-items: center; gap: 30px; }
+    #fn-logo { width: 150px; height: 150px; }
+    #fn-nom { font-size: 128px; font-weight: 700; letter-spacing: -0.055em; white-space: nowrap; }
+    #fn-sous { margin-top: 26px; font-size: 42px; font-weight: 600; letter-spacing: -0.02em; color: #5d6577; }
+    #fn-sous b { color: #0062cc; }
+    #fn-cta { margin-top: 50px; display: inline-flex; align-items: center; gap: 18px; height: 112px; padding: 0 56px; border-radius: 26px; background: #0b1220; color: #fff; font-size: 44px; font-weight: 700; letter-spacing: -0.02em; }
+    #fn-url { margin-top: 30px; font-family: 'JetBrains Mono', monospace; font-size: 44px; font-weight: 700; }
+    #fn-mention { position: absolute; left: 0; right: 0; bottom: 70px; text-align: center; font-size: 28px; color: #5d6577; }
+    #fn-drapeau { position: absolute; left: 50%; bottom: 40px; width: 360px; height: 8px; margin-left: -180px; display: flex; border-radius: 8px; overflow: hidden; }
+    @media (max-aspect-ratio: 1/1) {
+      #fn-bloc { top: 470px; }
+      #fn-marque { flex-direction: column; gap: 26px; }
+      #fn-logo { width: 190px; height: 190px; }
+      #fn-nom { font-size: 132px; }
+      #fn-url { font-size: 42px; }
+      #fn-mention { bottom: auto; top: 1240px; padding: 0 100px; }
+      #fn-drapeau { bottom: auto; top: 1330px; }
+    }
+  </style>
+  <div id="root" data-composition-id="s-fin" data-width="1080" data-height="1920"
+    data-composition-variables='[{"id":"t_fin","type":"number","label":"Fin","default":5}]'>
+    <div id="fn-bloc">
+      <div id="fn-marque">
+        <svg id="fn-logo" viewBox="0 0 32 32">
+          <defs><clipPath id="fn-niv"><rect id="fn-niveau" x="0" y="32" width="32" height="32" /></clipPath></defs>
+          <path d="M16 2.5 4.5 6.8v8.4c0 7.2 4.9 12.4 11.5 14.3 6.6-1.9 11.5-7.1 11.5-14.3V6.8L16 2.5Z" fill="none" stroke="#0b1220" stroke-width="1" />
+          <g clip-path="url(#fn-niv)"><path d="M16 2.5 4.5 6.8v8.4c0 7.2 4.9 12.4 11.5 14.3 6.6-1.9 11.5-7.1 11.5-14.3V6.8L16 2.5Z" fill="#0066c7" /><path d="M16 2.5v27c6.6-1.9 11.5-7.1 11.5-14.3V6.8L16 2.5Z" fill="#000" opacity=".12" /></g>
+          <path id="fn-trace" d="m9.5 19.5 4.2-4.6 3.4 2.6 5.4-6.3" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="20" stroke-dashoffset="20" />
+          <circle class="fn-point" cx="9.5" cy="19.5" r="1.7" fill="#F7C600" /><circle class="fn-point" cx="22.5" cy="11.2" r="1.9" fill="#F7C600" />
+        </svg>
+        <p id="fn-nom">Simulateur BCC</p>
+      </div>
+      <p id="fn-sous">Gratuit · par <b>Datalendo</b></p>
+      <div id="fn-cta">Commencer gratuitement <span>→</span></div>
+      <p id="fn-url">simulateur-bcc.datalendo.com</p>
+    </div>
+    <p id="fn-mention">Outil de préparation indépendant, non affilié à la Banque Centrale du Congo.</p>
+    <div id="fn-drapeau" data-layout-ignore><span style="flex:6;background:#0077e6"></span><span style="flex:1.5;background:#f7c600"></span><span style="flex:2.5;background:#ce1021"></span></div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#fn-niveau", { attr: { y: 32 } }, { attr: { y: 0 }, duration: 0.6, ease: "power2.out" }, 0.05);
+      tl.fromTo("#fn-trace", { strokeDashoffset: 20 }, { strokeDashoffset: 0, duration: 0.45, ease: "power2.out" }, 0.5);
+      tl.fromTo(".fn-point", { scale: 0, transformOrigin: "50% 50%" }, { scale: 1, duration: 0.3, stagger: 0.1, ease: "back.out(1.6)" }, 0.65);
+      tl.fromTo("#fn-nom", { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 0.7, ease: "power3.out" }, 0.2);
+      tl.fromTo("#fn-sous", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.8);
+      tl.fromTo("#fn-cta", { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.5, ease: "expo.out" }, 1.0);
+      tl.fromTo("#fn-url", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.25 }, 1.25);
+      tl.fromTo(["#fn-mention", "#fn-drapeau"], { opacity: 0 }, { opacity: 1, duration: 0.4 }, 1.5);
+      window.__timelines["s-fin"] = tl;
+    })();
+  </script>
+</template>

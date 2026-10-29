@@ -47,3 +47,7 @@ next-env.d.ts
 # vidéo HyperFrames : artefacts et rendus locaux
 video/.hyperframes/
 video/renders/
+video/presentation/rendus/
+video/presentation/**/.hyperframes/
+video/presentation/film/outils/.tmp/
+video/presentation/capture/
