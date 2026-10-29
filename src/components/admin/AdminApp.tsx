@@ -11,6 +11,9 @@ import { clientSupabase, syncConfiguree } from '@/lib/remote';
 import { formatNote, LIBELLES_FILIERE } from '@/lib/share';
 import { Modal } from '@/components/ui/Modal';
 import { BarresHorizontales, Histogramme } from './Graphiques';
+import { ReglagesEmail } from './ReglagesEmail';
+
+const BASE_PATH = (process.env.NEXT_PUBLIC_BASE_PATH ?? '').replace(/\/+$/, '');
 
 interface StatsAdmin {
   candidats: number;
@@ -46,7 +49,7 @@ interface LigneCandidat {
 
 interface LigneEmail {
   id: number;
-  type: 'bienvenue' | 'resultat';
+  type: 'bienvenue' | 'resultat' | 'test';
   destinataire: string;
   sujet: string;
   statut: 'envoye' | 'cle_absente' | 'limite';
@@ -123,40 +126,67 @@ function Panneau({ titre, children, action }: { titre: string; children: React.R
   );
 }
 
-function Connexion({ onErreur }: { onErreur: string | null }) {
+/** Message d'erreur éventuel renvoyé par Supabase dans l'URL après un lien magique expiré ou invalide. */
+function erreurLien(): string | null {
+  if (typeof window === 'undefined') return null;
+  const p = new URLSearchParams(window.location.hash.replace(/^#/, '') || window.location.search.replace(/^\?/, ''));
+  return p.get('error_description') ? 'Ce lien de connexion a expiré ou a déjà servi. Demandes-en un nouveau.' : null;
+}
+
+function Connexion() {
   const [email, setEmail] = useState('');
-  const [motDePasse, setMotDePasse] = useState('');
-  const [erreur, setErreur] = useState<string | null>(onErreur);
+  const [erreur, setErreur] = useState<string | null>(erreurLien);
+  const [envoye, setEnvoye] = useState(false);
   const [chargement, setChargement] = useState(false);
 
-  const connecter = async (e: FormEvent) => {
+  const envoyerLien = async (e: FormEvent) => {
     e.preventDefault();
     setChargement(true);
     setErreur(null);
     const supabase = await clientSupabase();
-    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password: motDePasse });
-    if (error) setErreur('Identifiants incorrects.');
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email.trim().toLowerCase(),
+      // Lien magique, comme sur Datalendo ; aucun compte ne peut être créé depuis cette page.
+      options: { shouldCreateUser: false, emailRedirectTo: `${window.location.origin}${BASE_PATH}/admin/` },
+    });
     setChargement(false);
+    if (error && error.status !== 400 && error.status !== 422) {
+      setErreur('Envoi impossible pour le moment. Réessaie dans une minute.');
+      return;
+    }
+    // Même réponse que le compte existe ou non (pas d'énumération des comptes).
+    setEnvoye(true);
   };
 
   return (
     <div className="mx-auto max-w-sm px-4 py-24">
       <h1 className="text-2xl font-semibold tracking-tight text-ink">Espace administrateur</h1>
-      <p className="mt-2 text-sm text-muted">Accès réservé. Connecte-toi avec ton compte Datalendo (administrateur).</p>
-      <form onSubmit={connecter} className="mt-8 space-y-4">
-        <label className="block text-sm font-medium text-ink">
-          E-mail
-          <input type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1.5 block h-11 w-full rounded-xl border border-border bg-surface px-3.5 text-[15px] outline-none focus:border-ink focus:ring-4 focus:ring-ink/5" />
-        </label>
-        <label className="block text-sm font-medium text-ink">
-          Mot de passe
-          <input type="password" autoComplete="current-password" value={motDePasse} onChange={(e) => setMotDePasse(e.target.value)} className="mt-1.5 block h-11 w-full rounded-xl border border-border bg-surface px-3.5 text-[15px] outline-none focus:border-ink focus:ring-4 focus:ring-ink/5" />
-        </label>
-        {erreur ? <p role="alert" className="text-sm text-danger">{erreur}</p> : null}
-        <button type="submit" disabled={chargement || !email || !motDePasse} className="h-11 w-full rounded-xl bg-ink text-sm font-semibold text-bg transition hover:bg-ink/90 disabled:opacity-40">
-          {chargement ? 'Connexion…' : 'Se connecter'}
-        </button>
-      </form>
+      {envoye ? (
+        <div className="mt-6 rounded-2xl border border-border bg-surface p-5" role="status">
+          <p className="font-semibold text-ink">Vérifie ta boîte de réception</p>
+          <p className="mt-1.5 text-sm leading-relaxed text-muted">
+            Si {email.trim()} est un compte administrateur, un lien de connexion vient d&apos;y être envoyé. Il t&apos;ouvre directement
+            le tableau de bord.
+          </p>
+          <button type="button" onClick={() => setEnvoye(false)} className="mt-4 text-sm font-medium text-ink underline underline-offset-2">
+            Utiliser une autre adresse
+          </button>
+        </div>
+      ) : (
+        <>
+          <p className="mt-2 text-sm text-muted">Accès réservé. Reçois un lien de connexion sur ton adresse Datalendo.</p>
+          <form onSubmit={envoyerLien} className="mt-8 space-y-4">
+            <label className="block text-sm font-medium text-ink">
+              E-mail
+              <input type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1.5 block h-11 w-full rounded-xl border border-border bg-surface px-3.5 text-[15px] outline-none focus:border-ink focus:ring-4 focus:ring-ink/5" />
+            </label>
+            {erreur ? <p role="alert" className="text-sm text-danger">{erreur}</p> : null}
+            <button type="submit" disabled={chargement || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim())} className="h-11 w-full rounded-xl bg-ink text-sm font-semibold text-bg transition hover:bg-ink/90 disabled:opacity-40">
+              {chargement ? 'Envoi…' : 'Recevoir un lien de connexion'}
+            </button>
+          </form>
+        </>
+      )}
     </div>
   );
 }
@@ -278,7 +308,7 @@ export function AdminApp() {
     );
   }
   if (!pret) return <div className="mx-auto h-96 max-w-6xl animate-pulse px-4 py-10" aria-busy="true" aria-label="Chargement" />;
-  if (!session) return <Connexion onErreur={null} />;
+  if (!session) return <Connexion />;
   if (admin === false) {
     return (
       <div className="mx-auto max-w-xl px-4 py-24">
@@ -314,6 +344,8 @@ export function AdminApp() {
 
       {erreur ? <p role="alert" className="rounded-xl bg-danger-soft px-4 py-3 text-sm text-danger">{erreur}</p> : null}
 
+      <ReglagesEmail onChange={() => void charger()} />
+
       {st ? (
         <>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -326,8 +358,8 @@ export function AdminApp() {
 
           {st.emails_en_attente_de_cle > 0 ? (
             <p role="status" className="rounded-xl border border-accent/50 bg-accent-soft px-4 py-3 text-sm text-ink">
-              {nombre(st.emails_en_attente_de_cle)} e-mail(s) non envoyé(s) : la clé Resend n&apos;est pas encore enregistrée dans le
-              Vault Supabase (secret <code className="font-mono">sbcc_resend_api_key</code>). {nombre(st.emails_envoyes)} envoyé(s) au total.
+              {nombre(st.emails_en_attente_de_cle)} e-mail(s) n&apos;ont pas pu partir faute de clé Resend (avant sa configuration).{' '}
+              {nombre(st.emails_envoyes)} envoyé(s) au total.
             </p>
           ) : null}
 
@@ -498,7 +530,7 @@ export function AdminApp() {
               <tbody>
                 {emails.map((m) => (
                   <tr key={m.id} className="border-b border-border last:border-0">
-                    <td className="px-4 py-3 text-muted">{m.type === 'bienvenue' ? 'Bienvenue' : 'Résultat'}</td>
+                    <td className="px-4 py-3 text-muted">{m.type === 'bienvenue' ? 'Bienvenue' : m.type === 'test' ? 'Test' : 'Résultat'}</td>
                     <td className="px-4 py-3 text-ink">{m.destinataire}</td>
                     <td className="max-w-xs truncate px-4 py-3 text-muted">{m.sujet}</td>
                     <td className="px-4 py-3">

@@ -26,7 +26,15 @@ export function clientSupabase(): Promise<SupabaseClient> {
   if (!client) {
     client = import('@supabase/supabase-js').then(({ createClient }) =>
       createClient(URL_SUPABASE, CLE_SUPABASE, {
-        auth: { persistSession: true, autoRefreshToken: true, storageKey: 'simbcc-admin-auth' },
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          storageKey: 'simbcc-admin-auth',
+          // Lien magique : le jeton revient dans l'URL de /admin ; « implicit » permet d'ouvrir le lien
+          // depuis un autre appareil que celui qui l'a demandé.
+          detectSessionInUrl: true,
+          flowType: 'implicit',
+        },
       }),
     );
   }
