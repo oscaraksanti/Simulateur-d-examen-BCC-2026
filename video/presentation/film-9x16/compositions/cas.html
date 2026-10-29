@@ -24,7 +24,8 @@
     #ca-table td { padding: 14px 30px; border-bottom: 1px solid rgba(255,255,255,.06); white-space: nowrap; }
     #ca-table td.m { text-align: right; font-family: 'JetBrains Mono', monospace; }
     .ca-suspect td:first-child { box-shadow: inset 6px 0 0 #ff5a67; }
-    .ca-fond { position: relative; }
+    /* L'alerte s'ancre au bas du panneau (sous le tableau), pas au tableau : elle ne couvre aucune ligne. */
+    .ca-fond { position: static; }
     #ca-alerte { position: absolute; right: 40px; bottom: 36px; display: flex; align-items: center; gap: 14px; padding: 18px 26px; border-radius: 18px; background: #ff5a67; color: #0b1220; font-size: 30px; font-weight: 700; box-shadow: 0 20px 60px rgba(255,90,103,.25); }
     @media (max-aspect-ratio: 1/1) {
       #ca-entete { left: 60px; right: 60px; top: 220px; flex-direction: column; gap: 10px; }
@@ -90,8 +91,9 @@
       // « des virements suspects » : glissé vers le flux de paiements, les lignes fractionnées se marquent.
       tl.to("#ca-p1", { x: -160, opacity: 0, filter: "blur(12px)", duration: 0.22, ease: "power3.in" }, tv - 0.3);
       tl.fromTo("#ca-p2", { x: 160, opacity: 0, filter: "blur(12px)" }, { x: 0, opacity: 1, filter: "blur(0px)", duration: 0.3, ease: "power3.out" }, tv - 0.1);
-      tl.fromTo(".ca-suspect td", { backgroundColor: "rgba(255,90,103,0)" }, { backgroundColor: "rgba(255,90,103,.13)", duration: 0.2, stagger: 0.03 }, tv + 0.5);
-      tl.fromTo("#ca-alerte", { opacity: 0, y: 20, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "back.out(1.6)" }, tv + 0.85);
+      tl.fromTo(".ca-suspect td", { backgroundColor: "rgba(255,90,103,0)" }, { backgroundColor: "rgba(255,90,103,.13)", duration: 0.2, stagger: 0.03 }, Math.min(tv + 0.5, tf - 1.15));
+      // L'alerte doit rester lisible ~0,7 s avant la sortie, même si la phrase finit tard.
+      tl.fromTo("#ca-alerte", { opacity: 0, y: 20, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.35, ease: "back.out(1.6)" }, Math.min(tv + 0.85, tf - 0.98));
       tl.to(["#ca-entete", "#ca-p2"], { opacity: 0, filter: "blur(10px)", duration: 0.25, ease: "power3.in" }, tf - 0.27);
       window.__timelines["s-cas"] = tl;
     })();

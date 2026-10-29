@@ -228,11 +228,24 @@ Le timer repose sur des timestamps (`debut`) persistés : un rechargement de pag
 - À faire à réception de la voix : caler, vérifier les planches (`snapshot --review`), rendre en `--quality delivery`,
   publier les MP4 (ex. `public/promo/`) et les proposer sur le site.
 
+### Session 7 — 29/10/2026 (voix off réelle, musique, mixage, publication des films)
+- Voix du propriétaire (`audi_bcc.WAV`, 54,4 s) : transcrite mot à mot (`hyperframes transcribe`, whisper small, fr),
+  recoupée avec les silences ; calage écrit dans `film/outils/calage.json` (segments + `ancres` mesurées « phrase:mot »).
+  Nouveau mode `caler.mjs normaliser` (−16 LUFS, limiteur −2 dBFS, stéréo). Brut gardé en local (ignoré par git).
+- Musique : HeyGen indisponible (CLI non installé) → MusicGen local (torch MPS déjà présent) ; 6 essais classés par mesures ;
+  retenu afro house 111 BPM (`video/presentation/assets/musique-sources/afro-1.wav`). `caler.mjs musique` + `outils/musique.py` :
+  boucle sur la mesure, accroche étouffée, ouverture sur « Voici le Simulateur », silence sous le riser, reprise sur l'impact,
+  remontée après la voix. ⚠️ Poids MusicGen sous CC-BY-NC : changer de piste pour une pub payante.
+- 17 effets sonores (Pixabay) causés par l'image ; mixage −16,1 LUFS, crête −1,5 dBFS. Scènes `note` et `cas` resserrées pour le
+  débit réel ; alerte « Fractionnement » ancrée sous le tableau (chevauchement corrigé en 9:16).
+- Rendus delivery publiés dans `public/promo/simulateur-bcc-presentation-{9x16,16x9}.mp4` (+ `affiche.jpg`) et proposés
+  sur la page de résultats (`ShareButtons`) ; l'ancienne promo muette de 25 s n'est plus servie (source gardée dans `video/`).
+
 ### Pistes pour la suite
 - Remplacer les placeholders de captures du README par de vraies captures.
 - Enrichir les banques (objectif : 100+ questions par filière) et ajouter des cas (2 par session de travail).
 - Mettre à jour `bccFacts.ts` après chaque CPM (taux directeur) en conservant source + date ; ajuster `VERIFIE_LE`.
 - Option : export PDF de la correction ; mode « examen long » (60 questions) ; e-mails de suivi (Resend) aux inscrits
-  ayant coché le consentement ; domaine personnalisé ; fond musical de la vidéo via `/media-use` (connexion HeyGen).
+  ayant coché le consentement ; sous-titres incrustés pour le film 9:16 ; musique sous licence commerciale (HeyGen).
 - Les écrans intérieurs (examen, cas, résultats) gardent le style v1 : les aligner sur la nouvelle direction de l'accueil.
 - Lighthouse non mesuré en CI : à lancer manuellement sur le déploiement (cible ≥ 95).

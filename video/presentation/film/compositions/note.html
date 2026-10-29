@@ -35,15 +35,17 @@
       const n = { v: 0 };
       tl.fromTo("#no-titre", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.18 }, 0);
       tl.fromTo("#no-anneau", { opacity: 0, scale: 0.92 }, { opacity: 1, scale: 1, duration: 0.45, ease: "expo.out" }, 0);
-      // Le paiement : l'anneau se trace et la note compte, à vitesse normale.
-      const debut = Math.max(0.15, tn - 0.25);
-      tl.fromTo("#no-arc", { strokeDashoffset: 1759.3 }, { strokeDashoffset: 1759.3 * (1 - 15.5 / 20), duration: 1.4, ease: "power3.out" }, debut);
-      tl.to(n, { v: 15.5, duration: 1.4, ease: "power3.out", onUpdate: () => {
+      // Le paiement : l'anneau se trace et la note compte ; la note doit être posée ~0,65 s avant la sortie,
+      // même quand la phrase est courte (la vraie voix dit « ta note sur vingt » en 2 s).
+      const debut = Math.max(0.15, Math.min(tn - 0.25, tf - 1.9));
+      const d = Math.max(0.8, Math.min(1.4, tf - debut - 0.9));
+      tl.fromTo("#no-arc", { strokeDashoffset: 1759.3 }, { strokeDashoffset: 1759.3 * (1 - 15.5 / 20), duration: d, ease: "power3.out" }, debut);
+      tl.to(n, { v: 15.5, duration: d, ease: "power3.out", onUpdate: () => {
         document.querySelector("#no-note").textContent = String(Math.round(n.v * 2) / 2).replace(".", ",");
       } }, debut);
-      tl.fromTo("#no-mention", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2 }, debut + 1.15);
-      tl.to(["#no-titre", "#no-mention"], { opacity: 0, duration: 0.15, ease: "power3.in" }, Math.max(debut + 1.6, tf - 0.25));
-      tl.to("#no-anneau", { scale: 0.6, opacity: 0, filter: "blur(10px)", duration: 0.25, ease: "power3.in" }, Math.max(debut + 1.6, tf - 0.25));
+      tl.fromTo("#no-mention", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2 }, debut + d * 0.8);
+      tl.to(["#no-titre", "#no-mention"], { opacity: 0, duration: 0.15, ease: "power3.in" }, Math.max(debut + d + 0.2, tf - 0.25));
+      tl.to("#no-anneau", { scale: 0.6, opacity: 0, filter: "blur(10px)", duration: 0.25, ease: "power3.in" }, Math.max(debut + d + 0.2, tf - 0.25));
       window.__timelines["s-note"] = tl;
     })();
   </script>

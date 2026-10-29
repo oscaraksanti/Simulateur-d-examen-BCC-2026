@@ -51,3 +51,5 @@ video/presentation/rendus/
 video/presentation/**/.hyperframes/
 video/presentation/film/outils/.tmp/
 video/presentation/capture/
+# Voix off brute du propriétaire (10 Mo, gardée en local) : la version nettoyée film/assets/voix/voix-off.m4a est versionnée.
+video/presentation/assets/voix-off/

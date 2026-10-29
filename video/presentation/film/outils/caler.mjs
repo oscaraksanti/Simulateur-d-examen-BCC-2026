@@ -3,10 +3,15 @@
 //
 //   node outils/caler.mjs guide                 → voix guide (say, Thomas) + calage
 //   node outils/caler.mjs voix <fichier-audio>  → vraie voix : détection des silences, regroupement en phrases
+//   node outils/caler.mjs normaliser <fichier>  → vraie voix nettoyée seulement (le calage est écrit à la main, voir plus bas)
+//   node outils/caler.mjs musique <piste.wav>   → lit musical calé (assets/musique/lit.m4a)
 //   node outils/caler.mjs appliquer             → (ré)génère index.html (16:9) et portrait.html (9:16) depuis calage.json
 //
 // Le calage associe chaque phrase de segments.json à [début, fin] en secondes dans assets/voix/voix-off.m4a.
 // Les scènes reçoivent leurs repères internes (mots-clés) via data-variable-values.
+// Voix réelle (audi_bcc.wav) : `npx hyperframes transcribe … -l fr --json` donne les mots horodatés (transcript.json),
+// recoupés avec les silences (ffmpeg silencedetect −35 dB / 0,25 s) ; les débuts/fins de phrase et les mots-clés
+// mesurés sont écrits dans calage.json (« ancres », en secondes absolues, clé « phrase:mot »).
 
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -17,6 +22,7 @@ const SEGMENTS = JSON.parse(readFileSync(join(RACINE, 'outils/segments.json'), '
 const CALAGE = join(RACINE, 'outils/calage.json');
 const VOIX = join(RACINE, 'assets/voix/voix-off.m4a');
 const TMP = join(RACINE, 'outils/.tmp');
+const LIT = join(RACINE, 'assets/musique/lit.m4a');
 
 const sh = (cmd, args) => execFileSync(cmd, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
 const duree = (f) => Number(sh('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', f]).trim());
@@ -51,11 +57,16 @@ function guide() {
 // ---------------------------------------------------------------------------
 // 2. Vraie voix : silences → zones de parole → regroupement optimal en N phrases.
 // ---------------------------------------------------------------------------
-function voix(fichier) {
+function normaliser(fichier) {
   if (!fichier || !existsSync(fichier)) throw new Error(`Fichier introuvable : ${fichier}`);
   mkdirSync(join(RACINE, 'assets/voix'), { recursive: true });
-  // Nettoyage léger : passe-haut, normalisation à −16 LUFS (réseaux sociaux), mono 48 kHz.
-  sh('ffmpeg', ['-y', '-i', fichier, '-af', 'highpass=f=70,loudnorm=I=-16:TP=-1.5:LRA=11', '-ar', '48000', '-ac', '1', '-c:a', 'aac', '-b:a', '160k', VOIX]);
+  // Nettoyage léger : passe-haut, normalisation à −16 LUFS (réseaux sociaux), limiteur à −2 dBFS (l'encodage AAC
+  // dépasse sinon le plafond de loudnorm), stéréo explicite (double mono) pour que le rendu ne réinterprète pas le niveau.
+  sh('ffmpeg', ['-y', '-i', fichier, '-af', 'highpass=f=70,loudnorm=I=-16:TP=-1.5:LRA=11,alimiter=limit=0.79:level=0:attack=2:release=60', '-ar', '48000', '-ac', '2', '-c:a', 'aac', '-b:a', '192k', VOIX]);
+}
+
+function voix(fichier) {
+  normaliser(fichier);
   const total = duree(VOIX);
   const stderr = execFileSync('sh', ['-c', `ffmpeg -i "${VOIX}" -af silencedetect=noise=-38dB:d=0.28 -f null - 2>&1`], { encoding: 'utf8' });
   const debuts = [...stderr.matchAll(/silence_start: ([\d.]+)/g)].map((m) => Number(m[1]));
@@ -122,16 +133,22 @@ function sauver(calage, source) {
 // ---------------------------------------------------------------------------
 // 3. Génération des deux compositions racines.
 // ---------------------------------------------------------------------------
-// Instant d'un mot dans une phrase (proportionnel à sa position dans le texte : précis à ~0,2 s).
+// Instant d'un mot dans une phrase : repère mesuré (calage.ancres, lu sur la transcription mot à mot) s'il existe,
+// sinon proportionnel à sa position dans le texte (précis à ~0,2 s).
+let ANCRES = {};
 function mot(seg, texte) {
+  const repere = ANCRES[`${seg.id}:${texte}`];
+  if (repere !== undefined) return repere;
   const s = SEGMENTS.find((x) => x.id === seg.id);
   const i = s.texte.indexOf(texte);
   if (i < 0) throw new Error(`« ${texte} » absent de ${seg.id}`);
   return round(seg.debut + ((seg.fin - seg.debut) * i) / s.texte.length);
 }
 
-function appliquer() {
-  const { segments, dureeVoix } = JSON.parse(readFileSync(CALAGE, 'utf8'));
+// Plan du film (scènes + repères) commun à « appliquer » et « musique ».
+function plan() {
+  const { segments, dureeVoix, ancres = {} } = JSON.parse(readFileSync(CALAGE, 'utf8'));
+  ANCRES = ancres;
   const S = Object.fromEntries(segments.map((s) => [s.id, s]));
   const FIN = round(Math.max(dureeVoix, S.signature.fin) + 2.6);
   const AVANCE = 0.18; // l'image précède légèrement la voix
@@ -151,18 +168,39 @@ function appliquer() {
     ['s-partage', 'partage', debutScene('succes'), debutScene('signature'), (t0) => ({ t_ami: round(S.partage.debut - t0), t_lien: round(mot(S.partage, 'envoie') - t0), t_ensemble: round(mot(S.partage, 'On réussit') - t0) })],
     ['s-fin', 'fin', debutScene('signature'), FIN, () => ({})],
   ].map(([id, fichier, debut, fin, vars]) => ({ id, fichier, debut, duree: round(fin - debut), vars: { ...vars(debut), t_fin: round(fin - debut) } }));
+  return { S, FIN, def, debutScene };
+}
 
-  // Sons : chaque effet a une cause à l'écran (clic, coupe, note qui tombe…), crête 1 image après l'image.
+function appliquer() {
+  const { S, FIN, def, debutScene } = plan();
+
+  // Sons : chaque effet a une cause à l'écran (coupe, clic, onglet, alerte, note qui tombe…), crête 1 image après l'image.
+  // [id, fichier, début absolu, volume, { debutMedia, duree }] — debutMedia saute l'attaque lente des sons longs
+  // (riser : crête à ~4,3 s puis coupure nette ; whoosh-cinematic : crête à ~2,6 s).
+  const at = (i, t) => round(def[i].debut + t);
+  const V = def.map((d) => d.vars);
+  const noteDebut = Math.max(0.15, Math.min(V[5].t_vingt - 0.25, V[5].t_fin - 1.9)); // même calcul que note.html
+  const noteDuree = Math.max(0.8, Math.min(1.4, V[5].t_fin - noteDebut - 0.9));
   const sons = [
-    ['sfx-whoosh-1', 'whoosh-short', round(debutScene('revelation') - 0.12), 0.5],
-    ['sfx-clic-filiere', 'click', round(def[2].debut + def[2].vars.t_cyber + 0.95), 0.7],
-    ['sfx-whoosh-2', 'whoosh', round(debutScene('cas') - 0.1), 0.45],
-    ['sfx-pop-note', 'pop', round(def[5].debut + 1.65), 0.6],
-    ['sfx-riser', 'riser', round(debutScene('cinq') - 1.1), 0.35],
-    ['sfx-impact', 'impact-bass-1', round(debutScene('cinq') + 0.02), 0.55],
-    ['sfx-clic-partage', 'click', round(def[9].debut + def[9].vars.t_lien + 0.1), 0.7],
-    ['sfx-sparkle', 'sparkle', round(def[10].debut + 0.9), 0.35],
+    ['sfx-ouverture', 'impact-bass-2', 0.02, 0.16, {}], //               « 1 seul essai. » posé dès l'image 0
+    ['sfx-rouleau', 'whoosh-short', at(0, V[0].t_question + 0.12), 0.3, {}], // le compteur roule de 1 à 5
+    ['sfx-traversee', 'whoosh-cinematic', at(0, V[0].t_fin - 1.7), 0.42, { debutMedia: 1.5, duree: 3 }], // zoom à travers le chiffre
+    ['sfx-onglet-1', 'click-soft', at(3, V[3].t_technique - 0.05), 0.4, {}],
+    ['sfx-onglet-2', 'click-soft', at(3, V[3].t_culture - 0.05), 0.4, {}],
+    ['sfx-onglet-3', 'click-soft', at(3, V[3].t_logique - 0.05), 0.4, {}],
+    ['sfx-clic-filiere', 'click', at(2, V[2].t_cyber + 0.95), 0.6, {}],
+    ['sfx-whoosh-cas', 'whoosh', round(def[4].debut - 0.1), 0.4, {}],
+    ['sfx-logs', 'typing', at(4, Math.max(0.5, V[4].t_attaque - 0.6)), 0.22, { duree: 1.2 }],
+    ['sfx-alerte', 'error', at(4, Math.min(V[4].t_virements + 0.85, V[4].t_fin - 0.98) - 0.45), 0.22, {}],
+    ['sfx-note', 'chime', at(5, noteDebut + noteDuree - 0.35), 0.38, {}],
+    ['sfx-cartes', 'whoosh-short', at(7, V[7].t_nouvelles - 0.12), 0.28, {}],
+    ['sfx-riser', 'riser', round(def[8].debut - 2.25), 0.17, { debutMedia: 2.2, duree: 2.25 }],
+    ['sfx-impact', 'impact-bass-1', round(def[8].debut + 0.02), 0.14, {}],
+    ['sfx-clic-partage', 'click', at(9, V[9].t_lien + 0.1), 0.6, {}],
+    ['sfx-message', 'notification', at(9, V[9].t_lien + 0.2), 0.28, {}],
+    ['sfx-sparkle', 'sparkle', at(10, 0.9), 0.32, {}],
   ];
+  const dureeSon = (f, o) => o.duree ?? round(duree(join(RACINE, `assets/sfx/${f}.mp3`)) - (o.debutMedia ?? 0));
 
   const racine = (largeur, hauteur, idComposition, titre) => `<!doctype html>
 <!-- FICHIER GÉNÉRÉ par outils/caler.mjs — modifier les scènes dans compositions/ ou le calage, pas ce fichier. -->
@@ -188,7 +226,7 @@ ${def
   )
   .join('\n')}
       <audio id="voix-off" src="assets/voix/voix-off.m4a" data-start="0" data-track-index="10" data-volume="1"></audio>
-${sons.map(([id, f, t, v], i) => `      <audio id="${id}" src="assets/sfx/${f}.mp3" data-start="${Math.max(0, t)}" data-duration="${round(duree(join(RACINE, `assets/sfx/${f}.mp3`)))}" data-track-index="${11 + i}" data-volume="${v}"></audio>`).join('\n')}
+${existsSync(LIT) ? `      <audio id="musique" src="assets/musique/lit.m4a" data-start="0" data-duration="${FIN}" data-track-index="11" data-volume="1"></audio>\n` : ''}${sons.map(([id, f, t, v, o], i) => `      <audio id="${id}" src="assets/sfx/${f}.mp3" data-start="${Math.max(0, t)}" data-duration="${dureeSon(f, o)}"${o.debutMedia ? ` data-media-start="${o.debutMedia}"` : ''} data-track-index="${12 + i}" data-volume="${v}"></audio>`).join('\n')}
     </div>
     <script>
       window.__timelines = window.__timelines || {};
@@ -216,8 +254,24 @@ ${sons.map(([id, f, t, v], i) => `      <audio id="${id}" src="assets/sfx/${f}.m
   console.log(`film/index.html (16:9) et film-9x16/index.html (9:16) régénérés — durée ${FIN} s, ${def.length} scènes.`);
 }
 
+// ---------------------------------------------------------------------------
+// 4. Lit musical : boucle calée sur la mesure + arc calé sur la voix (voir outils/musique.py).
+// ---------------------------------------------------------------------------
+function musique(fichier) {
+  if (!fichier || !existsSync(fichier)) throw new Error(`Fichier introuvable : ${fichier}`);
+  const { S, FIN, debutScene } = plan();
+  mkdirSync(join(RACINE, 'assets/musique'), { recursive: true });
+  const wav = join(TMP, 'lit.wav');
+  mkdirSync(TMP, { recursive: true });
+  process.stdout.write(sh('python3', ['-I', join(RACINE, 'outils/musique.py'), fichier, wav, String(FIN), String(debutScene('revelation')), String(debutScene('cinq')), String(S.signature.fin)]));
+  sh('ffmpeg', ['-y', '-i', wav, '-c:a', 'aac', '-b:a', '192k', LIT]);
+  console.log(`lit musical → ${LIT} (relancer « appliquer » pour l'intégrer)`);
+}
+
 const [mode, arg] = process.argv.slice(2);
 if (mode === 'guide') guide();
 else if (mode === 'voix') voix(arg);
+else if (mode === 'normaliser') normaliser(arg);
+else if (mode === 'musique') musique(arg);
 else if (mode === 'appliquer') appliquer();
-else console.log('usage : node outils/caler.mjs guide | voix <fichier> | appliquer');
+else console.log('usage : node outils/caler.mjs guide | voix <fichier> | normaliser <fichier> | musique <piste> | appliquer');

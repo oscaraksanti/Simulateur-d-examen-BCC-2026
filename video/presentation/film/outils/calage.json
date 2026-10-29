@@ -1,76 +1,37 @@
 {
-  "source": "guide (say Thomas)",
-  "dureeVoix": 56.3,
+  "source": "voix réelle (assets/voix-off/audi_bcc.wav) — transcription mot à mot + silences",
+  "dureeVoix": 54.44,
   "segments": [
-    {
-      "id": "accroche",
-      "debut": 0.25,
-      "fin": 4.1
-    },
-    {
-      "id": "question",
-      "debut": 4.48,
-      "fin": 7.44
-    },
-    {
-      "id": "revelation",
-      "debut": 7.82,
-      "fin": 12.01
-    },
-    {
-      "id": "filiere",
-      "debut": 12.39,
-      "fin": 16.59
-    },
-    {
-      "id": "examen",
-      "debut": 16.97,
-      "fin": 22.6
-    },
-    {
-      "id": "cas",
-      "debut": 22.98,
-      "fin": 28.66
-    },
-    {
-      "id": "note",
-      "debut": 29.04,
-      "fin": 30.82
-    },
-    {
-      "id": "explication",
-      "debut": 31.2,
-      "fin": 34.84
-    },
-    {
-      "id": "radar",
-      "debut": 35.22,
-      "fin": 37.49
-    },
-    {
-      "id": "nouvelles",
-      "debut": 37.87,
-      "fin": 40.65
-    },
-    {
-      "id": "cinq",
-      "debut": 41.03,
-      "fin": 45.59
-    },
-    {
-      "id": "succes",
-      "debut": 45.97,
-      "fin": 47.44
-    },
-    {
-      "id": "partage",
-      "debut": 47.82,
-      "fin": 53.01
-    },
-    {
-      "id": "signature",
-      "debut": 53.39,
-      "fin": 55.82
-    }
-  ]
+    { "id": "accroche", "debut": 0.08, "fin": 3.8 },
+    { "id": "question", "debut": 3.89, "fin": 7.04 },
+    { "id": "revelation", "debut": 7.78, "fin": 11.31 },
+    { "id": "filiere", "debut": 12.11, "fin": 16.2 },
+    { "id": "examen", "debut": 16.28, "fin": 21.89 },
+    { "id": "cas", "debut": 22.35, "fin": 28.34 },
+    { "id": "note", "debut": 28.68, "fin": 30.27 },
+    { "id": "explication", "debut": 30.75, "fin": 34.31 },
+    { "id": "radar", "debut": 34.83, "fin": 37.35 },
+    { "id": "nouvelles", "debut": 37.71, "fin": 40.34 },
+    { "id": "cinq", "debut": 41.03, "fin": 44.64 },
+    { "id": "succes", "debut": 44.99, "fin": 46.69 },
+    { "id": "partage", "debut": 46.69, "fin": 50.95 },
+    { "id": "signature", "debut": 51.27, "fin": 53.71 }
+  ],
+  "ancres": {
+    "question:avant": 6.12,
+    "revelation:Gratuit": 9.33,
+    "revelation:Datalendo": 10.88,
+    "filiere:Data": 13.69,
+    "filiere:Cybersécurité": 14.64,
+    "examen:technique": 19.04,
+    "examen:culture": 19.98,
+    "examen:logique": 21.12,
+    "cas:une attaque": 24.87,
+    "cas:des virements": 27.31,
+    "note:note": 29.5,
+    "explication:et pourquoi": 32.83,
+    "cinq:Le jour": 42.16,
+    "partage:envoie": 48.29,
+    "partage:On réussit": 49.64
+  }
 }

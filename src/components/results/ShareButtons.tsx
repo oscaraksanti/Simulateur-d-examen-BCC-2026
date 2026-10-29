@@ -126,25 +126,33 @@ export function ShareButtons({ prenom, note, filiere, mention }: ShareButtonsPro
         </div>
         <div className="flex items-center gap-4 rounded-2xl border border-border bg-surface-2/60 p-3">
           <video
-            src={`${BASE_PATH}/promo/simulateur-bcc-promo-9x16.mp4`}
+            src={`${BASE_PATH}/promo/simulateur-bcc-presentation-9x16.mp4`}
             poster={`${BASE_PATH}/promo/affiche.jpg`}
             preload="none"
             controls
-            muted
             playsInline
             className="h-32 w-[72px] shrink-0 rounded-lg bg-surface object-cover"
-            aria-label="Vidéo de présentation du simulateur (25 secondes, sans son)"
+            aria-label="Vidéo de présentation du simulateur (1 minute, avec voix off et musique)"
           />
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-ink">La vidéo de 25 s pour ton statut</p>
-            <p className="mt-0.5 text-[13px] text-muted">Format vertical, prête pour WhatsApp, TikTok ou Instagram.</p>
-            <a
-              href={`${BASE_PATH}/promo/simulateur-bcc-promo-9x16.mp4`}
-              download="simulateur-bcc.mp4"
-              className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-strong hover:underline"
-            >
-              <Download aria-hidden className="size-4" /> Télécharger la vidéo
-            </a>
+            <p className="text-sm font-semibold text-ink">La vidéo de présentation (1 min)</p>
+            <p className="mt-0.5 text-[13px] text-muted">Envoie-la à ceux qui préparent le même test : statut WhatsApp, TikTok, Instagram.</p>
+            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+              <a
+                href={`${BASE_PATH}/promo/simulateur-bcc-presentation-9x16.mp4`}
+                download="simulateur-bcc-9x16.mp4"
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-strong hover:underline"
+              >
+                <Download aria-hidden className="size-4" /> Format vertical
+              </a>
+              <a
+                href={`${BASE_PATH}/promo/simulateur-bcc-presentation-16x9.mp4`}
+                download="simulateur-bcc-16x9.mp4"
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-strong hover:underline"
+              >
+                <Download aria-hidden className="size-4" /> Format paysage
+              </a>
+            </div>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2 text-sm">

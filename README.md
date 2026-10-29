@@ -140,19 +140,24 @@ Les envois depuis le navigateur passent par une file d'attente locale et sont re
   `contact@datalendo.com` (modifiables dans `simulateur_bcc.parametres`). Le domaine de l'expéditeur doit être vérifié
   dans Resend. Limites anti-abus : une bienvenue par adresse, 5 récapitulatifs par adresse et par 24 h.
 
-## Vidéo promo (HyperFrames)
+## Vidéos (HyperFrames)
 
-Le dossier [`video/`](video/) contient une vidéo verticale de 25 s (1080×1920) composée en HTML avec
-[HyperFrames](https://hyperframes.heygen.com) : accroche, vraie question du simulateur, explication, note, appel à l'action.
-Le rendu est publié dans `public/promo/` et proposé au téléchargement sur la page de résultats (statut WhatsApp).
+**Film de présentation (1 min, 16:9 et 9:16)** — [`video/presentation/`](video/presentation/) : voix off réelle du
+fondateur, démonstration du simulateur (filière, examen chronométré, cas pratiques, note, explications, radar),
+musique afro house et 17 effets sonores calés sur l'image. Les rendus sont publiés dans `public/promo/`
+(`simulateur-bcc-presentation-9x16.mp4`, `simulateur-bcc-presentation-16x9.mp4`) et proposés au téléchargement sur la
+page de résultats. Détails et choix : [`video/presentation/REVIEW.md`](video/presentation/REVIEW.md).
 
 ```bash
-cd video
-npx hyperframes preview      # éditer dans le Studio
-npx hyperframes render --quality delivery -o renders/simulateur-bcc-promo-9x16.mp4
+cd video/presentation/film
+node outils/caler.mjs normaliser ../assets/voix-off/<voix>.wav   # voix nettoyée (−16 LUFS)
+node outils/caler.mjs musique ../assets/musique-sources/afro-1.wav # lit musical calé sur la voix
+node outils/caler.mjs appliquer                                    # régénère film/ (16:9) et film-9x16/ (9:16)
+npx hyperframes render --quality delivery -o ../rendus/simulateur-bcc-presentation-16x9.mp4
+cd ../film-9x16 && npx hyperframes render --quality delivery -o ../rendus/simulateur-bcc-presentation-9x16.mp4
 ```
 
-L'adresse affichée en fin de vidéo est la variable `site` de `video/index.html`.
+**Première promo verticale (25 s, muette)** — [`video/`](video/), conservée comme source.
 
 ## Déploiement sur Vercel (3 étapes)
 
