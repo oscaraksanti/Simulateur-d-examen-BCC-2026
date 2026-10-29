@@ -7,6 +7,7 @@ Document de passation pour toute IA ou développeur qui reprend le projet. À me
 Application web **open source, 100 % statique**, en **français**, qui aide les candidats congolais à préparer les tests de
 recrutement informatique de la Banque Centrale du Congo (BCC), filières **Data Analyse** et **Cybersécurité**.
 Dépôt : https://github.com/oscaraksanti/Simulateur-d-examen-BCC-2026 — auteur : Oscar Aksanti (formations4data).
+Site en ligne (GitHub Pages) : https://oscaraksanti.github.io/Simulateur-d-examen-BCC-2026/
 
 ### Règles non négociables (à respecter dans toute évolution)
 1. **Jamais déguisé en officiel** : pas de logo/sceau/charte/photos BCC, rien téléchargé ni lié depuis bcc.cd hormis le
@@ -142,6 +143,14 @@ Le timer repose sur des timestamps (`debut`) persistés : un rechargement de pag
 - Ajouts par rapport au cahier des charges initial : réfutation option par option, « à retenir », priorité aux questions non
   vues, historique + courbe de progression, objectif 5 simulations, mode entraînement, fiches de révision et jour J,
   alerte anti-arnaque, page 404.
+
+### Session 2 — 29/10/2026 (mise en ligne)
+- GitHub Pages activé (source : GitHub Actions) ; workflow vert ; toutes les routes répondent en 200 sous
+  `/Simulateur-d-examen-BCC-2026/`.
+- Correctif : `og:image` / `twitter:image` dupliquaient le sous-chemin (Next ajoute déjà le chemin de `metadataBase`).
+  Règle : avec `NEXT_PUBLIC_SITE_URL` défini, les URL d'images de métadonnées commencent par `/` SANS basePath.
+- Push : les identifiants git par défaut de la machine sont refusés (403) ; pousser avec
+  `git -c credential.helper= -c "credential.helper=!gh auth git-credential" push`.
 
 ### Pistes pour la suite
 - Remplacer les placeholders de captures du README par de vraies captures.

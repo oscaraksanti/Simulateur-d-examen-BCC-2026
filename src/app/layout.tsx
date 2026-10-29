@@ -15,6 +15,8 @@ const jetbrains = JetBrains_Mono({ variable: '--font-jetbrains', subsets: ['lati
 const SITE = urlSite();
 const BASE_PATH = (process.env.NEXT_PUBLIC_BASE_PATH ?? '').replace(/\/+$/, '');
 const TITRE = 'Simulateur BCC — Prépa Data & Cyber';
+// Avec metadataBase, Next ajoute déjà le sous-chemin du site : on ne préfixe le basePath que sans URL publique.
+const OG_IMAGE = SITE.startsWith('http') ? '/og-image.png' : `${BASE_PATH}/og-image.png`;
 const DESCRIPTION =
   "Examen blanc gratuit et chronométré pour préparer le recrutement 2026 de la Banque Centrale du Congo en Data Analyse et Cybersécurité : QCM corrigés, cas pratiques, culture BCC. Outil indépendant, non affilié à la BCC.";
 
@@ -43,13 +45,13 @@ export const metadata: Metadata = {
     siteName: 'Simulateur BCC',
     title: TITRE,
     description: DESCRIPTION,
-    images: [{ url: `${BASE_PATH}/og-image.png`, width: 1200, height: 630, alt: 'Simulateur BCC — Prépa Data & Cyber' }],
+    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: 'Simulateur BCC — Prépa Data & Cyber' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: TITRE,
     description: DESCRIPTION,
-    images: [`${BASE_PATH}/og-image.png`],
+    images: [OG_IMAGE],
   },
   robots: { index: true, follow: true },
 };
