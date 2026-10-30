@@ -43,7 +43,7 @@
     "typescript": "^5",
     "vitest": "^5.0.5"
   },
-  "description": "Simulateur BCC — Prépa informatique (7 domaines) : examen blanc indépendant pour préparer le recrutement de la Banque Centrale du Congo.",
+  "description": "Simulateur BCC — Prépa informatique (8 domaines) : examen blanc indépendant pour préparer le recrutement de la Banque Centrale du Congo.",
   "license": "MIT",
   "author": "Oscar Aksanti (Datalendo)",
   "homepage": "https://simulateur-bcc.datalendo.com"

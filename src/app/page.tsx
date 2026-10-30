@@ -57,7 +57,7 @@ const faq = [
   },
   {
     q: 'Les questions sont-elles celles du vrai test ?',
-    r: 'Personne ne connaît à l’avance les questions officielles. Les questions sont originales et couvrent les compétences des 7 domaines recrutés (data, cybersécurité, bases de données, systèmes, réseaux, développement, support IT), la culture de la banque centrale et les aptitudes logiques. Les faits sur la BCC sont sourcés et datés.',
+    r: 'Personne ne connaît à l’avance les questions officielles. Les questions sont originales et couvrent les compétences des 8 domaines recrutés (data, cybersécurité, bases de données, systèmes, réseaux, développement, support IT, numérique), la culture de la banque centrale et les aptitudes logiques. Les faits sur la BCC sont sourcés et datés.',
   },
   {
     q: 'Combien de fois dois-je passer l’examen blanc ?',
@@ -100,8 +100,8 @@ export default function Accueil() {
               Arrive au test de la BCC en l&apos;ayant déjà passé cinq fois.
             </h1>
             <p className="mt-6 max-w-[34rem] text-lg leading-relaxed text-muted sm:text-xl sm:leading-relaxed">
-              L&apos;examen blanc des <span className="text-ink">7 domaines</span> du recrutement informatique : data, cybersécurité,
-              bases de données, systèmes, réseaux, développement et support IT. Chronométré, corrigé question par question,
+              L&apos;examen blanc des <span className="text-ink">8 domaines</span> du recrutement informatique : data, cybersécurité,
+              bases de données, systèmes, réseaux, développement, support IT et numérique. Chronométré, corrigé question par question,
               gratuit et conçu pour les candidats congolais.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">

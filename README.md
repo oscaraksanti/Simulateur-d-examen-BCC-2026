@@ -1,8 +1,8 @@
-# Simulateur BCC — Prépa informatique (7 domaines)
+# Simulateur BCC — Prépa informatique (8 domaines)
 
 Examen blanc **gratuit et open source** pour préparer les tests de recrutement informatique 2026 de la Banque Centrale du
-Congo (BCC) dans ses **7 domaines** : Data Analyse, Cybersécurité, Bases de données, Administration systèmes, Réseaux &
-télécoms, Développement logiciel et Support IT. QCM chronométrés corrigés, cas pratiques immersifs, culture BCC sourcée,
+Congo (BCC) dans ses **8 domaines** : Data Analyse, Cybersécurité, Bases de données, Administration systèmes, Réseaux &
+télécoms, Développement logiciel, Support IT et Numérique. QCM chronométrés corrigés, cas pratiques immersifs, culture BCC sourcée,
 mode entraînement et fiches de révision.
 
 > ⚠️ **Outil de préparation indépendant, non affilié à la Banque Centrale du Congo.**
@@ -34,13 +34,13 @@ mode entraînement et fiches de révision.
 | **3. Cas pratiques** (`/cas-pratiques`) | 2 cas immersifs de la filière en 20 min : briefing « salle de crise », tableaux triables, logs surlignés, choix pondérés, glisser-déposer accessible, feedback par étape et corrigé expert. |
 | **4. Résultats** (`/resultats`) | Note /20 animée + mention, barres par section, radar des compétences (SVG maison), courbe de progression, correction détaillée (pourquoi la bonne réponse, pourquoi pas les autres), ressources d'Oscar Aksanti, partage viral et carte de score téléchargeable (1080×1350). |
 | **Entraînement** (`/entrainement`) | Séries ciblées par filière, section et compétence, correction immédiate. Lien direct depuis les « priorités de révision ». |
-| **Fiches** (`/fiches`) | Mémo culture BCC sourcé, formules data, repères des 7 domaines, méthode pour le jour J, alerte anti-arnaque. |
+| **Fiches** (`/fiches`) | Mémo culture BCC sourcé, formules data, repères des 8 domaines, méthode pour le jour J, alerte anti-arnaque. |
 | **Avis** (`/avis`) | Note de satisfaction, fonctionnalités souhaitées, message libre (aussi en fin de résultats). |
 | **Confidentialité** (`/confidentialite`) | Données collectées, finalités, droits des candidats. |
 | **Administration** (`/admin`, privé) | Inscrits, simulations, notes, compétences faibles, souhaits, avis, export CSV, suppression sur demande. |
 
 - **Production** : [simulateur-bcc.datalendo.com](https://simulateur-bcc.datalendo.com) (Vercel) — un outil [Datalendo](https://datalendo.com).
-- **Banques** : 485 questions (60 techniques par filière × 7, 25 culture BCC, 40 logique) et 28 cas pratiques (4 par filière).
+- **Banques** : 545 questions (60 techniques par filière × 8, 25 culture BCC, 40 logique) et 32 cas pratiques (4 par filière).
 - **Tirage intelligent** : chaque simulation privilégie les questions et cas jamais vus, et alterne les compétences.
 - **Objectif 5 simulations** : suivi de progression et historique local (courbe des notes).
 - **Notation** : `note /20 = (QCM / 24) × 12 + (cas / max cas) × 8`, arrondie au 0,5. Pas de points négatifs.
@@ -125,7 +125,7 @@ Les envois depuis le navigateur passent par une file d'attente locale et sont re
 
 ### Installation (nouvel environnement)
 1. Exécute dans l'ordre les migrations de [`supabase/migrations/`](supabase/migrations/) (`0001` schéma et API, `0002` e-mails
-   administrables, `0003` les 7 filières) dans le SQL Editor.
+   administrables, `0003` les 7 filières, `0004` la filière Numérique) dans le SQL Editor.
 2. Donne les droits d'administration à un compte existant :
    ```sql
    insert into simulateur_bcc.admins (user_id)
@@ -199,7 +199,7 @@ src/
 ├── components/     # layout, ui, landing, onboarding, exam, cases, results, training, feedback, admin, illustrations
 ├── context/        # ExamContext (useReducer + localStorage) et garde de navigation
 ├── data/           # quizData, casesData, banques/ et cas/ (5 filières), bccFacts (source unique de vérité), resources
-├── lib/            # filieres (7 domaines), scoring, sampling (tirage seedé), share, storage, remote (Supabase), types
+├── lib/            # filieres (8 domaines), scoring, sampling (tirage seedé), share, storage, remote (Supabase), types
 └── __tests__/      # Vitest
 scripts/generate-og.ts    # og-image.png 1200×630 (satori + resvg, police locale)
 supabase/migrations/      # schéma simulateur_bcc, RLS, fonctions sbcc_*, e-mails (testé sur Postgres 16)

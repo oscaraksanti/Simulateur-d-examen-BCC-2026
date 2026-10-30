@@ -1,13 +1,15 @@
-# CLAUDE.md — Simulateur BCC (Prépa informatique, 7 domaines)
+# CLAUDE.md — Simulateur BCC (Prépa informatique, 8 domaines)
 
 Document de passation pour toute IA ou développeur qui reprend le projet. À mettre à jour à chaque fin de session.
 
 ## 1. Le projet en bref
 
 Application web **open source, 100 % statique**, en **français**, qui aide les candidats congolais à préparer les tests de
-recrutement informatique de la Banque Centrale du Congo (BCC) dans ses **7 domaines** : Data Analyse, Cybersécurité,
-Bases de données, Administration systèmes, Réseaux & télécoms, Développement logiciel, Support IT (ids `data`, `cyber`,
-`bdd`, `systemes`, `reseaux`, `dev`, `support` — registre unique `src/lib/filieres.ts`).
+recrutement informatique de la Banque Centrale du Congo (BCC) dans ses **8 domaines** : Data Analyse, Cybersécurité,
+Bases de données, Administration systèmes, Réseaux & télécoms, Développement logiciel, Support IT, Numérique (ids `data`,
+`cyber`, `bdd`, `systemes`, `reseaux`, `dev`, `support`, `numerique` — registre unique `src/lib/filieres.ts`).
+Les 7 premiers sont ceux de l'avis officiel (`bccFacts.recrutement2026.domaines`) ; « Numérique » (professionnel du numérique)
+vient de la répartition des candidatures publiée par la DRH (8 catégories, 44 130 candidats), transmise par le propriétaire.
 Dépôt : https://github.com/oscaraksanti/Simulateur-d-examen-BCC-2026 — auteur : Oscar Aksanti — marque **Datalendo** (https://datalendo.com ; ne plus utiliser « formations4data »).
 Production (Vercel, projet `sys-bcc-26` de l'équipe `oscar-d5ae`, relié au dépôt, déploiement auto sur push `main`) :
 https://simulateur-bcc.datalendo.com (sous-domaine ; DNS de datalendo.com chez Namecheap → CNAME
@@ -45,7 +47,7 @@ Miroir GitHub Pages : https://oscaraksanti.github.io/Simulateur-d-examen-BCC-202
 npm run dev          # http://localhost:3000
 npm run lint         # ESLint (doit être vide)
 npm run typecheck    # tsc --noEmit
-npm test             # Vitest : 575 tests (scoring, sampling, share, remote, intégrité des données des 7 filières)
+npm test             # Vitest : 642 tests (scoring, sampling, share, remote, intégrité des données des 8 filières)
 npm run build        # prebuild → scripts/generate-og.ts → next build → out/
 npm start            # sert out/ (npx serve)
 ```
@@ -63,6 +65,7 @@ Variables : `NEXT_PUBLIC_SITE_URL` (URL publique, utilisée dans les textes de p
   Tables : candidats, tentatives, feedbacks, admins, emails (journal), parametres (expediteur, repondre_a, site, whatsapp).
 - Migration `0003_sept_filieres.sql` (appliquée le 30/10/2026 : `simulateur_bcc_sept_filieres`) : contraintes `filiere`
   élargies aux 7 ids, fonction `simulateur_bcc.libelle_filiere()` (mêmes libellés que `filieres.ts`) utilisée par les e-mails.
+  Migration `0004_filiere_numerique.sql` (appliquée le 30/10/2026 : `simulateur_bcc_filiere_numerique`) : ajoute `numerique`.
   Toute nouvelle filière = nouvelle migration (contraintes + libellé) AVANT le déploiement du front.
 - API (toutes `security definer`, `search_path = ''`) : publiques `sbcc_enregistrer_candidat`, `sbcc_enregistrer_tentative`,
   `sbcc_envoyer_avis`, `sbcc_stats_publiques`, `sbcc_est_admin` ; admin (authenticated + contrôle) `sbcc_stats_admin`,
@@ -95,7 +98,7 @@ src/app/
   cas-pratiques/page.tsx→ components/cases/CasesSession
   resultats/page.tsx    → components/results/ResultsView
   entrainement/page.tsx → components/training/TrainingSession  (BONUS : séries par compétence, correction immédiate)
-  fiches/page.tsx       BONUS : mémo culture BCC, formules data, repères cyber + 5 autres domaines, méthode jour J, arnaques
+  fiches/page.tsx       BONUS : mémo culture BCC, formules data, repères cyber + 6 autres domaines, méthode jour J, arnaques
   not-found.tsx
 src/context/
   ExamContext.tsx       useReducer + persistance localStorage. Ne stocke QUE des ids (les banques sont importées par les
@@ -103,7 +106,7 @@ src/context/
                         DUREE_CAS_MS (20 min), OBJECTIF_SIMULATIONS (5). etapeAtteinte() pour le Stepper.
   useGarde.ts           garde de navigation client : 'candidat' | 'qcm_termine' | 'resultat' → router.replace
 src/lib/
-  filieres.ts           REGISTRE des 7 filières : id, nom, domaine, préfixe d'ids, résumé, compétences (chaînes EXACTES) ;
+  filieres.ts           REGISTRE des 8 filières : id, nom, domaine, préfixe d'ids, résumé, compétences (chaînes EXACTES) ;
                         infoFiliere(), estFiliere(), IDS_FILIERES. Icônes/teintes : components/ui/IconeFiliere.tsx
   types.ts              tous les types (QcmQuestion avec pourquoiPas + aRetenir ; CasPratique avec role/heure/enjeu ; Tentative…)
   scoring.ts            fonctions pures : note = (qcm/qcmMax)×12 + (cas/casMax)×8 arrondie au 0,5 ; étape ordre =
@@ -115,11 +118,11 @@ src/lib/
                         questions-vues, cas-vus, ref, theme
 src/data/
   bccFacts.ts           SOURCE UNIQUE DE VÉRITÉ (faits, tauxDirecteur2026, fluxPaiement, recrutement2026)
-  quizData.ts           485 questions : Data (60), Cyber (60), Culture BCC (25), Logique (40) + import des 5 banques de
+  quizData.ts           545 questions : Data (60), Cyber (60), Culture BCC (25), Logique (40) + import des 6 banques de
                         banques/ ; banquesTechniques: Record<Filiere, …>, quizData, questionParId()
-  banques/              bdd.ts, systemes.ts, reseaux.ts, dev.ts, support.ts : 60 questions chacune (BDD-, SYS-, RES-, DEV-, SUP-)
-  casesData.ts          28 cas : 8 ici (DATA-CAS-01..04, CYB-CAS-01..04) + import de cas/ ; casParId()
-  cas/                  bdd.ts, systemes.ts, reseaux.ts, dev.ts, support.ts : 4 cas chacun (<PREFIXE>-CAS-01..04)
+  banques/              bdd, systemes, reseaux, dev, support, numerique (.ts) : 60 questions chacune (BDD-, SYS-, RES-, DEV-, SUP-, NUM-)
+  casesData.ts          32 cas : 8 ici (DATA-CAS-01..04, CYB-CAS-01..04) + import de cas/ ; casParId()
+  cas/                  bdd, systemes, reseaux, dev, support, numerique (.ts) : 4 cas chacun (<PREFIXE>-CAS-01..04)
   resources.ts          liens Oscar (YouTube @oscaraksanti, WhatsApp 243971601855)
 src/components/
   layout/   Header, Footer, DisclaimerBanner, ThemeToggle (système→clair→sombre, data-theme), Stepper, Logo (logo original)
@@ -166,6 +169,7 @@ Le timer repose sur des timestamps (`debut`) persistés : un rechargement de pag
 | Réseaux & télécoms | 60 | Modèle OSI & TCP/IP (8), Adressage IP & sous-réseaux (8), Commutation & VLAN (7), Routage (8), Réseaux sans fil & mobiles (7), Transmission & télécoms (8), Services réseau (DNS, DHCP, NAT) (7), Sécurité & supervision réseau (7) |
 | Développement logiciel | 60 | Algorithmique & complexité (8), Structures de données (8), Programmation orientée objet (7), Bases de données pour développeurs (7), Web & API (8), Tests & qualité (7), Git & DevOps (7), Sécurité du code (8) |
 | Support IT | 60 | Matériel & périphériques (8), Windows & postes de travail (8), Dépannage réseau (8), Messagerie & bureautique (7), Comptes & accès (7), Gestion des incidents (ITIL) (8), Sécurité au poste de travail (7), Relation utilisateur (7) |
+| Numérique | 60 | Transformation numérique (7), Gestion de projet & agilité (8), Services financiers numériques (8), Cloud & SaaS (8), IA & automatisation (8), Web, UX & accessibilité (7), Gouvernance du SI & données personnelles (7), Hygiène numérique & sécurité (7) |
 
 - Nouvelles banques : 18 faciles / 30 moyennes / 12 difficiles et 15 bonnes réponses par lettre dans chaque fichier ;
   le test exige pour chaque filière le préfixe d'id, des compétences déclarées dans `filieres.ts` et ≥ 4 cas.
@@ -270,6 +274,15 @@ Le timer repose sur des timestamps (`debut`) persistés : un rechargement de pag
 - Biais corrigé dans les cas pratiques (anciens et nouveaux) : la meilleure option était presque toujours la plus longue
   (113 étapes sur 116) ; options rééquilibrées sans changer points ni fond.
 - Reste un biais modéré sur les QCM Data/Cyber d'origine (bonne réponse la plus longue dans ~46 % des cas, hasard = 25 %).
+
+### Session 9 — 30/10/2026 (8e filière « Numérique »)
+- Chiffres DRH transmis par le propriétaire : 44 130 candidats en 8 catégories (Data 8 768, Support 7 383, DBA 7 280,
+  Réseau 6 808, Système 6 221, Dev 3 668, Numérique 2 809, Cyber 1 193). Non publiés sur le site (source non vérifiée en ligne).
+- Inscrits au 30/10 (≈ 09h) : 307 candidats (Data 193, Cyber 51, Support 18, Dev 14, Systèmes 12, BDD 11, Réseaux 8), 113 simulations.
+- Filière `numerique` (préfixe NUM, icône MonitorSmartphone) : 60 QCM (15 par lettre, 18/30/12, bonne réponse la plus longue
+  dans 17 %) + 4 cas (NUM-CAS-01..04 : crédit PME dématérialisé, fraude QR/SIM swap, contrat SaaS & SLA, assistant IA).
+  Calculs vérifiés par script. Repères « Numérique » dans /fiches ; textes 7 → 8 domaines (accueil, SEO, OG, pied de page).
+- Supabase : migration 0004 appliquée (`simulateur_bcc_filiere_numerique`) avant le déploiement du front.
 
 ### Pistes pour la suite
 - Remplacer les placeholders de captures du README par de vraies captures.

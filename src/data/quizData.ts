@@ -14,6 +14,7 @@ import { banqueTechniqueBdd } from './banques/bdd';
 import { banqueTechniqueDev } from './banques/dev';
 import { banqueTechniqueReseaux } from './banques/reseaux';
 import { banqueTechniqueSupport } from './banques/support';
+import { banqueTechniqueNumerique } from './banques/numerique';
 import { banqueTechniqueSystemes } from './banques/systemes';
 
 // ===========================================================================
@@ -5180,6 +5181,7 @@ export const banquesTechniques: Record<Filiere, QcmQuestion[]> = {
   reseaux: banqueTechniqueReseaux,
   dev: banqueTechniqueDev,
   support: banqueTechniqueSupport,
+  numerique: banqueTechniqueNumerique,
 };
 
 /** Toutes les questions, toutes banques confondues. */

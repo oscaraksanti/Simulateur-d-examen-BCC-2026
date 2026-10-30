@@ -1,8 +1,8 @@
 // Types partagés de l'application « Simulateur BCC — Prépa informatique ».
 // Toute la donnée (questions, cas, faits) est typée ici : aucun `any`.
 
-/** Les 7 domaines du recrutement informatique 2026 (voir src/lib/filieres.ts). */
-export type Filiere = 'data' | 'cyber' | 'bdd' | 'systemes' | 'reseaux' | 'dev' | 'support';
+/** Les 8 catégories du recrutement informatique 2026 (voir src/lib/filieres.ts). */
+export type Filiere = 'data' | 'cyber' | 'bdd' | 'systemes' | 'reseaux' | 'dev' | 'support' | 'numerique';
 export type Section = 'technique' | 'culture_bcc' | 'logique';
 export type Difficulte = 'facile' | 'moyen' | 'difficile';
 export type OptionId = 'A' | 'B' | 'C' | 'D';

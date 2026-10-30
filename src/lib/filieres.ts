@@ -1,5 +1,6 @@
-// Les 7 filières du simulateur = les 7 domaines du recrutement informatique BCC 2026
-// (liste vérifiée dans src/data/bccFacts.ts → recrutement2026.domaines).
+// Les 8 filières du simulateur = les 7 domaines de l'avis de recrutement informatique BCC 2026
+// (liste vérifiée dans src/data/bccFacts.ts → recrutement2026.domaines), plus la catégorie
+// « Numérique » (professionnel du numérique) qui figure dans la répartition des candidatures.
 //
 // Les noms de compétences sont la clé de regroupement des questions : une nouvelle question
 // doit reprendre la chaîne EXACTE (apostrophe typographique ’ comprise).
@@ -139,6 +140,23 @@ export const FILIERES: readonly InfoFiliere[] = [
       'Gestion des incidents (ITIL)',
       'Sécurité au poste de travail',
       'Relation utilisateur',
+    ],
+  },
+  {
+    id: 'numerique',
+    nom: 'Numérique',
+    domaine: 'Professionnel du numérique',
+    prefixe: 'NUM',
+    resume: 'Projets agiles, paiements mobiles, cloud, IA, UX',
+    competences: [
+      'Transformation numérique',
+      'Gestion de projet & agilité',
+      'Services financiers numériques',
+      'Cloud & SaaS',
+      'IA & automatisation',
+      'Web, UX & accessibilité',
+      'Gouvernance du SI & données personnelles',
+      'Hygiène numérique & sécurité',
     ],
   },
 ];

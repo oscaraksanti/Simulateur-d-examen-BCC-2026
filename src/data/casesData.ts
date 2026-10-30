@@ -11,6 +11,7 @@ import { casBdd } from './cas/bdd';
 import { casDev } from './cas/dev';
 import { casReseaux } from './cas/reseaux';
 import { casSupport } from './cas/support';
+import { casNumerique } from './cas/numerique';
 import { casSystemes } from './cas/systemes';
 
 // ===========================================================================
@@ -1801,6 +1802,7 @@ export const casPratiques: CasPratique[] = [
   ...casReseaux,
   ...casDev,
   ...casSupport,
+  ...casNumerique,
 ];
 
 const index = new Map(casPratiques.map((c) => [c.id, c]));

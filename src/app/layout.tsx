@@ -18,7 +18,7 @@ const TITRE = 'Simulateur BCC — Prépa informatique 2026';
 // Avec metadataBase, Next ajoute déjà le sous-chemin du site : on ne préfixe le basePath que sans URL publique.
 const OG_IMAGE = SITE.startsWith('http') ? '/og-image.png' : `${BASE_PATH}/og-image.png`;
 const DESCRIPTION =
-  "Examen blanc gratuit et chronométré pour préparer le recrutement 2026 de la Banque Centrale du Congo dans les 7 domaines informatiques (data, cybersécurité, bases de données, systèmes, réseaux, développement, support IT) : QCM corrigés, cas pratiques, culture BCC. Outil indépendant, non affilié à la BCC.";
+  "Examen blanc gratuit et chronométré pour préparer le recrutement 2026 de la Banque Centrale du Congo dans les 8 domaines informatiques (data, cybersécurité, bases de données, systèmes, réseaux, développement, support IT, numérique) : QCM corrigés, cas pratiques, culture BCC. Outil indépendant, non affilié à la BCC.";
 
 export const metadata: Metadata = {
   metadataBase: SITE.startsWith('http') ? new URL(SITE) : undefined,
@@ -39,6 +39,7 @@ export const metadata: Metadata = {
     'réseaux et télécommunications',
     'développement logiciel',
     'support IT',
+    'professionnel du numérique',
     'RDC',
     'Kinshasa',
     'préparation concours',

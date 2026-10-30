@@ -12,7 +12,7 @@ import type { Filiere } from '@/lib/types';
 
 export const metadata: Metadata = {
   title: 'Fiches de révision & jour J',
-  description: 'Mémo culture BCC sourcé, repères des 7 domaines (data, cyber, bases de données, systèmes, réseaux, développement, support IT) et conseils pour le jour du test.',
+  description: 'Mémo culture BCC sourcé, repères des 8 domaines (data, cyber, bases de données, systèmes, réseaux, développement, support IT, numérique) et conseils pour le jour du test.',
 };
 
 const formulesData: { titre: string; formule: string; note: string }[] = [
@@ -105,6 +105,19 @@ const reperesFilieres: { filiere: Filiere; titre: string; reperes: { titre: stri
       { titre: 'Mot de passe oublié', contenu: 'Toujours vérifier l’identité selon la procédure avant de réinitialiser, même pour un directeur pressé au téléphone : c’est la cible préférée de l’ingénierie sociale.' },
       { titre: 'Poste suspect', contenu: 'Message de rançon ou comportement anormal : débrancher le réseau sans éteindre, ne rien supprimer, escalader immédiatement à la sécurité.' },
       { titre: 'Ticket bien tenu', contenu: 'Symptôme, actions faites, résultat, prochaine étape. On clôture avec l’accord de l’utilisateur, et on alimente la base de connaissances.' },
+    ],
+  },
+  {
+    filiere: 'numerique',
+    titre: 'Repères Numérique',
+    reperes: [
+      { titre: 'Scrum en 30 secondes', contenu: 'Product Owner (priorise le backlog), Scrum Master (facilite, lève les obstacles), développeurs. Sprint d’un mois au plus : planification, mêlée quotidienne de 15 min, revue, rétrospective.' },
+      { titre: 'User story et MoSCoW', contenu: '« En tant que…, je veux…, afin de… » + critères d’acceptation testables. Priorités : Must, Should, Could, Won’t (pas cette fois). Un MVP ne garde que les Must.' },
+      { titre: 'IaaS, PaaS, SaaS', contenu: 'Plus on monte (IaaS → PaaS → SaaS), plus le fournisseur gère. Mais quel que soit le modèle, le client reste responsable de ses données, de ses comptes et de leurs droits d’accès.' },
+      { titre: 'Disponibilité d’un SLA', contenu: '99,9 % ≈ 8 h 46 min d’arrêt par an ; 99,99 % ≈ 53 min. Exige aussi la réversibilité (récupérer tes données dans un format exploitable) et la localisation des données.' },
+      { titre: 'Données personnelles', contenu: 'Finalité déterminée, minimisation (seulement le nécessaire), durée de conservation limitée, sécurité, droits des personnes (accès, rectification, effacement).' },
+      { titre: 'IA générative', contenu: 'Elle peut inventer avec aplomb (hallucination) : vérifie les sources. Ne colle jamais de données clients ou internes dans un outil grand public non approuvé.' },
+      { titre: 'Accessibilité (WCAG)', contenu: 'Contraste d’au moins 4,5:1 pour le texte courant, texte alternatif pour les images, tout utilisable au clavier, formulaires avec des libellés explicites.' },
     ],
   },
 ];
