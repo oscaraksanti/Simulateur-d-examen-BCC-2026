@@ -39,7 +39,7 @@ export function DefiBanner() {
         <p className="text-[15px]">
           <strong>Un ami te défie : bats {formatNote(defi.note)}/20 !</strong>{' '}
           {defi.filiere ? <span className="text-muted">Filière {LIBELLES_FILIERE[defi.filiere]}.</span> : null}{' '}
-          <a href="#inscription" className="font-semibold text-primary-strong underline underline-offset-2">
+          <a href="#commencer" className="font-semibold text-primary-strong underline underline-offset-2">
             Relever le défi
           </a>
         </p>

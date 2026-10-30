@@ -1,7 +1,8 @@
-// Types partagés de l'application « Simulateur BCC — Prépa Data & Cyber ».
+// Types partagés de l'application « Simulateur BCC — Prépa informatique ».
 // Toute la donnée (questions, cas, faits) est typée ici : aucun `any`.
 
-export type Filiere = 'data' | 'cyber';
+/** Les 7 domaines du recrutement informatique 2026 (voir src/lib/filieres.ts). */
+export type Filiere = 'data' | 'cyber' | 'bdd' | 'systemes' | 'reseaux' | 'dev' | 'support';
 export type Section = 'technique' | 'culture_bcc' | 'logique';
 export type Difficulte = 'facile' | 'moyen' | 'difficile';
 export type OptionId = 'A' | 'B' | 'C' | 'D';
@@ -13,7 +14,7 @@ export interface QcmQuestion {
   competence: string; // ex. "SQL", "Statistiques", "Réseaux", "Gestion d'incident"
   difficulte: Difficulte;
   enonce: string;
-  extrait?: { langage: 'sql' | 'python' | 'log' | 'texte'; contenu: string }; // code/log affiché en mono
+  extrait?: { langage: 'sql' | 'python' | 'log' | 'shell' | 'texte'; contenu: string }; // code/log affiché en mono
   options: { id: OptionId; texte: string }[];
   bonneReponse: OptionId;
   explication: string; // 2-4 phrases pédagogiques

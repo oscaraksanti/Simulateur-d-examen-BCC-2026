@@ -5,7 +5,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, Check, Lock } from 'lucide-react';
 import { useExam } from '@/context/ExamContext';
+import { FILIERES } from '@/lib/filieres';
 import { nouvelId, syncConfiguree } from '@/lib/remote';
+import { ICONES_FILIERE } from '@/components/ui/IconeFiliere';
 import type { Candidat, Filiere } from '@/lib/types';
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -36,10 +38,7 @@ export function valider(
   return e;
 }
 
-const filieres = [
-  { v: 'data' as const, titre: 'Data Analyse', desc: 'SQL, Python, statistiques, Power BI' },
-  { v: 'cyber' as const, titre: 'Cybersécurité', desc: 'Réseaux, crypto, SIEM, réponse à incident' },
-];
+const filieres = FILIERES.map((f) => ({ v: f.id, titre: f.nom, desc: f.resume, Icone: ICONES_FILIERE[f.id] }));
 
 export function RegistrationForm({ filiereSuggeree }: { filiereSuggeree?: Filiere | null }) {
   const { etat, inscrire } = useExam();
@@ -146,13 +145,13 @@ export function RegistrationForm({ filiereSuggeree }: { filiereSuggeree?: Filier
 
       <fieldset>
         <legend className="text-sm font-medium text-ink">Filière</legend>
-        <div className="mt-2 grid gap-3 sm:grid-cols-2">
+        <div className="mt-2 grid gap-2.5 sm:grid-cols-2">
           {filieres.map((f) => {
             const actif = filiere === f.v;
             return (
               <label
                 key={f.v}
-                className={`relative flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-ink/10 ${
+                className={`relative flex cursor-pointer items-start gap-3 rounded-xl border px-4 py-3 transition has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-ink/10 ${
                   actif ? 'border-ink bg-surface shadow-[0_0_0_1px_var(--ink)]' : 'border-border bg-surface hover:border-ink/30'
                 }`}
               >
@@ -173,8 +172,10 @@ export function RegistrationForm({ filiereSuggeree }: { filiereSuggeree?: Filier
                 >
                   {actif ? <Check className="size-3" strokeWidth={3} /> : null}
                 </span>
-                <span>
-                  <span className="block text-[15px] font-semibold text-ink">{f.titre}</span>
+                <span className="min-w-0">
+                  <span className="flex items-center gap-1.5 text-[15px] font-semibold text-ink">
+                    <f.Icone aria-hidden className="size-4 shrink-0 text-muted" /> {f.titre}
+                  </span>
                   <span className="mt-0.5 block text-[13px] text-muted">{f.desc}</span>
                 </span>
               </label>

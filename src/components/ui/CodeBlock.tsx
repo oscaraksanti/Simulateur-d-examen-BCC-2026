@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 
-type Langage = 'sql' | 'python' | 'log' | 'texte';
+type Langage = 'sql' | 'python' | 'log' | 'shell' | 'texte';
 
 const MOTS_SQL =
   /\b(SELECT|FROM|WHERE|GROUP BY|ORDER BY|HAVING|JOIN|LEFT|RIGHT|INNER|OUTER|FULL|ON|AS|AND|OR|NOT|NULL|IS|IN|EXISTS|DISTINCT|COUNT|SUM|AVG|MIN|MAX|OVER|PARTITION BY|ROW_NUMBER|RANK|DENSE_RANK|LAG|LEAD|WITH|CASE|WHEN|THEN|ELSE|END|UNION|ALL|LIMIT|BETWEEN|LIKE|INSERT|UPDATE|DELETE|INTO|VALUES|SET|CREATE|TABLE|DESC|ASC|COALESCE|ROWS|PRECEDING|CURRENT ROW|BY)\b/g;
@@ -42,6 +42,14 @@ function regles(langage: Langage): Regle[] {
         },
         { re: NIVEAUX, classe: () => 'font-semibold text-danger' },
       ];
+    case 'shell':
+      return [
+        { re: /#.*$/gm, classe: () => 'text-muted italic' },
+        { re: /(['"])(?:(?!\1).)*\1/g, classe: () => 'text-success-ink' },
+        { re: /^\s*(?:\$|PS [^>]*>|C:\\[^>]*>)/gm, classe: () => 'text-muted' },
+        { re: /(?<=\s)--?[A-Za-z][\w-]*/g, classe: () => 'text-primary-strong' },
+        { re: IP, classe: () => 'rounded bg-primary-soft px-0.5 text-primary-strong' },
+      ];
     default:
       return [];
   }
@@ -75,7 +83,7 @@ export function colorer(texte: string, langage: Langage): ReactNode[] {
   return sortie;
 }
 
-const libelles: Record<Langage, string> = { sql: 'SQL', python: 'Python', log: 'Logs', texte: 'Données' };
+const libelles: Record<Langage, string> = { sql: 'SQL', python: 'Python', log: 'Logs', shell: 'Terminal', texte: 'Données' };
 
 export function CodeBlock({ langage, contenu, titre }: { langage: Langage; contenu: string; titre?: string }) {
   return (

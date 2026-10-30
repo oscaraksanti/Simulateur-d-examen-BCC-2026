@@ -58,6 +58,10 @@ describe('textes de partage', () => {
 describe('lireDefi', () => {
   it('lit un défi valide', () => {
     expect(lireDefi(new URLSearchParams('defi=13.5&f=cyber'))).toEqual({ note: 13.5, filiere: 'cyber' });
+    expect(lireDefi(new URLSearchParams('defi=12&f=reseaux'))).toEqual({ note: 12, filiere: 'reseaux' });
+  });
+  it('ignore une filière inconnue', () => {
+    expect(lireDefi(new URLSearchParams('defi=12&f=compta'))).toEqual({ note: 12, filiere: null });
   });
   it('rejette les valeurs invalides', () => {
     expect(lireDefi(new URLSearchParams('defi=25'))).toBeNull();

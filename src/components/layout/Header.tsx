@@ -43,7 +43,7 @@ export function Header() {
           <LogoMark className="size-7 shrink-0" />
           <span className="truncate text-[15px] font-semibold tracking-[-0.02em] text-ink">
             Simulateur BCC
-            <span className="ml-2 hidden font-normal text-muted sm:inline">Data &amp; Cyber</span>
+            <span className="ml-2 hidden font-normal text-muted sm:inline">Prépa IT</span>
           </span>
         </Link>
         <nav aria-label="Navigation principale" className="hidden items-center gap-0.5 md:flex">

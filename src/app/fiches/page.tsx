@@ -7,10 +7,12 @@ import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import { Reveal } from '@/components/ui/Reveal';
 import { ButtonLink } from '@/components/ui/Button';
+import { ICONES_FILIERE } from '@/components/ui/IconeFiliere';
+import type { Filiere } from '@/lib/types';
 
 export const metadata: Metadata = {
   title: 'Fiches de révision & jour J',
-  description: 'Mémo culture BCC sourcé, formules data, repères cybersécurité et conseils pour le jour du test de recrutement.',
+  description: 'Mémo culture BCC sourcé, repères des 7 domaines (data, cyber, bases de données, systèmes, réseaux, développement, support IT) et conseils pour le jour du test.',
 };
 
 const formulesData: { titre: string; formule: string; note: string }[] = [
@@ -37,6 +39,74 @@ const reperesCyber: { titre: string; contenu: string }[] = [
   { titre: 'PCI-DSS', contenu: 'Interdit de stocker CVV, piste magnétique ou PIN après autorisation. PAN affiché masqué (au plus 6 premiers et 4 derniers chiffres).' },
   { titre: 'Preuves numériques', contenu: 'Respecter l’ordre de volatilité (mémoire avant disque) : isoler du réseau sans éteindre, tracer la chaîne de conservation.' },
   { titre: 'Moindre privilège', contenu: 'Chacun n’a que les droits nécessaires à sa mission ; séparation des tâches entre saisie et validation d’un paiement.' },
+];
+
+const reperesFilieres: { filiere: Filiere; titre: string; reperes: { titre: string; contenu: string }[] }[] = [
+  {
+    filiere: 'bdd',
+    titre: 'Repères Bases de données',
+    reperes: [
+      { titre: 'ACID', contenu: 'Atomicité (tout ou rien), Cohérence (contraintes respectées), Isolation (transactions concurrentes sans interférence), Durabilité (validé = conservé, même après une panne).' },
+      { titre: 'Niveaux d’isolation', contenu: 'READ UNCOMMITTED → READ COMMITTED → REPEATABLE READ → SERIALIZABLE. Anomalies à connaître : lecture sale, lecture non répétable, lecture fantôme.' },
+      { titre: 'Types de sauvegarde', contenu: 'Complète ; différentielle = changements depuis la dernière COMPLÈTE ; incrémentale = depuis la dernière sauvegarde, quelle qu’elle soit. Une sauvegarde jamais restaurée n’est pas une sauvegarde.' },
+      { titre: 'Restauration à un instant (PITR)', contenu: 'Restaurer la dernière complète puis rejouer les journaux de transactions (WAL, redo logs) jusqu’à l’instant voulu, juste avant l’erreur.' },
+      { titre: 'Index', contenu: 'Accélère les lectures sélectives mais ralentit les écritures. Index composite : l’ordre des colonnes compte (préfixe de gauche). Lis le plan d’exécution (EXPLAIN) avant d’agir.' },
+      { titre: 'Formes normales', contenu: '1FN : valeurs atomiques. 2FN : pas de dépendance à une partie de la clé. 3FN : pas de dépendance entre attributs non-clés (dépendance transitive).' },
+      { titre: 'Réplication', contenu: 'Synchrone : aucune perte des transactions validées, mais latence. Asynchrone : rapide, mais les dernières transactions peuvent être perdues lors d’une bascule.' },
+    ],
+  },
+  {
+    filiere: 'systemes',
+    titre: 'Repères Administration systèmes',
+    reperes: [
+      { titre: 'Droits Linux en octal', contenu: 'r = 4, w = 2, x = 1. 750 = rwxr-x--- (propriétaire tout, groupe lecture + exécution, autres rien). 644 est courant pour un fichier, 755 pour un répertoire.' },
+      { titre: 'RAID', contenu: 'RAID 1 : miroir. RAID 5 : capacité de n−1 disques, tolère 1 panne. RAID 6 : n−2 disques, tolère 2 pannes. RAID 10 : 50 % utile. Le RAID protège du matériel, pas d’une suppression : ce n’est pas une sauvegarde.' },
+      { titre: 'Snapshot ≠ sauvegarde', contenu: 'Un snapshot de VM dépend du stockage d’origine et sert à un retour arrière rapide (avant une mise à jour). La sauvegarde est une copie indépendante, idéalement hors site.' },
+      { titre: 'GPO : ordre LSDOU', contenu: 'Local → Site → Domaine → Unité d’organisation. La dernière stratégie appliquée l’emporte en cas de conflit. Vérification : gpresult /r ; application immédiate : gpupdate /force.' },
+      { titre: 'Charge d’un serveur Linux', contenu: 'Le load average se lit par rapport au nombre de cœurs : 4,0 sur 8 cœurs est confortable, sur 2 cœurs le système est saturé.' },
+      { titre: 'Enregistrements DNS', contenu: 'A (IPv4), AAAA (IPv6), CNAME (alias), MX (serveur de messagerie), PTR (résolution inverse), TXT (SPF, DKIM, DMARC).' },
+      { titre: 'DHCP : DORA', contenu: 'Discover → Offer → Request → Acknowledge. Un poste en 169.254.x.x n’a reçu aucune réponse DHCP.' },
+    ],
+  },
+  {
+    filiere: 'reseaux',
+    titre: 'Repères Réseaux & télécoms',
+    reperes: [
+      { titre: 'Modèle OSI', contenu: '1 Physique · 2 Liaison (MAC, commutateur) · 3 Réseau (IP, routeur) · 4 Transport (TCP, UDP) · 5 Session · 6 Présentation · 7 Application.' },
+      { titre: 'Nombre d’hôtes', contenu: '2^(32 − préfixe) − 2. /24 → 254 hôtes, /26 → 62, /28 → 14, /30 → 2 (liaison point à point).' },
+      { titre: 'Adresses privées (RFC 1918)', contenu: '10.0.0.0/8 · 172.16.0.0/12 · 192.168.0.0/16. 169.254.0.0/16 = adresse automatique (APIPA) sans DHCP.' },
+      { titre: 'VLAN', contenu: 'Port d’accès : un seul VLAN, sans étiquette. Lien trunk 802.1Q : plusieurs VLAN étiquetés. Pour passer d’un VLAN à l’autre, il faut un routage (routeur ou commutateur de niveau 3).' },
+      { titre: 'Choix de la route', contenu: 'Le routeur retient le préfixe le plus long qui correspond (longest prefix match), puis la distance administrative, puis la métrique.' },
+      { titre: 'Décibels', contenu: '+3 dB ≈ puissance × 2, +10 dB = × 10, −3 dB ≈ moitié. Les pertes en dB d’une liaison s’additionnent.' },
+      { titre: 'Débit et durée', contenu: '1 octet = 8 bits. 100 Mo sur un lien de 10 Mbit/s : 800 Mbit / 10 Mbit/s = 80 s au minimum, hors surcharge des protocoles.' },
+    ],
+  },
+  {
+    filiere: 'dev',
+    titre: 'Repères Développement logiciel',
+    reperes: [
+      { titre: 'Complexités à connaître', contenu: 'Accès à un tableau O(1) · recherche dichotomique (tableau trié) O(log n) · parcours O(n) · bon tri O(n log n) · deux boucles imbriquées O(n²).' },
+      { titre: 'L’argent n’est jamais un flottant', contenu: '0,1 + 0,2 ≠ 0,3 en virgule flottante. Utilise des entiers (centimes) ou un type décimal, et une règle d’arrondi explicite.' },
+      { titre: 'HTTP', contenu: 'GET, PUT et DELETE sont idempotents, POST ne l’est pas. 201 créé · 400 requête invalide · 401 non authentifié · 403 interdit · 404 introuvable · 409 conflit · 500 erreur serveur.' },
+      { titre: 'Injection SQL', contenu: 'Toujours des requêtes paramétrées (ou un ORM qui les utilise), jamais de concaténation de saisies utilisateur dans le SQL.' },
+      { titre: 'Mots de passe et secrets', contenu: 'Hachage lent et salé (bcrypt, Argon2). Un secret poussé dans Git est compromis : on le révoque et on le remplace, l’effacer de l’historique ne suffit pas.' },
+      { titre: 'Git', contenu: 'git revert crée un commit qui annule (sûr sur une branche partagée) ; git reset réécrit l’historique (à réserver au local).' },
+      { titre: 'Pyramide des tests', contenu: 'Beaucoup de tests unitaires rapides, moins de tests d’intégration, peu de tests de bout en bout. Un bug corrigé = un test de non-régression.' },
+    ],
+  },
+  {
+    filiere: 'support',
+    titre: 'Repères Support IT',
+    reperes: [
+      { titre: 'Priorité ITIL', contenu: 'Priorité = impact × urgence. Un guichet entier bloqué passe avant un poste isolé, quel que soit le rang de la personne qui appelle.' },
+      { titre: 'Incident, problème, demande', contenu: 'Incident : interruption à rétablir vite. Problème : cause racine d’incidents répétés. Demande de service : besoin standard (accès, logiciel). Changement : modification planifiée et approuvée.' },
+      { titre: 'Dépannage par couches', contenu: 'Commence par le physique (câble, voyants, alimentation), puis l’adresse IP, la passerelle, le DNS, et enfin l’application.' },
+      { titre: 'Commandes Windows utiles', contenu: 'ipconfig /all · ipconfig /release puis /renew · ping · nslookup · tracert · gpupdate /force · sfc /scannow.' },
+      { titre: 'Mot de passe oublié', contenu: 'Toujours vérifier l’identité selon la procédure avant de réinitialiser, même pour un directeur pressé au téléphone : c’est la cible préférée de l’ingénierie sociale.' },
+      { titre: 'Poste suspect', contenu: 'Message de rançon ou comportement anormal : débrancher le réseau sans éteindre, ne rien supprimer, escalader immédiatement à la sécurité.' },
+      { titre: 'Ticket bien tenu', contenu: 'Symptôme, actions faites, résultat, prochaine étape. On clôture avec l’accord de l’utilisateur, et on alimente la base de connaissances.' },
+    ],
+  },
 ];
 
 const conseilsJourJ: { titre: string; contenu: string }[] = [
@@ -136,6 +206,25 @@ export default function PageFiches() {
           ))}
         </div>
       </section>
+
+      {reperesFilieres.map((f) => {
+        const Icone = ICONES_FILIERE[f.filiere];
+        return (
+          <section key={f.filiere} aria-labelledby={`fiche-${f.filiere}`}>
+            <h2 id={`fiche-${f.filiere}`} className="flex items-center gap-2 text-2xl font-bold tracking-tight text-ink">
+              <Icone aria-hidden className="size-6 text-primary-strong" /> {f.titre}
+            </h2>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              {f.reperes.map((r) => (
+                <div key={r.titre} className="rounded-2xl border border-border bg-surface p-4">
+                  <p className="text-sm font-semibold text-ink">{r.titre}</p>
+                  <p className="mt-1.5 text-sm leading-relaxed text-muted">{r.contenu}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+      })}
 
       {/* Jour J */}
       <section aria-labelledby="fiche-jourj">

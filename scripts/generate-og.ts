@@ -68,11 +68,11 @@ async function main() {
       'div',
       { style: { display: 'flex', flexDirection: 'column' } },
       h('div', { style: { fontSize: 72, fontWeight: 800, lineHeight: 1.05, letterSpacing: -2 } }, 'Simulateur BCC'),
-      h('div', { style: { fontSize: 46, fontWeight: 700, color: '#3D9BFF', marginTop: 8 } }, 'Prépa Data & Cybersécurité'),
+      h('div', { style: { fontSize: 46, fontWeight: 700, color: '#3D9BFF', marginTop: 8 } }, 'Prépa informatique · 7 domaines'),
       h(
         'div',
         { style: { fontSize: 28, color: '#9AABC2', marginTop: 24, maxWidth: 900 } },
-        'QCM chronométrés corrigés, cas pratiques immersifs et culture BCC pour préparer le recrutement.',
+        'Data, cyber, bases de données, systèmes, réseaux, dev, support IT : QCM corrigés, cas pratiques et culture BCC.',
       ),
     ),
     h(

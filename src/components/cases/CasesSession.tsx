@@ -84,7 +84,7 @@ export function CasesSession() {
               (fictif). Lis le briefing, exploite les pièces jointes et prends les bonnes décisions.
             </p>
             <ul className="mt-5 space-y-3 text-sm text-muted">
-              <li className="flex gap-2.5"><ListChecks aria-hidden className="mt-0.5 size-4 shrink-0 text-primary-strong" /> <span><strong className="text-ink">{NB_CAS} cas</strong> de 4 à 5 étapes : choix pondérés et mises en ordre.</span></li>
+              <li className="flex gap-2.5"><ListChecks aria-hidden className="mt-0.5 size-4 shrink-0 text-primary-strong" /> <span><strong className="text-ink">{NB_CAS} cas</strong> de 4 à 6 étapes : choix pondérés et mises en ordre.</span></li>
               <li className="flex gap-2.5"><TimerIcon aria-hidden className="mt-0.5 size-4 shrink-0 text-primary-strong" /> <span><strong className="text-ink">20 minutes</strong> au total. À 0, tes réponses sont validées automatiquement.</span></li>
               <li className="flex gap-2.5"><Lightbulb aria-hidden className="mt-0.5 size-4 shrink-0 text-primary-strong" /> <span>Le <strong className="text-ink">feedback</strong> s&apos;affiche après chaque étape validée, puis le corrigé de l&apos;expert en fin de cas.</span></li>
               <li className="flex gap-2.5"><Flag aria-hidden className="mt-0.5 size-4 shrink-0 text-primary-strong" /> <span>Les cas comptent pour <strong className="text-ink">8 points sur 20</strong>.</span></li>

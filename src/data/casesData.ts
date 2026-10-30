@@ -1,4 +1,5 @@
-// Cas pratiques immersifs — TOUS les cas du simulateur (4 Data + 4 Cyber).
+// Cas pratiques immersifs — TOUS les cas du simulateur (Data et Cyber ici, les 5 autres filières
+// dans src/data/cas/).
 //
 // Scénarios entièrement fictifs (banques « Banque Alpha », « Banque Beta »…, IP de documentation,
 // domaines .example). Règles : `pointsMax` = somme des maxima d'étapes (10 à 20 points),
@@ -6,6 +7,11 @@
 // src/__tests__/data.test.ts.
 
 import type { CasPratique } from '@/lib/types';
+import { casBdd } from './cas/bdd';
+import { casDev } from './cas/dev';
+import { casReseaux } from './cas/reseaux';
+import { casSupport } from './cas/support';
+import { casSystemes } from './cas/systemes';
 
 // ===========================================================================
 // FILIÈRE DATA ANALYSE
@@ -84,7 +90,7 @@ const casData: CasPratique[] = [
           {
             id: 'b',
             texte:
-              'La ligne TX-26101222 présente deux fois à l’identique : il y a un risque de double débit pour Ets Lumbu Pharma.',
+              'La ligne TX-26101222 présente deux fois à l’identique (même ID, même horodatage) : il y a un risque de double débit pour Ets Lumbu Pharma.',
             points: 1,
             feedback:
               'Le doublon est réel et doit être traité au nettoyage, mais c’est un incident de qualité de données ou de traitement technique, à faible enjeu (2 750 USD). Ce n’est pas le point prioritaire pour un comité de surveillance.',
@@ -92,7 +98,7 @@ const casData: CasPratique[] = [
           {
             id: 'c',
             texte:
-              'Six virements de Sarl Mosala Import vers le même compte Cpte 77-0193, tous compris entre 9 870 000 et 9 990 000 CDF, en moins de 9 minutes (09:14:03 à 09:22:47).',
+              'Six virements de Sarl Mosala Import vers Cpte 77-0193, tous entre 9 870 000 et 9 990 000 CDF, en moins de 9 minutes.',
             points: 4,
             feedback:
               'Exact : c’est un schéma typique de fractionnement (« smurfing ») destiné à rester sous le seuil de déclaration de 10 000 000 CDF. Le cumul atteint 59 630 000 CDF, soit près de six fois le seuil, vers un même bénéficiaire et via deux canaux. C’est un risque LBC/FT (blanchiment de capitaux et financement du terrorisme) qui appelle un signalement à la conformité.',
@@ -100,7 +106,7 @@ const casData: CasPratique[] = [
           {
             id: 'd',
             texte:
-              'Aucune anomalie majeure : tous les virements de Sarl Mosala Import sont sous le seuil, ils n’ont donc pas à être déclarés.',
+              'Aucune anomalie majeure : pris un par un, tous les virements de Sarl Mosala Import restent sous le seuil de 10 000 000 CDF, ils n’ont donc pas à être déclarés à la conformité.',
             points: 0,
             feedback:
               'C’est précisément le piège. Un seuil se contourne en découpant les montants. Un analyste doit raisonner sur le cumul par couple émetteur-bénéficiaire et par fenêtre de temps, pas seulement opération par opération.',
@@ -116,7 +122,7 @@ const casData: CasPratique[] = [
           {
             id: 'a',
             texte:
-              'Le montant moyen des transactions de la journée, tous canaux confondus.',
+              'Le montant moyen des transactions de la journée, tous canaux confondus, comparé à la moyenne des 30 derniers jours, avec une alerte si l’écart dépasse 20 %.',
             points: 0,
             feedback:
               'Une moyenne globale noie le signal : six virements suspects parmi des milliers d’opérations ne la feront presque pas bouger. Elle est en plus très sensible aux aberrants comme les 182 000 000 CDF.',
@@ -124,7 +130,7 @@ const casData: CasPratique[] = [
           {
             id: 'b',
             texte:
-              'Le nombre d’opérations dépassant le seuil de 10 000 000 CDF.',
+              'Le nombre d’opérations dépassant le seuil de 10 000 000 CDF, suivi par banque émettrice : c’est la mesure directe du respect de l’obligation de déclaration.',
             points: 0,
             feedback:
               'Cet indicateur est structurellement aveugle au fractionnement, puisque celui-ci consiste justement à rester sous le seuil. Il mesure la conformité déclarative, pas le contournement.',
@@ -132,7 +138,7 @@ const casData: CasPratique[] = [
           {
             id: 'c',
             texte:
-              'Le cumul journalier reçu par chaque bénéficiaire.',
+              'Le cumul journalier reçu par chaque bénéficiaire, tous émetteurs et canaux confondus, classé du plus élevé au plus faible.',
             points: 2,
             feedback:
               'C’est un progrès, car on raisonne enfin en cumul. Mais sans fenêtre de temps courte ni filtre sur les montants proches du seuil, l’indicateur mélangera les gros bénéficiaires légitimes (grossistes, payeurs de salaires) et les schémas de fractionnement. Il générera beaucoup de faux positifs.',
@@ -140,7 +146,7 @@ const casData: CasPratique[] = [
           {
             id: 'd',
             texte:
-              'Par couple émetteur-bénéficiaire et sur une fenêtre glissante (ex. 30 minutes) : le nombre d’opérations comprises entre 90 % et 100 % du seuil et leur cumul, avec alerte au-delà de 3 opérations.',
+              'Par couple émetteur-bénéficiaire, sur une fenêtre glissante de 30 minutes : le nombre et le cumul des opérations entre 90 % et 100 % du seuil.',
             points: 4,
             feedback:
               'C’est l’indicateur adapté. Il cible le comportement (montants juste sous le seuil, répétés, concentrés dans le temps vers un même bénéficiaire) et reste peu bruité. Les paramètres (fenêtre, bande de 90 %, nombre d’opérations) sont à calibrer sur l’historique puis à revoir régulièrement.',
@@ -173,7 +179,7 @@ const casData: CasPratique[] = [
           {
             id: 'a',
             texte:
-              'Un camembert 3D de la répartition des montants par canal (ACH, RTGS, Mobile).',
+              'Un camembert 3D de la répartition des montants par canal (ACH, RTGS, Mobile), pour que le comité voie d’un coup d’œil quel canal concentre l’essentiel des flux.',
             points: 0,
             feedback:
               'Un camembert, a fortiori en 3D, déforme les proportions. Surtout, il ne montre ni le temps, ni le bénéficiaire, ni le seuil, c’est-à-dire les trois éléments qui font le schéma.',
@@ -181,7 +187,7 @@ const casData: CasPratique[] = [
           {
             id: 'b',
             texte:
-              'Une chronologie (09h00-09h35) des virements vers Cpte 77-0193, en barres ou en points, avec une ligne horizontale rouge au seuil de 10 000 000 CDF et le cumul annoté.',
+              'Une chronologie (09h00-09h35) des virements vers Cpte 77-0193, avec une ligne rouge au seuil de 10 000 000 CDF et le cumul annoté.',
             points: 3,
             feedback:
               'C’est le bon choix : en un coup d’œil, le comité voit six barres serrées dans le temps, collées juste sous la ligne de seuil, vers le même compte. L’annotation du cumul (59,63 M CDF) rend la gravité immédiatement lisible.',
@@ -189,7 +195,7 @@ const casData: CasPratique[] = [
           {
             id: 'c',
             texte:
-              'Une carte de chaleur canal × tranche horaire du nombre d’opérations.',
+              'Une carte de chaleur canal × tranche horaire du nombre d’opérations, qui fait ressortir les pics d’activité de la matinée sur chaque canal.',
             points: 1,
             feedback:
               'Ce visuel est utile pour le profilage, car il montre les pics d’activité. Mais il agrège et fait disparaître le bénéficiaire, les montants et le seuil : le fractionnement n’y apparaît pas.',
@@ -197,7 +203,7 @@ const casData: CasPratique[] = [
           {
             id: 'd',
             texte:
-              'Le tableau brut des 26 lignes, avec les six lignes suspectes surlignées en jaune.',
+              'Le tableau brut des 26 lignes, avec les six lignes suspectes surlignées en jaune : le comité dispose de toutes les données, sans agrégation qui les déforme.',
             points: 1,
             feedback:
               'Il est transparent et sert d’annexe, mais un comité ne lit pas 26 lignes en séance. Le message principal (concentration dans le temps sous le seuil) doit sauter aux yeux sans effort.',
@@ -212,7 +218,8 @@ const casData: CasPratique[] = [
         options: [
           {
             id: 'a',
-            texte: 'Je la supprime de l’extrait : elle est manifestement fausse.',
+            texte:
+              'Je la supprime de l’extrait : elle est manifestement fausse, et une ligne de plusieurs milliards de CDF fausserait tous les totaux présentés au comité.',
             points: 0,
             feedback:
               'Supprimer une transaction réelle fait perdre une information et une trace d’audit. L’opération a bien eu lieu : seule son étiquette de devise est douteuse.',
@@ -220,7 +227,7 @@ const casData: CasPratique[] = [
           {
             id: 'b',
             texte:
-              'Je la marque comme suspecte (quarantaine), je documente l’hypothèse « montant en CDF mal étiqueté » et je demande confirmation à l’émetteur avant de corriger.',
+              'Je la mets en quarantaine, je documente l’hypothèse d’une devise mal étiquetée et je demande confirmation à l’émetteur avant toute correction.',
             points: 3,
             feedback:
               'C’est la bonne pratique : on ne corrige jamais une donnée financière sur une simple hypothèse. On isole, on trace, on fait confirmer à la source. Entre-temps, l’analyse est conduite avec et sans cette ligne si elle peut influencer les résultats.',
@@ -228,14 +235,15 @@ const casData: CasPratique[] = [
           {
             id: 'c',
             texte:
-              'Je la convertis directement en CDF dans mon fichier, puisque c’est évidemment une erreur d’étiquette.',
+              'Je la convertis directement en CDF dans mon fichier, puisque c’est évidemment une erreur d’étiquette : 2 850 000 USD serait sans rapport avec le profil de l’émetteur.',
             points: 1,
             feedback:
               'L’hypothèse est probablement juste : 2 850 000 USD représenterait plusieurs milliards de CDF, sans rapport avec le profil de l’émetteur. Mais une correction silencieuse, sans confirmation ni traçabilité, n’est pas acceptable dans une banque centrale.',
           },
           {
             id: 'd',
-            texte: 'Je la laisse telle quelle : ce n’est pas mon rôle de juger la devise.',
+            texte:
+              'Je la laisse telle quelle : ce n’est pas mon rôle de juger la devise, et l’extrait doit rester fidèle à ce que le Switch a transmis.',
             points: 0,
             feedback:
               'La laisser telle quelle gonflerait artificiellement les volumes en USD et fausserait toute agrégation. La qualité des données fait partie du métier de l’analyste.',
@@ -298,7 +306,7 @@ const casData: CasPratique[] = [
           {
             id: 'a',
             texte:
-              'Hausse de 6,12 % du taux : le franc congolais s’apprécie, puisque le chiffre augmente.',
+              'Hausse de 6,12 % du taux (de 2 780 à 2 950) : le franc congolais s’apprécie, puisque le chiffre de la cotation augmente semaine après semaine.',
             points: 0,
             feedback:
               'Le calcul est juste, mais l’interprétation est inversée, et c’est exactement l’erreur que redoute Mme Ilunga. Avec une cotation en CDF pour 1 USD, un taux qui monte signifie qu’il faut plus de francs pour obtenir un dollar : le CDF se déprécie.',
@@ -306,7 +314,7 @@ const casData: CasPratique[] = [
           {
             id: 'b',
             texte:
-              'Le taux passe de 2 780 à 2 950, soit +6,12 % : il faut plus de CDF pour 1 USD, donc le CDF se déprécie. En valeur, 1 CDF vaut environ 5,76 % de moins en USD.',
+              'Le taux monte de 6,12 % : il faut plus de CDF pour 1 USD, le CDF se déprécie ; 1 CDF vaut environ 5,76 % de moins en USD.',
             points: 4,
             feedback:
               'C’est parfait : (2 950 − 2 780) / 2 780 ≈ +6,12 % pour le prix du dollar en francs, et 2 780 / 2 950 − 1 ≈ −5,76 % pour la valeur du franc en dollars. Les deux chiffres diffèrent parce que la base change. Préciser lequel on publie évite toute ambiguïté.',
@@ -314,7 +322,7 @@ const casData: CasPratique[] = [
           {
             id: 'c',
             texte:
-              'Le taux augmente de 170 %, signe d’une forte dépréciation du CDF.',
+              'Le taux augmente de 170 % entre S1 et S12 (de 2 780 à 2 950 CDF pour 1 USD), signe d’une forte dépréciation du CDF sur la période.',
             points: 0,
             feedback:
               '170 est un écart en CDF (2 950 − 2 780), pas un pourcentage. Confondre variation absolue et variation relative est une erreur rédhibitoire dans une note de conjoncture.',
@@ -322,7 +330,7 @@ const casData: CasPratique[] = [
           {
             id: 'd',
             texte:
-              'Le CDF se déprécie de 6,12 % sur la période.',
+              'Le CDF se déprécie de 6,12 % sur la période, puisque le taux indicatif passe de 2 780 à 2 950 CDF pour 1 USD entre S1 et S12.',
             points: 2,
             feedback:
               'Le sens est correct, mais la mesure est imprécise : 6,12 % est la hausse du prix du dollar en francs. La perte de valeur du franc en dollars est de 5,76 %. Il faut toujours préciser la base du pourcentage.',
@@ -374,7 +382,7 @@ const casData: CasPratique[] = [
           {
             id: 'a',
             texte:
-              'Prime de 3,91 % : (3 070 − 2 950) / 3 070.',
+              'Prime de 3,91 % : (3 070 − 2 950) / 3 070. Elle progresse depuis S1, ce qui traduit des tensions croissantes sur la disponibilité des devises.',
             points: 2,
             feedback:
               'L’écart absolu (120 CDF) est juste, mais la convention usuelle exprime la prime par rapport au taux de référence, c’est-à-dire le taux indicatif. Si tu choisis une autre base, il faut l’annoncer explicitement.',
@@ -382,14 +390,15 @@ const casData: CasPratique[] = [
           {
             id: 'b',
             texte:
-              'Prime de 4,07 % : (3 070 − 2 950) / 2 950. Elle s’est élargie depuis S1 (2,52 %). Le taux indicatif sert de référence, le taux parallèle mesure les tensions sur le marché informel.',
+              'Prime de 4,07 % : (3 070 − 2 950) / 2 950, contre 2,52 % en S1. L’écart s’élargit : tensions sur le marché informel.',
             points: 4,
             feedback:
               'C’est la bonne réponse, et elle est bien contextualisée. La prime rapportée au taux de référence passe de 2,52 % à 4,07 % : son élargissement signale des tensions croissantes sur la disponibilité des devises. Il faut aussi rappeler que le relevé parallèle est moins fiable, car il repose sur un échantillon.',
           },
           {
             id: 'c',
-            texte: 'Prime de 120 %.',
+            texte:
+              'Prime de 120 % : c’est l’écart entre 3 070 et 2 950 à S12, bien plus large que l’écart de 70 observé en S1.',
             points: 0,
             feedback:
               '120 est un écart en CDF, pas en pourcentage. Une prime de 120 % voudrait dire que le dollar coûte plus du double sur le marché parallèle, ce qui est totalement faux ici.',
@@ -397,7 +406,7 @@ const casData: CasPratique[] = [
           {
             id: 'd',
             texte:
-              'Il vaut mieux ne pas calculer d’écart : les deux taux mesurent la même chose et seul le taux parallèle reflète la réalité.',
+              'Il vaut mieux ne pas calculer d’écart : les deux taux mesurent la même chose et seul le taux parallèle reflète la réalité des transactions, c’est donc lui qu’il faut publier.',
             points: 0,
             feedback:
               'Les deux taux ne mesurent pas la même chose : l’un est une référence officielle, l’autre un relevé informel. Leur écart est justement un indicateur clé de tensions de change, qu’il serait dommage d’ignorer.',
@@ -412,7 +421,7 @@ const casData: CasPratique[] = [
           {
             id: 'a',
             texte:
-              'Un histogramme empilé du taux indicatif et du taux parallèle par semaine.',
+              'Un histogramme empilé du taux indicatif et du taux parallèle par semaine, pour voir dans une même barre le niveau des deux marchés et leur évolution conjointe.',
             points: 0,
             feedback:
               'Empiler deux taux n’a aucun sens : leur somme (environ 5 800 CDF) ne représente rien. Un empilement ne se justifie que pour des parties d’un même total.',
@@ -420,7 +429,7 @@ const casData: CasPratique[] = [
           {
             id: 'b',
             texte:
-              'Deux courbes (indicatif et parallèle) sur un même axe en CDF pour 1 USD, la MM4 en pointillé, et en dessous un petit graphique de la prime en %. Le titre précise que la hausse correspond à une dépréciation du CDF.',
+              'Deux courbes (indicatif, parallèle) avec la MM4 en pointillé, un panneau de la prime en % et un titre rappelant qu’une hausse signifie une dépréciation du CDF.',
             points: 3,
             feedback:
               'C’est le bon choix : la courbe montre la tendance dans le temps, la MM4 lisse le bruit et le panneau séparé rend lisible l’élargissement de la prime. Le titre explicatif sur le sens de cotation protège contre le contresens.',
@@ -428,7 +437,7 @@ const casData: CasPratique[] = [
           {
             id: 'c',
             texte:
-              'Un tableau des 12 semaines avec les valeurs en gras.',
+              'Un tableau des 12 semaines avec les valeurs en gras et les variations hebdomadaires en %, pour que le directeur ait les chiffres exacts sans approximation graphique.',
             points: 1,
             feedback:
               'Il est utile en annexe pour la traçabilité, mais un tableau ne fait pas ressortir la tendance ni l’élargissement de l’écart. Dans un tableau de bord, la dynamique doit se voir d’un coup d’œil.',
@@ -436,7 +445,7 @@ const casData: CasPratique[] = [
           {
             id: 'd',
             texte:
-              'Une jauge indiquant le dernier taux indicatif (2 950) avec des zones vert, orange et rouge.',
+              'Une jauge indiquant le dernier taux indicatif (2 950) avec des zones vert, orange et rouge, pour signaler d’emblée le niveau de tension du change.',
             points: 1,
             feedback:
               'Une jauge peut compléter une page, mais elle ne montre qu’un point et pas la trajectoire. En plus, des seuils de couleur arbitraires risquent d’être lus comme des objectifs officiels de change.',
@@ -524,7 +533,7 @@ const casData: CasPratique[] = [
           {
             id: 'a',
             texte:
-              'Uniquement l’exactitude : il suffit de corriger les fautes de frappe dans les noms.',
+              'Uniquement l’exactitude : il suffit de corriger les fautes de frappe dans les noms (accents, casse, initiales en trop), le reste de l’extrait étant exploitable en l’état.',
             points: 0,
             feedback:
               'C’est trop réducteur. Les fautes de frappe ne sont qu’un symptôme : le vrai risque est qu’un même emprunteur apparaisse plusieurs fois (unicité), sans compter les champs vides et les dates impossibles.',
@@ -532,7 +541,7 @@ const casData: CasPratique[] = [
           {
             id: 'b',
             texte:
-              'Complétude pour les doublons, unicité pour les pièces manquantes, actualité pour les dates incohérentes.',
+              'Complétude pour les doublons, unicité pour les pièces manquantes, actualité pour les dates incohérentes, et conformité de format pour les saisies hétérogènes.',
             points: 1,
             feedback:
               'Les bonnes dimensions sont citées, mais elles sont mal rattachées aux anomalies. Un doublon relève de l’unicité, un champ vide de la complétude, et une échéance antérieure à l’octroi de la cohérence ou de la validité, pas de l’actualité.',
@@ -540,7 +549,7 @@ const casData: CasPratique[] = [
           {
             id: 'c',
             texte:
-              'Unicité (MBUYI, KASONGO et ILUNGA en double), complétude (pièces d’identité vides), cohérence et validité (échéance avant octroi, naissance en 2031, encours négatif), conformité de format (dates et pièces saisies de façons différentes).',
+              'Unicité (MBUYI, KASONGO, ILUNGA en double), complétude (pièces vides), validité (échéance avant octroi, naissance en 2031, encours négatif) et conformité de format.',
             points: 4,
             feedback:
               'C’est le diagnostic complet et correctement rattaché. Il permet de prioriser : l’unicité est critique pour un calcul d’endettement consolidé, et la conformité de format est un prérequis pour corriger le reste.',
@@ -548,7 +557,7 @@ const casData: CasPratique[] = [
           {
             id: 'd',
             texte:
-              'Unicité et complétude seulement : les dates incohérentes viennent sans doute de l’ordre des colonnes et ne posent pas de problème.',
+              'Unicité et complétude seulement : les dates incohérentes viennent sans doute d’une inversion de colonnes à l’export et ne posent pas de problème de fond.',
             points: 2,
             feedback:
               'Les deux dimensions majeures sont bien identifiées. Mais les règles de validité (échéance avant octroi, date de naissance future, encours négatif) sont ignorées, alors qu’elles faussent directement les durées et les encours.',
@@ -564,7 +573,7 @@ const casData: CasPratique[] = [
           {
             id: 'a',
             texte:
-              'Fusionner automatiquement toutes les lignes qui partagent la même date de naissance.',
+              'Fusionner automatiquement toutes les lignes qui partagent la même date de naissance : c’est le seul champ toujours renseigné, contrairement à la pièce d’identité.',
             points: 0,
             feedback:
               'Des milliers d’emprunteurs partagent la même date de naissance : on fusionnerait des personnes différentes (faux positifs massifs), ce qui gonflerait artificiellement leur endettement.',
@@ -572,7 +581,7 @@ const casData: CasPratique[] = [
           {
             id: 'b',
             texte:
-              'Clé exacte « nom + date de naissance » après mise en majuscules.',
+              'Clé exacte « nom + date de naissance » après mise en majuscules, ce qui sépare bien les homonymes nés à des dates différentes, comme les deux MUKENDI Sarah.',
             points: 2,
             feedback:
               'C’est un début raisonnable, mais insuffisant : « MBUYI GRÂCE » et « MBUYI GRACE », ou « KASONGO PATRICK » et « KASONGO PATRICK M. », ne matchent pas en exact. Les deux MUKENDI Sarah, qui ont des dates différentes, sont en revanche correctement séparés.',
@@ -580,7 +589,7 @@ const casData: CasPratique[] = [
           {
             id: 'c',
             texte:
-              'Après normalisation (casse, accents, formats de date et de pièce), clé composite date de naissance + n° de pièce ; à défaut de pièce, rapprochement flou du nom (ex. Jaro-Winkler au-dessus d’un seuil) avec la même date de naissance ; validation humaine des cas limites et table de correspondance, sans fusion destructive.',
+              'Normaliser, puis clé date de naissance + n° de pièce ; sans pièce, rapprochement flou du nom à même date de naissance ; revue humaine, sans fusion destructive.',
             points: 4,
             feedback:
               'C’est la règle robuste : la normalisation fait matcher les variantes, la clé composite sécurise les cas où la pièce est présente, le rapprochement flou couvre les pièces manquantes (Mbuyi Grace), et la revue humaine évite les fusions abusives. La table de correspondance garde la trace et respecte la base de production.',
@@ -588,7 +597,7 @@ const casData: CasPratique[] = [
           {
             id: 'd',
             texte:
-              'Fusionner les lignes qui ont exactement le même nom déclaré.',
+              'Fusionner les lignes qui ont exactement le même nom déclaré : faute d’identifiant national fiable, le nom est le champ que les établissements saisissent le plus soigneusement.',
             points: 0,
             feedback:
               'C’est doublement faux. Les variantes d’orthographe passent au travers (faux négatifs), et les homonymes sont fusionnés à tort : les deux MUKENDI Sarah sont deux personnes différentes (naissance et pièce différentes).',
@@ -619,14 +628,16 @@ const casData: CasPratique[] = [
         options: [
           {
             id: 'a',
-            texte: 'Le nombre total de lignes reçues.',
+            texte:
+              'Le nombre total de lignes reçues de chaque établissement, pour montrer que la centrale couvre une part croissante des crédits octroyés dans le secteur.',
             points: 0,
             feedback:
               'C’est un indicateur de volume, pas de qualité. Une base peut grossir tout en se dégradant.',
           },
           {
             id: 'b',
-            texte: 'Un score global unique de qualité de 0 à 100 pour l’ensemble de la centrale.',
+            texte:
+              'Un score global unique de qualité de 0 à 100 pour l’ensemble de la centrale, simple à communiquer et comparable d’un mois sur l’autre.',
             points: 1,
             feedback:
               'Il est facile à communiquer, mais il ne dit ni quelle dimension pose problème ni quel établissement doit agir. Un score agrégé masque les mauvais élèves et n’entraîne aucune correction.',
@@ -634,7 +645,7 @@ const casData: CasPratique[] = [
           {
             id: 'c',
             texte:
-              'Le nombre de lignes que l’équipe a corrigées elle-même dans le mois.',
+              'Le nombre de lignes que l’équipe a corrigées elle-même dans le mois, qui montre concrètement l’effort fourni pour fiabiliser la centrale.',
             points: 0,
             feedback:
               'Cet indicateur mesure l’effort interne, pas la qualité à la source, et il encourage à corriger à la place des déclarants, ce que M. Kabeya interdit justement.',
@@ -642,7 +653,7 @@ const casData: CasPratique[] = [
           {
             id: 'd',
             texte:
-              'Un taux de conformité par dimension et par établissement (% de pièces renseignées, % de dates cohérentes, % de doublons suspects), suivi mois par mois avec une cible.',
+              'Un taux de conformité par dimension et par établissement (pièces renseignées, dates cohérentes, doublons suspects), suivi chaque mois face à une cible.',
             points: 4,
             feedback:
               'C’est le bon choix : l’indicateur est actionnable (chaque établissement voit ses propres écarts), diagnostique (par dimension) et suivi dans le temps par rapport à une cible. C’est ce qui fait progresser la qualité à la source.',
@@ -658,28 +669,31 @@ const casData: CasPratique[] = [
           {
             id: 'a',
             texte:
-              'Je la mets en quarantaine avec un code d’anomalie, je la signale à Banque Beta pour correction à la source et je l’exclus des calculs de durée jusqu’à correction.',
+              'Je la mets en quarantaine avec un code d’anomalie, je la signale à Banque Beta pour correction à la source et je l’exclus des calculs de durée.',
             points: 3,
             feedback:
               'C’est la bonne pratique : traçabilité, responsabilité du déclarant et protection des calculs. L’encours peut rester dans l’endettement consolidé avec une mention, puisque seule la date pose problème.',
           },
           {
             id: 'b',
-            texte: 'J’inverse les deux dates : c’est forcément une inversion de saisie.',
+            texte:
+              'J’inverse les deux dates : c’est forcément une inversion de saisie, puisqu’un crédit ne peut pas arriver à échéance six mois avant d’avoir été octroyé.',
             points: 1,
             feedback:
               'L’hypothèse est plausible, mais rien ne la garantit : l’erreur peut aussi porter sur l’année. Corriger sans confirmation et dans la base, c’est fabriquer une donnée.',
           },
           {
             id: 'c',
-            texte: 'Je supprime la ligne de l’extrait.',
+            texte:
+              'Je supprime la ligne de l’extrait : une ligne aussi incohérente fausserait les calculs, et Banque Beta la renverra corrigée lors de sa prochaine déclaration.',
             points: 0,
             feedback:
               'Supprimer fait disparaître un encours de 6 200 000 CDF et sous-estime l’endettement d’une emprunteuse qui figure déjà chez Gamma Microfinance. On perd aussi la trace de l’anomalie.',
           },
           {
             id: 'd',
-            texte: 'Je la laisse en l’état : la date d’échéance n’entre pas dans le calcul de l’endettement.',
+            texte:
+              'Je la laisse en l’état : la date d’échéance n’entre pas dans le calcul de l’endettement consolidé, seul l’encours compte pour la centrale des risques.',
             points: 0,
             feedback:
               'La date d’échéance sert aux maturités, aux échéanciers et aux indicateurs de retard. Laisser passer une incohérence connue sans la signaler, c’est accepter qu’elle se propage.',
@@ -739,7 +753,7 @@ const casData: CasPratique[] = [
           {
             id: 'a',
             texte:
-              'Le mobile money double l’épargne (61 % contre 29 %, soit un rapport d’environ 2,1).',
+              'Le mobile money double l’épargne (61 % contre 29 %, soit un rapport d’environ 2,1) : avec 3 000 ménages enquêtés, l’écart est solide.',
             points: 0,
             feedback:
               'Le rapport est juste arithmétiquement, mais la conclusion est causale alors que les données sont observationnelles. Les deux groupes diffèrent sur presque tout (milieu, revenu, instruction, âge) : on ne peut pas attribuer l’écart au seul mobile money.',
@@ -747,7 +761,7 @@ const casData: CasPratique[] = [
           {
             id: 'b',
             texte:
-              'L’écart (32 points) pourrait être dû au hasard de l’échantillonnage : il faut d’abord un test de significativité.',
+              'L’écart (32 points) pourrait être dû au hasard de l’échantillonnage : avant toute interprétation, il faut d’abord un test de significativité du khi-deux.',
             points: 1,
             feedback:
               'Tester la significativité est un bon réflexe, mais avec 1 200 et 1 800 répondants, un écart de 32 points ne doit presque rien au hasard. Le vrai problème n’est pas l’aléa d’échantillonnage, c’est la comparabilité des groupes (biais de sélection).',
@@ -755,7 +769,7 @@ const casData: CasPratique[] = [
           {
             id: 'c',
             texte:
-              'Les utilisateurs épargnent nettement plus (61 % contre 29 %), mais c’est une association : les groupes ne sont pas comparables (plus urbains, plus riches, plus instruits, plus jeunes), donc l’effet propre du mobile money reste inconnu.',
+              '61 % contre 29 % : c’est une association, car les groupes ne sont pas comparables (plus urbains, plus riches, plus instruits) ; l’effet propre reste inconnu.',
             points: 4,
             feedback:
               'C’est l’interprétation correcte : on décrit l’écart sans le surinterpréter et on nomme le biais de sélection. Ceux qui adoptent le mobile money sont, au départ, ceux qui avaient déjà plus de moyens d’épargner.',
@@ -763,7 +777,7 @@ const casData: CasPratique[] = [
           {
             id: 'd',
             texte:
-              'Le mobile money n’a aucun effet sur l’épargne : ce sont uniquement les plus riches qui l’utilisent.',
+              'Le mobile money n’a aucun effet sur l’épargne : ce sont uniquement les plus riches qui l’utilisent, et ils épargnaient déjà avant de l’adopter.',
             points: 0,
             feedback:
               'C’est l’erreur inverse : conclure à l’absence d’effet est tout aussi infondé. Ces données ne permettent ni de prouver ni d’exclure un effet causal.',
@@ -778,21 +792,24 @@ const casData: CasPratique[] = [
         options: [
           {
             id: 'a',
-            texte: 'La taille des groupes (1 200 contre 1 800).',
+            texte:
+              'La taille des groupes (1 200 contre 1 800) : avec 600 répondants d’écart, la comparaison des deux proportions est déséquilibrée.',
             points: 0,
             feedback:
               'Des effectifs différents n’introduisent aucun biais quand on compare des proportions. Ils jouent seulement sur la précision des estimations.',
           },
           {
             id: 'b',
-            texte: 'L’âge moyen du chef de ménage.',
+            texte:
+              'L’âge moyen du chef de ménage (31 ans contre 43 ans), qui reflète le cycle de vie et donc la propension à épargner.',
             points: 2,
             feedback:
               'L’âge diffère bien entre les groupes et peut jouer, mais son lien avec l’épargne est moins direct que celui du revenu et du milieu de résidence. C’est une variable de contrôle secondaire.',
           },
           {
             id: 'c',
-            texte: 'La part des ménages déclarant une épargne.',
+            texte:
+              'La part des ménages déclarant une épargne, qu’il faut égaliser entre les deux groupes pour les comparer à niveau d’épargne équivalent.',
             points: 0,
             feedback:
               'C’est la variable de résultat elle-même, pas une variable confondante. Contrôler par le résultat n’a pas de sens.',
@@ -800,7 +817,7 @@ const casData: CasPratique[] = [
           {
             id: 'd',
             texte:
-              'Le revenu et le milieu de résidence (urbain ou rural), qui favorisent à la fois l’adoption du mobile money et la capacité d’épargne.',
+              'Le revenu et le milieu de résidence, qui favorisent à la fois l’adoption du mobile money et l’épargne.',
             points: 4,
             feedback:
               'C’est la bonne réponse : une variable confondante influence à la fois l’exposition (adopter le mobile money) et le résultat (épargner). Un ménage urbain au revenu de 420 000 CDF a plus accès aux agents et plus de marge pour épargner. Il faut comparer à revenu et milieu équivalents.',
@@ -815,14 +832,16 @@ const casData: CasPratique[] = [
         options: [
           {
             id: 'a',
-            texte: '+9 points : 38 % (Nord 2025) − 29 % (Sud 2025).',
+            texte:
+              '+9 points : 38 % (Nord 2025) − 29 % (Sud 2025), en comparant les deux provinces à la même date, après le déploiement.',
             points: 1,
             feedback:
               'Comparer les deux provinces en 2025 ignore qu’elles ne partaient pas du même niveau (24 % contre 22 %). On attribue alors au déploiement une partie de l’écart initial.',
           },
           {
             id: 'b',
-            texte: '+14 points : 38 % − 24 % dans la Province Nord.',
+            texte:
+              '+14 points : 38 % − 24 % dans la Province Nord, soit la hausse observée entre 2023 et 2025 là où les agents ont été déployés.',
             points: 1,
             feedback:
               'C’est une comparaison avant-après sans groupe témoin : on attribue au déploiement toute la hausse, y compris la tendance générale, que la Province Sud montre aussi (+7 points sans agents).',
@@ -830,14 +849,15 @@ const casData: CasPratique[] = [
           {
             id: 'c',
             texte:
-              'Environ +7 points : (38 − 24) − (29 − 22). C’est une différence de différences, à condition que les deux provinces aient eu des tendances comparables avant 2024.',
+              'Environ +7 points : (38 − 24) − (29 − 22), par différence de différences, si les tendances étaient parallèles avant 2024.',
             points: 4,
             feedback:
               'C’est la différence de différences : on retire à la hausse de la province traitée (+14) la hausse observée sans traitement (+7). L’hypothèse clé, les « tendances parallèles », doit être vérifiée sur les années antérieures et annoncée.',
           },
           {
             id: 'd',
-            texte: '+58 % : (38 − 24) / 24.',
+            texte:
+              '+58 % : (38 − 24) / 24, soit la progression relative de l’épargne dans la Province Nord depuis le déploiement.',
             points: 0,
             feedback:
               'C’est une variation relative avant-après, sans groupe témoin, et exprimée en % plutôt qu’en points de pourcentage. Ce chiffre gonflé mélange tendance générale et effet du déploiement.',
@@ -868,7 +888,7 @@ const casData: CasPratique[] = [
           {
             id: 'a',
             texte:
-              'Présenter 61 % contre 29 % en grand, avec la mention « corrélation » en note de bas de page.',
+              'Présenter 61 % contre 29 % en grand, avec la mention « corrélation » en note de bas de page : le message reste percutant et la précaution figure bien sur la diapositive.',
             points: 1,
             feedback:
               'Le chiffre affiché en grand sera retenu comme une preuve causale : la note de bas de page ne protège personne. La précaution doit être au cœur du message, pas en marge.',
@@ -876,7 +896,7 @@ const casData: CasPratique[] = [
           {
             id: 'b',
             texte:
-              'Ne rien présenter tant qu’on ne dispose pas d’une étude expérimentale parfaite.',
+              'Ne rien présenter tant qu’on ne dispose pas d’une étude expérimentale parfaite, car tout chiffre montré au comité risque d’être repris comme une preuve.',
             points: 1,
             feedback:
               'La prudence est louable, mais le comité doit décider avec l’information disponible. Mieux vaut une estimation honnêtement qualifiée qu’un silence qui laisse circuler le chiffre « deux fois plus ».',
@@ -892,7 +912,7 @@ const casData: CasPratique[] = [
           {
             id: 'd',
             texte:
-              'Présenter l’association observée, puis l’estimation prudente d’environ +7 points (différence de différences) avec ses hypothèses et limites, et recommander un pilote évalué avec groupe témoin avant toute généralisation.',
+              'Présenter l’association, puis l’estimation prudente d’environ +7 points avec ses limites, et recommander un pilote évalué avec groupe témoin avant toute généralisation.',
             points: 4,
             feedback:
               'C’est la recommandation défendable : transparente sur ce que l’on sait et ce que l’on ignore, chiffrée avec la bonne méthode et assortie d’une démarche pour réduire l’incertitude. Elle reste neutre vis-à-vis des opérateurs.',
@@ -960,25 +980,25 @@ const casCyber: CasPratique[] = [
         options: [
           {
             id: 'a',
-            texte: `Un DDoS volumétrique : le lien Internet est saturé par un flot massif de paquets, il faut demander au fournisseur d'accès de filtrer en amont.`,
+            texte: `Un DDoS volumétrique : le lien Internet est saturé par un flot massif de paquets venant de milliers d'IP, il faut demander au fournisseur d'accès de filtrer en amont.`,
             points: 1,
             feedback: `Il s'agit bien d'un déni de service distribué, mais pas volumétrique : le lien n'est chargé qu'à 41 % et aucun pic UDP/ICMP n'est observé. Ce sont les ressources applicatives (CPU à 98 %) qui sont épuisées.`,
           },
           {
             id: 'b',
-            texte: `Un DDoS applicatif (couche 7) : des milliers d'IP distinctes envoient des requêtes HTTP syntaxiquement valides, avec des user-agents répétitifs et anormaux, sur les points d'entrée coûteux POST /login et POST /api/virements ; le serveur s'épuise (503 croissants) alors que la bande passante reste disponible.`,
+            texte: `Un DDoS applicatif (couche 7) : des milliers d'IP aux user-agents anormaux visent POST /login et /api/virements ; le serveur s'épuise, pas le lien.`,
             points: 4,
             feedback: `Exact. Chaque indice des journaux converge : 2 870 IP, UA obsolète (MSIE 6.0) ou de script (python-requests), concentration sur deux endpoints qui sollicitent l'authentification et la base, 503 passant de 4 % à 81 %, lien non saturé. La qualification oriente directement le confinement vers le WAF et la limitation de débit.`,
           },
           {
             id: 'c',
-            texte: `Une simple surcharge liée au pic d'activité du jour d'échéance : il suffit d'attendre que le volume retombe.`,
+            texte: `Une simple surcharge liée au pic d'activité du jour d'échéance : toutes les banques soumettent leurs ordres en même temps, il suffit d'attendre que le volume retombe.`,
             points: 0,
             feedback: `Dangereux : les user-agents « MSIE 6.0 » et « python-requests » n'appartiennent pas aux opérateurs bancaires légitimes, qui utilisent des navigateurs récents depuis les plages 172.16.x. Attendre revient à laisser l'attaquant atteindre son objectif avant 12h00.`,
           },
           {
             id: 'd',
-            texte: `Uniquement du bourrage d'identifiants (credential stuffing) : il suffit de verrouiller les comptes ciblés après trois échecs.`,
+            texte: `Uniquement du bourrage d'identifiants (credential stuffing), comme le montrent les 401 sur /login : il suffit de verrouiller les comptes ciblés après trois échecs.`,
             points: 1,
             feedback: `Les 401 sur /login montrent bien une composante de test d'identifiants, mais elle n'explique pas le flot sur /api/virements ni l'épuisement du serveur. Verrouiller les comptes pénaliserait surtout les opérateurs légitimes : c'est un effet de déni de service supplémentaire.`,
           },
@@ -1021,25 +1041,25 @@ const casCyber: CasPratique[] = [
         options: [
           {
             id: 'a',
-            texte: `Bloquer une par une, sur le pare-feu, les adresses IP visibles dans l'extrait de journaux.`,
+            texte: `Bloquer une par une, sur le pare-feu, les adresses IP visibles dans l'extrait de journaux, en commençant par celles qui envoient le plus de requêtes sur /login, pour couper l'attaque à la source.`,
             points: 1,
             feedback: `Avec près de 3 000 IP qui tournent (botnet), le blocage unitaire est trop lent et toujours en retard. Il risque aussi de bloquer des adresses partagées (NAT) légitimes. Utile seulement en complément.`,
           },
           {
             id: 'b',
-            texte: `Arrêter complètement le portail jusqu'à la fin de l'attaque pour protéger les serveurs.`,
+            texte: `Arrêter complètement le portail jusqu'à la fin de l'attaque pour protéger les serveurs : une fois les ressources libérées, on le rouvrira proprement pour que les banques soumettent leurs ordres.`,
             points: 0,
             feedback: `C'est offrir à l'attaquant exactement ce qu'il cherche, le jour d'échéance. Un déni de service se traite en filtrant le trafic malveillant tout en préservant le trafic légitime, pas en coupant le service.`,
           },
           {
             id: 'c',
-            texte: `Ajouter des serveurs applicatifs (montée en charge automatique) pour absorber le trafic.`,
+            texte: `Ajouter des serveurs applicatifs (montée en charge automatique) pour absorber le trafic : le lien n'étant chargé qu'à 41 %, il reste de la marge et seule la puissance de calcul manque.`,
             points: 1,
             feedback: `Cela peut donner un peu de répit, mais la charge illégitime continuera de croître et la base de données d'authentification restera le goulet d'étranglement. Sans filtrage, on paie pour servir l'attaquant.`,
           },
           {
             id: 'd',
-            texte: `Activer des règles WAF ciblées (limitation de débit par IP et par session sur /login et /api/virements, blocage des UA anormaux, défi pour les clients non authentifiés), mettre en liste blanche les plages déclarées des banques participantes, basculer le trafic vers le service anti-DDoS amont et ouvrir le canal de repli prévu au plan de continuité pour les ordres urgents.`,
+            texte: `Activer des règles WAF ciblées (limitation de débit, blocage des UA anormaux, défi), mettre les plages des banques en liste blanche, basculer vers l'anti-DDoS amont et ouvrir le canal de repli.`,
             points: 4,
             feedback: `C'est la réponse proportionnée : elle filtre la couche 7 là où se situe l'attaque, protège le trafic légitime identifié et prévoit un canal de secours pour tenir l'échéance de 12h00. Chaque règle activée doit être tracée dans la main courante.`,
           },
@@ -1052,25 +1072,25 @@ const casCyber: CasPratique[] = [
         options: [
           {
             id: 'a',
-            texte: `Un message factuel validé par le responsable de crise, diffusé par le canal prévu au plan de crise (liste des correspondants sécurité et opérations) : indisponibilité partielle depuis 09h02 due à un trafic malveillant, mesures en cours, procédure de repli pour les ordres urgents, heure du prochain point (10h00). Aucune attribution ni spéculation.`,
+            texte: `Un message factuel validé par le responsable de crise, par le canal du plan de crise : indisponibilité partielle, mesures en cours, procédure de repli, prochain point à 10h00.`,
             points: 3,
             feedback: `C'est la bonne pratique : un seul canal officiel, un message vérifié, des consignes actionnables et un rendez-vous de mise à jour. On ne spécule ni sur l'auteur ni sur la durée.`,
           },
           {
             id: 'b',
-            texte: `Publier immédiatement un communiqué sur les réseaux sociaux attribuant l'attaque à un groupe criminel connu.`,
+            texte: `Publier immédiatement un communiqué sur les réseaux sociaux attribuant l'attaque à un groupe criminel connu, pour montrer que l'institution maîtrise la situation et rassurer le public.`,
             points: 0,
             feedback: `L'attribution est prématurée et non étayée, et une communication publique non coordonnée peut alimenter la panique et la désinformation. La communication externe relève de la cellule de crise et de la direction de la communication.`,
           },
           {
             id: 'c',
-            texte: `Ne rien dire avant la résolution complète, pour ne pas inquiéter inutilement les banques.`,
+            texte: `Ne rien dire avant la résolution complète, pour ne pas inquiéter inutilement les banques ni révéler à l'attaquant que son action perturbe réellement le service.`,
             points: 0,
             feedback: `Le silence laisse les banques sans consignes à trois heures de la clôture : elles multiplient les appels, réessaient en boucle et aggravent la charge. La transparence factuelle fait partie de la gestion de crise.`,
           },
           {
             id: 'd',
-            texte: `Appeler chaque banque depuis votre téléphone personnel pour expliquer l'origine probable de l'attaque.`,
+            texte: `Appeler chaque banque depuis votre téléphone personnel pour expliquer l'origine probable de l'attaque : un contact direct et humain rassure davantage qu'un message collectif.`,
             points: 1,
             feedback: `L'intention est bonne mais la méthode est mauvaise : canal non prévu, non tracé, messages potentiellement divergents d'une banque à l'autre, et « origine probable » relève de la spéculation.`,
           },
@@ -1083,25 +1103,25 @@ const casCyber: CasPratique[] = [
         options: [
           {
             id: 'a',
-            texte: `Changer d'hébergeur, puisque celui-ci n'a pas su empêcher l'attaque.`,
+            texte: `Changer d'hébergeur, puisque celui-ci n'a pas su empêcher l'attaque : un prestataire mieux équipé en protection réseau aurait absorbé le flot sans interruption de service.`,
             points: 0,
             feedback: `Réaction émotionnelle sans analyse des causes : un autre hébergeur subirait la même attaque si l'architecture applicative reste vulnérable aux floods couche 7.`,
           },
           {
             id: 'b',
-            texte: `Rédiger le rapport d'incident et l'archiver.`,
+            texte: `Rédiger le rapport d'incident et l'archiver, avec la chronologie complète et les indicateurs de délai, pour disposer d'une trace en cas d'audit ou de nouvelle attaque.`,
             points: 1,
             feedback: `Nécessaire mais insuffisant : un rapport sans plan d'action suivi n'améliore pas la résilience. Le retour d'expérience doit déboucher sur des mesures datées et attribuées.`,
           },
           {
             id: 'c',
-            texte: `Souscrire une protection anti-DDoS permanente (filtrage amont et WAF), imposer des limites de débit natives et une authentification forte des clients API (certificats mutuels ou liste blanche), organiser des tests de charge et un exercice de crise, tenir le retour d'expérience, mettre à jour le plan de réponse et effectuer les notifications prévues par les procédures internes.`,
+            texte: `Anti-DDoS permanent, limites de débit natives, authentification forte des clients API, tests de charge, exercice de crise, RETEX, mise à jour du plan et notifications.`,
             points: 4,
             feedback: `C'est un plan complet qui traite les causes techniques (absence de limitation de débit, API exposée sans authentification forte), la préparation (exercices) et la gouvernance (RETEX, notifications).`,
           },
           {
             id: 'd',
-            texte: `Bloquer définitivement tout le trafic provenant de l'étranger (géoblocage total).`,
+            texte: `Bloquer définitivement tout le trafic provenant de l'étranger (géoblocage total), puisque les banques participantes se connectent toutes depuis le territoire national.`,
             points: 1,
             feedback: `Le géoblocage peut réduire une partie du bruit, mais il est facilement contourné par des machines compromises situées localement et peut bloquer des correspondants légitimes. Ce n'est qu'une mesure d'appoint.`,
           },
@@ -1188,25 +1208,25 @@ Le Service Recrutement`,
         options: [
           {
             id: 'a',
-            texte: `Le ton pressant du message et l'éventuelle présence de fautes d'orthographe.`,
+            texte: `Le ton pressant du message, la menace d'annulation du dossier sous 24 heures et l'éventuelle présence de fautes d'orthographe, typiques des campagnes d'hameçonnage.`,
             points: 1,
             feedback: `Ce sont des signaux d'alerte utiles pour un utilisateur, mais ce ne sont pas des IoC exploitables techniquement : on ne bloque pas un « ton ». Les campagnes ciblées sont d'ailleurs souvent bien rédigées.`,
           },
           {
             id: 'b',
-            texte: `L'en-tête X-Mailer « PHPMailer », qui suffit à prouver la fraude.`,
+            texte: `L'en-tête X-Mailer « PHPMailer », qui suffit à prouver la fraude : une institution n'envoie jamais ses convocations officielles avec un script PHP de publipostage.`,
             points: 1,
             feedback: `C'est un indice faible : PHPMailer est aussi utilisé par des expéditeurs légitimes. Il complète le faisceau d'indices mais ne suffit ni à qualifier ni à bloquer.`,
           },
           {
             id: 'c',
-            texte: `Le domaine sosie bcc-rdc-carrieres.example (enregistré il y a 3 jours), le Reply-To vers une messagerie gratuite différente de l'expéditeur, l'échec SPF/DMARC et l'absence de DKIM, l'IP d'envoi 203.0.113.88, le lien raccourci menant à portail-rh-bcc.example (198.51.100.23), la pièce jointe .html qui poste vers /collect.php, et la demande d'identifiants assortie d'un délai.`,
+            texte: `Le domaine sosie récent, le Reply-To vers une messagerie gratuite, l'échec SPF/DMARC sans DKIM, l'IP 203.0.113.88, l'URL portail-rh-bcc.example (198.51.100.23) et la pièce jointe .html.`,
             points: 4,
             feedback: `Exact. Ces éléments sont à la fois probants et exploitables : domaines, URL, IP et empreinte de la pièce jointe alimentent directement les blocages (passerelle, proxy, DNS) et les recherches dans les journaux.`,
           },
           {
             id: 'd',
-            texte: `Le fait que le message soit adressé à une liste de diffusion interne, ce qui montre qu'il provient de l'interne.`,
+            texte: `Le fait que le message soit adressé à une liste de diffusion interne, ce qui montre qu'il provient de l'interne, car seule la messagerie de l'institution connaît ces listes.`,
             points: 0,
             feedback: `Faux : n'importe quel expéditeur externe peut écrire à une adresse de liste si elle est connue. Les en-têtes Received et Authentication-Results montrent clairement une origine externe non authentifiée.`,
           },
@@ -1219,25 +1239,25 @@ Le Service Recrutement`,
         options: [
           {
             id: 'a',
-            texte: `Réinitialiser immédiatement leurs mots de passe, révoquer toutes les sessions et jetons actifs, vérifier l'inscription MFA, supprimer la règle de transfert créée sur la boîte d'agent.ops12, analyser les connexions depuis 203.0.113.150 et lancer une analyse EDR du poste d'agent.cpt03 qui a ouvert la pièce jointe.`,
+            texte: `Réinitialiser les mots de passe, révoquer sessions et jetons, supprimer la règle de transfert d'agent.ops12, analyser les connexions depuis 203.0.113.150 et passer à l'EDR le poste d'agent.cpt03.`,
             points: 4,
             feedback: `C'est la réponse complète : les journaux montrent déjà une connexion IMAP réussie depuis une IP externe et une règle de transfert vers l'adresse de l'attaquant. Il faut couper l'accès, supprimer la persistance et mesurer ce qui a été exfiltré.`,
           },
           {
             id: 'b',
-            texte: `Leur envoyer un e-mail leur demandant de changer leur mot de passe dès qu'ils le pourront.`,
+            texte: `Leur envoyer un e-mail leur demandant de changer leur mot de passe dès qu'ils le pourront, en leur rappelant de choisir une phrase de passe longue et jamais réutilisée.`,
             points: 1,
             feedback: `Trop lent et insuffisant : l'attaquant est déjà connecté, et changer le mot de passe ne révoque ni les sessions ouvertes ni la règle de transfert. De plus, l'e-mail peut être lu par l'attaquant.`,
           },
           {
             id: 'c',
-            texte: `Ne rien faire tant qu'aucune activité suspecte n'est constatée sur leurs comptes.`,
+            texte: `Ne rien faire tant qu'aucune activité suspecte n'est constatée sur leurs comptes : un formulaire soumis ne prouve pas que les identifiants saisis étaient les bons.`,
             points: 0,
             feedback: `Une activité suspecte est déjà visible (connexion IMAP depuis 203.0.113.150, règle de transfert). Attendre, c'est laisser l'attaquant exfiltrer des messages et rebondir sur d'autres agents.`,
           },
           {
             id: 'd',
-            texte: `Désactiver définitivement leurs comptes et engager une procédure disciplinaire.`,
+            texte: `Désactiver définitivement leurs comptes et engager une procédure disciplinaire, pour couper tout accès de l'attaquant et rappeler à chacun la gravité d'une saisie d'identifiants sur une page externe.`,
             points: 1,
             feedback: `Une suspension temporaire peut se justifier, mais la sanction est contre-productive : elle décourage le signalement, qui est la première ligne de détection. Et elle ne traite ni la règle de transfert ni l'analyse du poste.`,
           },
@@ -1280,25 +1300,25 @@ Le Service Recrutement`,
         options: [
           {
             id: 'a',
-            texte: `Un message qui reprend le lien malveillant en exemple pour que chacun puisse le reconnaître.`,
+            texte: `Un message qui reprend le lien malveillant en exemple pour que chacun puisse le reconnaître, avec une capture de la fausse page de connexion et l'adresse de l'expéditeur.`,
             points: 0,
             feedback: `C'est rediffuser l'attaque à tout le personnel : certains cliqueront. On décrit l'e-mail (expéditeur, objet), on ne republie jamais un lien actif.`,
           },
           {
             id: 'b',
-            texte: `Le rappel générique habituel : « Soyez vigilants face aux e-mails suspects ».`,
+            texte: `Le rappel générique habituel : « Soyez vigilants face aux e-mails suspects », diffusé à tous sans citer ce message précis, pour ne pas attirer l'attention sur la campagne ni inciter les curieux à rechercher le message.`,
             points: 1,
             feedback: `Trop vague pour être utile dans l'urgence : il ne dit ni quel message est concerné, ni quoi faire en cas de clic ou de saisie d'identifiants.`,
           },
           {
             id: 'c',
-            texte: `Aucun message, pour ne pas affoler les agents en pleine campagne de recrutement.`,
+            texte: `Aucun message, pour ne pas affoler les agents en pleine campagne de recrutement : le faux e-mail a été purgé des boîtes et le domaine est désormais bloqué par le proxy.`,
             points: 0,
             feedback: `Le silence profite à l'attaquant : la campagne peut revenir avec un autre domaine et les victimes qui s'ignorent ne se signaleront pas.`,
           },
           {
             id: 'd',
-            texte: `Un message court et factuel, par plusieurs canaux : description du faux e-mail (expéditeur, objet), rappel que les candidatures officielles passent uniquement par le site officiel de l'institution et que la DRH ne demande jamais d'identifiants, consigne de ne pas cliquer et de signaler, invitation à contacter le SOC sans crainte en cas de clic ou de saisie.`,
+            texte: `Un message court, par plusieurs canaux : description du faux e-mail, rappel que le recrutement passe par le site officiel et que la DRH ne demande jamais d'identifiants, appel à signaler sans crainte.`,
             points: 3,
             feedback: `C'est le bon format : concret, actionnable, non culpabilisant. Le rappel du canal officiel de recrutement neutralise le prétexte utilisé par l'attaquant.`,
           },
@@ -1311,25 +1331,25 @@ Le Service Recrutement`,
         options: [
           {
             id: 'a',
-            texte: `Bloquer tous les e-mails provenant de l'extérieur pendant la campagne de recrutement.`,
+            texte: `Bloquer tous les e-mails provenant de l'extérieur pendant la campagne de recrutement, puisque c'est la période où les attaquants imitent le plus volontiers la DRH.`,
             points: 0,
             feedback: `Disproportionné : l'institution doit continuer à échanger avec ses partenaires et les candidats. La sécurité doit être compatible avec l'activité.`,
           },
           {
             id: 'b',
-            texte: `Combiner MFA résistant à l'hameçonnage (clés FIDO2) pour la messagerie, DMARC en p=reject sur le domaine officiel, surveillance des domaines sosies, bannière « expéditeur externe », blocage des pièces jointes .html et .docm, et simulations régulières d'hameçonnage.`,
+            texte: `MFA résistant à l'hameçonnage (FIDO2), DMARC en p=reject, surveillance des domaines sosies, blocage des pièces jointes .html et simulations régulières d'hameçonnage.`,
             points: 3,
             feedback: `Défense en profondeur : le MFA FIDO2 rend les identifiants volés inutilisables, DMARC p=reject empêche l'usurpation exacte du domaine officiel, et la surveillance des sosies couvre ce que DMARC ne couvre pas (comme ici). La sensibilisation régulière entretient le réflexe de signalement.`,
           },
           {
             id: 'c',
-            texte: `Acheter tous les noms de domaine ressemblant à celui de l'institution.`,
+            texte: `Acheter tous les noms de domaine ressemblant à celui de l'institution, afin qu'aucun attaquant ne puisse plus enregistrer de domaine sosie pour imiter la DRH.`,
             points: 1,
             feedback: `Utile pour les variantes les plus évidentes, mais les combinaisons possibles sont infinies (tirets, mots ajoutés, autres extensions). Cela ne remplace ni la surveillance ni l'authentification forte.`,
           },
           {
             id: 'd',
-            texte: `Rendre l'antivirus des postes plus sensible.`,
+            texte: `Rendre l'antivirus des postes plus sensible, pour qu'il bloque les pièces jointes et les pages de connexion frauduleuses dès leur ouverture par un agent.`,
             points: 1,
             feedback: `L'antivirus ne voit pas une page web de collecte d'identifiants : il n'y a aucun code malveillant à détecter quand l'utilisateur saisit lui-même son mot de passe.`,
           },
@@ -1421,25 +1441,25 @@ Contact : via l'adresse indiquée sur notre portail (le lien vous sera communiqu
         options: [
           {
             id: 'a',
-            texte: `Éteindre immédiatement le poste en coupant l'alimentation.`,
+            texte: `Éteindre immédiatement le poste en coupant l'alimentation, ce qui arrête net le chiffrement en cours et toute nouvelle connexion vers le serveur de fichiers.`,
             points: 1,
             feedback: `Cela stoppe le chiffrement local, mais détruit la mémoire vive : processus actifs, connexions, et parfois des clés ou artefacts utiles à l'enquête et au déchiffrement. On ne l'envisage qu'en dernier recours si l'isolation est impossible.`,
           },
           {
             id: 'b',
-            texte: `Lancer une analyse antivirus complète sur le poste, toujours connecté au réseau.`,
+            texte: `Lancer une analyse antivirus complète sur le poste, toujours connecté au réseau, pour identifier la souche et la supprimer avant qu'elle ne se propage.`,
             points: 0,
             feedback: `Pendant l'analyse, le rançongiciel continue de chiffrer FS-OPS01 et tente déjà de rebondir sur OPS-PC-122. L'analyse modifie en outre de nombreux horodatages utiles à l'enquête.`,
           },
           {
             id: 'c',
-            texte: `Reformater le poste et réinstaller Windows pour repartir sur une base saine.`,
+            texte: `Reformater le poste et réinstaller Windows pour repartir sur une base saine, puisque les fichiers locaux de l'agent sont de toute façon déjà chiffrés.`,
             points: 0,
             feedback: `C'est détruire toutes les preuves avant même d'avoir compris le vecteur et l'étendue de l'attaque. La reconstruction viendra plus tard, à l'étape d'éradication.`,
           },
           {
             id: 'd',
-            texte: `Isoler le poste du réseau sans l'éteindre (isolation réseau via l'EDR, ou à défaut débrancher le câble et couper le Wi-Fi), suspendre le compte agent.ops07 et couper ses accès aux partages.`,
+            texte: `Isoler le poste du réseau sans l'éteindre (via l'EDR, ou en débranchant le câble), puis suspendre le compte agent.ops07.`,
             points: 4,
             feedback: `Exact. L'isolation stoppe la propagation et l'exfiltration vers 198.51.100.77 tout en préservant la mémoire vive pour l'analyse. Suspendre le compte bloque les tentatives de rebond déjà visibles (OPS-PC-122).`,
           },
@@ -1452,25 +1472,25 @@ Contact : via l'adresse indiquée sur notre portail (le lien vous sera communiqu
         options: [
           {
             id: 'a',
-            texte: `Copier la note de rançon sur une clé USB, puis redémarrer le poste pour vérifier si le chiffrement continue.`,
+            texte: `Copier la note de rançon sur une clé USB, puis redémarrer le poste pour vérifier si le chiffrement continue et mesurer l'étendue des fichiers touchés.`,
             points: 0,
             feedback: `Le redémarrage efface la mémoire vive et peut relancer la charge malveillante via la clé Run. La clé USB non maîtrisée introduit en plus un risque de contamination.`,
           },
           {
             id: 'b',
-            texte: `Capturer la mémoire vive, puis réaliser une image disque forensique avec calcul d'empreintes, exporter les journaux EDR, Active Directory, proxy et pare-feu, conserver la note et un échantillon de fichier chiffré, et documenter la chaîne de traçabilité (qui, quoi, quand).`,
+            texte: `Capturer la mémoire vive, puis faire une image disque avec empreintes, exporter les journaux (EDR, AD, proxy, pare-feu) et documenter la chaîne de traçabilité.`,
             points: 3,
             feedback: `C'est la démarche attendue, dans l'ordre de volatilité : la mémoire d'abord, le disque ensuite. Les empreintes et la chaîne de traçabilité rendent les preuves exploitables, y compris en cas de dépôt de plainte.`,
           },
           {
             id: 'c',
-            texte: `Prendre des photos de l'écran avec un smartphone.`,
+            texte: `Prendre des photos horodatées de l'écran avec un smartphone, pour conserver la note de rançon et l'état exact du poste au moment de la découverte.`,
             points: 1,
             feedback: `Cela documente la note de rançon, mais ne préserve aucune donnée technique (mémoire, disque, journaux) indispensable pour comprendre l'attaque.`,
           },
           {
             id: 'd',
-            texte: `Supprimer d'abord svchost32.exe pour éviter toute propagation, puis documenter ce qui reste.`,
+            texte: `Supprimer d'abord svchost32.exe pour éviter toute propagation, puis documenter ce qui reste : un binaire actif reste une menace tant qu'il est présent sur le disque du poste.`,
             points: 0,
             feedback: `Le poste étant isolé, il n'y a plus d'urgence à supprimer le binaire. Le supprimer maintenant détruit une preuve essentielle (échantillon, empreinte, configuration).`,
           },
@@ -1517,25 +1537,25 @@ Contact : via l'adresse indiquée sur notre portail (le lien vous sera communiqu
         options: [
           {
             id: 'a',
-            texte: `Recommander de ne pas payer : aucune garantie de déchiffrement ni de non-publication des données, financement d'activités criminelles, risques juridiques et risque d'être ciblé à nouveau. Rappeler que la décision relève de la gouvernance (direction générale, cellule de crise, juridique), et qu'une restauration est possible depuis des sauvegardes intègres.`,
+            texte: `Ne pas payer (aucune garantie, financement du crime, risque de récidive) ; la décision revient à la gouvernance, et une restauration depuis des sauvegardes intègres reste possible.`,
             points: 3,
             feedback: `C'est la position professionnelle : l'analyste éclaire la décision sans la prendre seul, et il montre qu'une alternative technique existe. L'exfiltration (412 Mo vers 198.51.100.77) doit aussi être traitée comme une possible violation de données.`,
           },
           {
             id: 'b',
-            texte: `Payer rapidement : c'est le moyen le plus sûr de récupérer les fichiers avant le délai de 72 heures.`,
+            texte: `Payer rapidement : c'est le moyen le plus sûr de récupérer les fichiers avant le délai de 72 heures, et le coût reste inférieur à celui d'une journée d'opérations interrompues.`,
             points: 0,
             feedback: `Rien ne garantit l'obtention ni le bon fonctionnement de la clé, ni la destruction des données volées. Le paiement finance l'attaquant et désigne l'organisation comme cible solvable.`,
           },
           {
             id: 'c',
-            texte: `Prendre vous-même contact avec l'attaquant pour négocier et gagner du temps.`,
+            texte: `Prendre vous-même contact avec l'attaquant pour négocier et gagner du temps, en exigeant le déchiffrement gratuit de quelques fichiers comme preuve de bonne foi.`,
             points: 0,
             feedback: `Un analyste n'a ni le mandat ni le cadre pour négocier. Tout contact relève d'une décision de gouvernance, encadrée par le juridique et, le cas échéant, par les autorités compétentes.`,
           },
           {
             id: 'd',
-            texte: `Ne pas payer, et ne pas en informer la direction générale pour éviter la panique.`,
+            texte: `Ne pas payer, et ne pas en informer la direction générale pour éviter la panique : l'équipe technique peut restaurer seule depuis les sauvegardes, sans mobiliser la gouvernance.`,
             points: 1,
             feedback: `Ne pas payer est la bonne orientation, mais dissimuler l'incident à la gouvernance est une faute grave : la direction doit décider, communiquer et assumer les obligations de notification.`,
           },
@@ -1548,25 +1568,25 @@ Contact : via l'adresse indiquée sur notre portail (le lien vous sera communiqu
         options: [
           {
             id: 'a',
-            texte: `Restaurer la copie NAS de 06h00 : la perte de données n'est que de 1h12, le RPO est respecté.`,
+            texte: `Restaurer la copie NAS de 06h00 : la perte de données n'est que de 1h12 (06h00 → 07h12), le RPO de 4 h est respecté et la restauration sera plus rapide.`,
             points: 0,
             feedback: `La copie NAS-BKP01 est montée en SMB et a été chiffrée (alerte de 07h21) : elle est inutilisable. Une sauvegarde accessible en ligne depuis le réseau n'est pas une sauvegarde de dernier recours.`,
           },
           {
             id: 'b',
-            texte: `Restaurer uniquement les bandes du 18/10 23h00 : ce sont les plus sûres, et le RPO est respecté.`,
+            texte: `Restaurer uniquement les bandes du 18/10 23h00 : ce sont les plus sûres car hors ligne, à l'abri du chiffrement, et le RPO est respecté.`,
             points: 1,
             feedback: `Les bandes sont fiables, mais s'arrêter à elles fait perdre plus de trois jours de données (18/10 23h00 → 22/10 07h12), ce qui viole largement le RPO alors que l'incrémentale immuable de 02h00 est intègre.`,
           },
           {
             id: 'c',
-            texte: `Restaurer la complète du 18/10 puis l'incrémentale immuable de 02h00 : la perte est de 5h12 (02h00 → 07h12), supérieure au RPO de 4 h ; l'écart doit être déclaré et les opérations de 02h00 à 07h12 reconstituées depuis les systèmes sources. Fin estimée : 09h30 + 3h30 + 1h30 + 0h45 = 15h15, avant l'échéance du RTO (07h40 + 8 h = 15h40), soit 25 minutes de marge.`,
+            texte: `Complète du 18/10 + incrémentale immuable de 02h00 : perte de 5h12, au-delà du RPO (écart à déclarer) ; fin à 15h15, dans le RTO (15h40).`,
             points: 5,
             feedback: `Exact sur toute la ligne : bonne chaîne de sauvegardes, calcul juste de la perte (5h12) et du délai de reprise (15h15 contre 15h40). Reconnaître honnêtement le non-respect du RPO et proposer une compensation est exactement ce qu'on attend.`,
           },
           {
             id: 'd',
-            texte: `Restaurer l'incrémentale de 02h00 : la perte de 5h12 est acceptable car elle reste inférieure au RTO de 8 h.`,
+            texte: `Restaurer l'incrémentale de 02h00 : la perte de 5h12 est acceptable car elle reste inférieure au RTO de 8 h, qui fixe la limite tolérée par le plan de continuité.`,
             points: 2,
             feedback: `Le choix de la sauvegarde est pertinent, mais le raisonnement confond RPO et RTO. Le RPO (4 h) borne la perte de données ; le RTO (8 h) borne la durée d'indisponibilité. Avec 5h12 de perte, le RPO n'est pas respecté.`,
           },
@@ -1622,25 +1642,25 @@ Réflexes à retenir : isoler, ne pas éteindre, préserver, vérifier les sauve
         options: [
           {
             id: 'a',
-            texte: `L'écart n°1 : le CVV2 fait partie des données sensibles d'authentification, dont le stockage après autorisation est interdit, même chiffré. Sa compromission permettrait directement la fraude en paiement à distance.`,
+            texte: `L'écart n°1 : le CVV2 est une donnée sensible d'authentification, interdite de stockage après autorisation, même chiffrée.`,
             points: 4,
             feedback: `Exact. C'est une interdiction absolue de la norme, et non une simple exigence de protection. Avec le PAN, le CVV2 suffit à frauder en vente à distance : c'est l'écart qui crée le risque de fraude le plus direct et le plus massif.`,
           },
           {
             id: 'b',
-            texte: `L'écart n°5 : l'absence de MFA sur l'accès administrateur est la porte d'entrée de la plupart des attaques.`,
+            texte: `L'écart n°5 : l'absence de MFA sur l'accès administrateur est la porte d'entrée de la plupart des attaques, et elle met en danger tout le reste du CDE.`,
             points: 2,
             feedback: `C'est un écart grave, à corriger rapidement, car il facilite l'intrusion. Mais il s'agit d'un risque d'accès, alors que l'écart n°1 constitue une violation déjà réalisée de l'interdiction de stocker des données sensibles d'authentification.`,
           },
           {
             id: 'c',
-            texte: `L'écart n°8 : sans politique à jour, aucun autre contrôle n'a de valeur.`,
+            texte: `L'écart n°8 : sans politique de sécurité à jour, aucun autre contrôle n'a de valeur, car rien ne fixe les responsabilités ni les règles à appliquer.`,
             points: 0,
             feedback: `La gouvernance est importante, mais une politique non revue n'expose aucune donnée par elle-même. Commencer par la documentation pendant que des CVV dorment dans une base serait une erreur de priorisation.`,
           },
           {
             id: 'd',
-            texte: `L'écart n°6 : sans scans, on ignore toutes les vulnérabilités du système.`,
+            texte: `L'écart n°6 : sans scans depuis trois trimestres, on ignore toutes les vulnérabilités du système, et donc l'ampleur réelle de l'exposition.`,
             points: 1,
             feedback: `L'absence de scans est sérieuse (contrôle de détection défaillant), mais il s'agit d'un manque de visibilité sur un risque potentiel, pas d'une exposition de données déjà avérée.`,
           },
@@ -1668,25 +1688,25 @@ Réflexes à retenir : isoler, ne pas éteindre, préserver, vérifier les sauve
         options: [
           {
             id: 'a',
-            texte: `Traiter les écarts dans l'ordre du rapport, à raison d'un écart par mois.`,
+            texte: `Traiter les écarts dans l'ordre du rapport, à raison d'un écart par mois : le rythme est soutenable pour une équipe réduite et chaque correction peut être auditée avant de passer à la suivante.`,
             points: 0,
             feedback: `L'ordre du rapport n'est pas un ordre de risque, et huit mois d'exposition pour certains écarts (CVV, PAN en clair, MFA) sont inacceptables. Un plan se priorise par le risque.`,
           },
           {
             id: 'b',
-            texte: `Commencer par réécrire et faire signer la politique de sécurité, qui servira de base au reste.`,
+            texte: `Commencer par réécrire et faire signer la politique de sécurité, qui servira de base au reste : elle fixe les rôles, les règles et les priorités sans lesquels les correctifs techniques restent dispersés.`,
             points: 1,
             feedback: `La politique doit être revue, mais pas avant de stopper les expositions de données. On peut mener la revue documentaire en parallèle, sans retarder les actions techniques urgentes.`,
           },
           {
             id: 'c',
-            texte: `Actions immédiates (quelques jours) : purger de façon sécurisée les CVV2, y compris dans les sauvegardes, et corriger le code qui les écrit ; arrêter la journalisation des PAN en clair (masquage) et purger les journaux ; changer les mots de passe par défaut des TPE ; imposer le MFA sur les accès administrateurs. Court terme (semaines à quelques mois) : segmenter le CDE, réaliser les scans internes et ASV puis corriger, compléter et revoir la journalisation, réviser la politique. Chaque action avec un responsable, une échéance et une preuve de clôture.`,
+            texte: `Sous quelques jours : purger les CVV2 (sauvegardes comprises), masquer les PAN des journaux, changer les mots de passe par défaut, imposer le MFA ; puis segmenter, scanner, réviser la politique, chaque action datée et attribuée.`,
             points: 4,
             feedback: `C'est un plan crédible : il distingue ce qui supprime une exposition immédiate de ce qui demande un projet, et il rend chaque action traçable et vérifiable. Les mesures immédiates coûtent peu et réduisent fortement le risque.`,
           },
           {
             id: 'd',
-            texte: `Chiffrer la base contenant les CVV2, ce qui règle l'écart n°1, puis traiter le reste l'an prochain.`,
+            texte: `Chiffrer la base contenant les CVV2, ce qui règle l'écart n°1 puisque les données deviennent illisibles sans la clé, puis traiter le reste l'an prochain, une fois le budget de sécurité voté.`,
             points: 1,
             feedback: `Le chiffrement ne régularise pas l'écart : le stockage des données sensibles d'authentification après autorisation est interdit, chiffré ou non. Il faut les supprimer. Reporter le reste d'un an est par ailleurs inacceptable pour le PAN en clair et le MFA.`,
           },
@@ -1699,25 +1719,25 @@ Réflexes à retenir : isoler, ne pas éteindre, préserver, vérifier les sauve
         options: [
           {
             id: 'a',
-            texte: `Masquer le PAN à l'affichage (6 premiers et 4 derniers chiffres au maximum) dans les applications du support.`,
+            texte: `Masquer le PAN à l'affichage (6 premiers et 4 derniers chiffres au maximum) dans les applications du support, pour que les agents ne voient plus jamais le numéro complet.`,
             points: 1,
             feedback: `Le masquage à l'affichage est une exigence (3.4.1) et protège contre la lecture par les agents, mais le PAN reste stocké en clair derrière : le périmètre n'est pas réduit.`,
           },
           {
             id: 'b',
-            texte: `Tokeniser le PAN dans tous les systèmes qui n'ont pas besoin du numéro réel (support, CRM, reporting) et isoler le CDE dans une zone dédiée avec un filtrage strict, puis valider la segmentation par des tests d'intrusion réguliers.`,
+            texte: `Tokeniser le PAN partout où le numéro réel est inutile (support, CRM, reporting) et isoler le CDE par une segmentation testée.`,
             points: 4,
             feedback: `Exact. La tokenisation retire les données de titulaires de nombreux systèmes et la segmentation sépare le CDE du reste du réseau : moins de systèmes en périmètre, donc moins de surface d'attaque et un coût de conformité réduit. La segmentation doit être prouvée par des tests.`,
           },
           {
             id: 'c',
-            texte: `Migrer la base monétique chez un fournisseur cloud certifié, qui devient alors responsable de toute la conformité.`,
+            texte: `Migrer la base monétique chez un fournisseur cloud certifié PCI-DSS, qui devient alors responsable de toute la conformité, de l'infrastructure jusqu'aux applications.`,
             points: 0,
             feedback: `Faux : la responsabilité est partagée. Le fournisseur couvre sa part (infrastructure), mais Banque Beta reste responsable de ses applications, de ses accès et de ses données. Une migration ne règle aucun écart par elle-même.`,
           },
           {
             id: 'd',
-            texte: `Activer le chiffrement des disques du serveur de base de données.`,
+            texte: `Activer le chiffrement des disques du serveur de base de données, pour rendre illisible le PAN stocké, comme l'exige la norme.`,
             points: 1,
             feedback: `Le chiffrement de disque protège contre le vol physique du support, mais il est transparent pour l'application et pour un attaquant connecté. PCI-DSS v4.0 ne l'accepte plus seul pour rendre le PAN illisible (sauf sur supports amovibles), et il ne réduit pas le périmètre.`,
           },
@@ -1730,25 +1750,25 @@ Réflexes à retenir : isoler, ne pas éteindre, préserver, vérifier les sauve
         options: [
           {
             id: 'a',
-            texte: `Il a raison : PCI-DSS est une norme privée qui ne concerne pas un participant au Switch national.`,
+            texte: `Il a raison : PCI-DSS est une norme privée, édictée par les réseaux de cartes, qui ne concerne pas un participant au Switch national limité aux transactions domestiques.`,
             points: 0,
             feedback: `Faux : pour les participants au Switch, la conformité PCI-DSS et EMV n'est pas une simple recommandation, elle est imposée par le cadre réglementaire.`,
           },
           {
             id: 'b',
-            texte: `Seule la norme EMV (cartes à puce) est obligatoire ; PCI-DSS n'est qu'une bonne pratique recommandée.`,
+            texte: `Seule la norme EMV (cartes à puce) est obligatoire pour le Switch ; PCI-DSS n'est qu'une bonne pratique recommandée, à adopter selon les moyens de chaque banque.`,
             points: 1,
             feedback: `L'obligation EMV est bien réelle, mais PCI-DSS est imposée elle aussi aux participants : les deux normes sont complémentaires (sécurité de la carte et de la transaction d'un côté, protection des données de titulaires de l'autre).`,
           },
           {
             id: 'c',
-            texte: `La conformité est acquise une fois l'audit passé ; il suffira de la revoir dans cinq ans.`,
+            texte: `La conformité est acquise une fois l'audit passé ; il suffira de la revoir dans cinq ans, lors du prochain renouvellement de l'infrastructure monétique.`,
             points: 0,
             feedback: `La conformité PCI-DSS est un état à maintenir en continu, avec une évaluation au moins annuelle et des contrôles périodiques (scans trimestriels, revues de journaux, tests de segmentation).`,
           },
           {
             id: 'd',
-            texte: `Pour un participant au Switch, la conformité n'est pas facultative : l'Instruction n°58 de la BCC impose les normes EMV et PCI-DSS. Les écarts doivent donc faire l'objet d'un plan d'action formalisé, daté, avec des responsables désignés et des preuves de remédiation, suivi jusqu'à sa clôture.`,
+            texte: `La conformité n'est pas facultative : l'Instruction n°58 de la BCC impose EMV et PCI-DSS aux participants au Switch ; il faut donc un plan d'action daté et suivi.`,
             points: 3,
             feedback: `C'est la bonne réponse : elle rappelle le fondement réglementaire et le traduit en exigence concrète de pilotage. La conformité protège à la fois les porteurs de cartes, le participant et la confiance dans tout le Switch.`,
           },
@@ -1773,7 +1793,15 @@ Réflexes à retenir : ne jamais stocker les données sensibles d'authentificati
 // EXPORTS
 // ===========================================================================
 
-export const casPratiques: CasPratique[] = [...casData, ...casCyber];
+export const casPratiques: CasPratique[] = [
+  ...casData,
+  ...casCyber,
+  ...casBdd,
+  ...casSystemes,
+  ...casReseaux,
+  ...casDev,
+  ...casSupport,
+];
 
 const index = new Map(casPratiques.map((c) => [c.id, c]));
 

@@ -39,7 +39,7 @@ export function Footer() {
             <span className="font-semibold tracking-[-0.02em] text-ink">Simulateur BCC</span>
           </Link>
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted">
-            L&apos;examen blanc gratuit pour préparer le recrutement en Data Analyse et Cybersécurité. Conçu par {OSCAR.nom} pour{' '}
+            L&apos;examen blanc gratuit pour préparer le recrutement informatique de la BCC dans ses 7 domaines. Conçu par {OSCAR.nom} pour{' '}
             <a href={OSCAR.site} target="_blank" rel="noopener noreferrer" className="font-medium text-ink underline-offset-2 hover:underline">
               {OSCAR.marque}
             </a>

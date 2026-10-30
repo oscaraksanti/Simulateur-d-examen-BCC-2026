@@ -5,6 +5,7 @@
 // uniquement par les pages qui en ont besoin (bundle de l'accueil plus léger).
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, type ReactNode } from 'react';
+import { estFiliere } from '@/lib/filieres';
 import { CLES, ecrire, lire, supprimer, toutEffacer } from '@/lib/storage';
 import { nouvelId, synchroniserCandidat, synchroniserTentative, viderFile } from '@/lib/remote';
 import type {
@@ -193,7 +194,7 @@ function estCandidat(v: unknown): v is Candidat {
     estObjet(v) &&
     typeof v.nom === 'string' &&
     typeof v.email === 'string' &&
-    (v.filiere === 'data' || v.filiere === 'cyber')
+    estFiliere(v.filiere)
   );
 }
 

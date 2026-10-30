@@ -3,7 +3,7 @@ import { CasesSession } from '@/components/cases/CasesSession';
 
 export const metadata: Metadata = {
   title: 'Cas pratiques',
-  description: 'Mises en situation immersives (fictives) : salle de crise data et cybersécurité, feedback étape par étape et corrigé expert.',
+  description: 'Mises en situation immersives (fictives) dans les 7 domaines informatiques : feedback étape par étape et corrigé expert.',
 };
 
 export default function PageCasPratiques() {

@@ -7,7 +7,9 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { Download, LogOut, RefreshCw, Search, Trash2 } from 'lucide-react';
+import { IDS_FILIERES } from '@/lib/filieres';
 import { clientSupabase, syncConfiguree } from '@/lib/remote';
+import type { Filiere } from '@/lib/types';
 import { formatNote, LIBELLES_FILIERE } from '@/lib/share';
 import { Modal } from '@/components/ui/Modal';
 import { BarresHorizontales, Histogramme } from './Graphiques';
@@ -39,7 +41,7 @@ interface LigneCandidat {
   nom: string;
   email: string;
   whatsapp: string | null;
-  filiere: 'data' | 'cyber';
+  filiere: Filiere;
   consentement_contact: boolean;
   source: string | null;
   created_at: string;
@@ -59,7 +61,7 @@ interface LigneEmail {
 
 interface LigneTentative {
   id: string;
-  filiere: 'data' | 'cyber';
+  filiere: Filiere;
   note_sur_20: number;
   duree_secondes: number;
   created_at: string;
@@ -323,7 +325,7 @@ export function AdminApp() {
   }
 
   const st = stats;
-  const totalFiliere = st ? (st.par_filiere.data ?? 0) + (st.par_filiere.cyber ?? 0) : 0;
+  const totalFiliere = st ? IDS_FILIERES.reduce((s, f) => s + (st.par_filiere[f] ?? 0), 0) : 0;
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 px-4 py-10 sm:px-6">
@@ -386,7 +388,7 @@ export function AdminApp() {
             </Panneau>
             <Panneau titre="Filières">
               <div className="space-y-4">
-                {(['data', 'cyber'] as const).map((f) => {
+                {[...IDS_FILIERES].sort((a, b) => (st.par_filiere[b] ?? 0) - (st.par_filiere[a] ?? 0)).map((f) => {
                   const n = st.par_filiere[f] ?? 0;
                   const pct = totalFiliere ? Math.round((n / totalFiliere) * 100) : 0;
                   return (

@@ -8,10 +8,9 @@ import { OBJECTIF_SIMULATIONS, useExam } from '@/context/ExamContext';
 import { useGarde } from '@/context/useGarde';
 import { questionParId } from '@/data/quizData';
 import { competencesFaibles, COMPETENCE_CAS, mention, taux } from '@/lib/scoring';
-import { LIBELLES_FILIERE } from '@/lib/share';
 import type { QcmQuestion } from '@/lib/types';
 import { Stepper } from '@/components/layout/Stepper';
-import { Button } from '@/components/ui/Button';
+import { Button, ButtonLink } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { Reveal } from '@/components/ui/Reveal';
@@ -33,7 +32,7 @@ function Titre({ icone: Icone, children }: { icone: typeof BarChart3; children: 
 
 export function ResultsView() {
   const pret = useGarde('resultat');
-  const { etat, nouvelleTentative, changerFiliere } = useExam();
+  const { etat, nouvelleTentative } = useExam();
   const router = useRouter();
 
   const questions = useMemo<QcmQuestion[]>(
@@ -70,7 +69,6 @@ export function ResultsView() {
   const precedente = idx > 0 ? historique.slice(0, idx).filter((t) => t.filiere === r.filiere).at(-1) : undefined;
   const priorites = competencesFaibles(r.parCompetence, 2);
   const nb = historique.length;
-  const autre = r.filiere === 'data' ? 'cyber' : 'data';
 
   const refaire = () => {
     nouvelleTentative();
@@ -176,17 +174,9 @@ export function ResultsView() {
         <Button taille="lg" onClick={refaire} icone={<RotateCcw aria-hidden className="size-5" />}>
           Refaire un examen
         </Button>
-        <Button
-          taille="lg"
-          variante="secondaire"
-          onClick={() => {
-            changerFiliere(autre);
-            router.push('/examen/');
-          }}
-          icone={<ArrowLeftRight aria-hidden className="size-5" />}
-        >
-          Changer de filière ({LIBELLES_FILIERE[autre]})
-        </Button>
+        <ButtonLink href="/#commencer" taille="lg" variante="secondaire" icone={<ArrowLeftRight aria-hidden className="size-5" />}>
+          Changer de filière
+        </ButtonLink>
       </div>
     </div>
   );

@@ -1,14 +1,20 @@
 // Banque de questions QCM — TOUTES les questions du simulateur.
 //
-// Organisation : 4 banques (Technique Data, Technique Cyber, Culture BCC, Aptitudes logiques).
+// Organisation : une banque technique par filière (Data et Cyber ici, les 5 autres dans src/data/banques/),
+// plus deux banques communes (Culture BCC, Aptitudes logiques).
 // Pour ajouter une question : copiez un objet existant de la même banque, donnez-lui un id unique
 // (préfixe + numéro suivant), 4 options A–D, une explication, `pourquoiPas` pour les 3 mauvaises
 // options et `aRetenir`. Les questions « culture_bcc » DOIVENT s'appuyer uniquement sur
 // src/data/bccFacts.ts et porter `source` + `verifieLe`. Le test src/__tests__/data.test.ts
 // vérifie automatiquement ces règles.
 
-import type { QcmQuestion } from '@/lib/types';
+import type { Filiere, QcmQuestion } from '@/lib/types';
 import { VERIFIE_LE } from './bccFacts';
+import { banqueTechniqueBdd } from './banques/bdd';
+import { banqueTechniqueDev } from './banques/dev';
+import { banqueTechniqueReseaux } from './banques/reseaux';
+import { banqueTechniqueSupport } from './banques/support';
+import { banqueTechniqueSystemes } from './banques/systemes';
 
 // ===========================================================================
 // TECHNIQUE — DATA ANALYSE
@@ -5165,10 +5171,20 @@ export const banqueTechniqueCyber: QcmQuestion[] = [...banqueCyberA, ...banqueCy
 export const banqueCultureBcc: QcmQuestion[] = banqueBcc;
 export const banqueAptitudesLogiques: QcmQuestion[] = banqueLogique;
 
+/** Banque technique de chaque filière. */
+export const banquesTechniques: Record<Filiere, QcmQuestion[]> = {
+  data: banqueTechniqueData,
+  cyber: banqueTechniqueCyber,
+  bdd: banqueTechniqueBdd,
+  systemes: banqueTechniqueSystemes,
+  reseaux: banqueTechniqueReseaux,
+  dev: banqueTechniqueDev,
+  support: banqueTechniqueSupport,
+};
+
 /** Toutes les questions, toutes banques confondues. */
 export const quizData: QcmQuestion[] = [
-  ...banqueTechniqueData,
-  ...banqueTechniqueCyber,
+  ...Object.values(banquesTechniques).flat(),
   ...banqueCultureBcc,
   ...banqueAptitudesLogiques,
 ];

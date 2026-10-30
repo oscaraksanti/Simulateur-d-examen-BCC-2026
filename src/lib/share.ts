@@ -1,12 +1,10 @@
 // Textes et liens de partage (WhatsApp, réseaux sociaux, défi entre amis) — fonctions pures.
 
 import { OSCAR } from '@/data/resources';
+import { FILIERES, estFiliere } from './filieres';
 import type { Filiere } from './types';
 
-export const LIBELLES_FILIERE: Record<Filiere, string> = {
-  data: 'Data Analyse',
-  cyber: 'Cybersécurité',
-};
+export const LIBELLES_FILIERE = Object.fromEntries(FILIERES.map((f) => [f.id, f.nom])) as Record<Filiere, string>;
 
 /** URL publique du site, normalisée avec une barre finale. */
 export function urlSite(brute: string | undefined = process.env.NEXT_PUBLIC_SITE_URL): string {
@@ -66,5 +64,5 @@ export function lireDefi(params: URLSearchParams): Defi | null {
   const note = Number(brut.replace(',', '.'));
   if (!Number.isFinite(note) || note < 0 || note > 20 || Math.round(note * 2) !== note * 2) return null;
   const f = params.get('f');
-  return { note, filiere: f === 'data' || f === 'cyber' ? f : null };
+  return { note, filiere: estFiliere(f) ? f : null };
 }

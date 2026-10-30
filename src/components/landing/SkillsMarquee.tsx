@@ -1,7 +1,7 @@
 // Bandeau défilant des compétences évaluées (CSS pur, en pause si « réduire les animations »).
 
-const LIGNE_1 = ['SQL', 'Python & pandas', 'Power BI · DAX', 'Statistiques', 'Qualité des données', 'Détection d’anomalies', 'Visualisation', 'Données monétaires', 'Excel'];
-const LIGNE_2 = ['Réseaux TCP/IP', 'Cryptographie', 'OWASP Top 10', 'IAM & MFA', 'SIEM', 'NIST SP 800-61', 'PCI-DSS & EMV', 'PCA / PRA', 'SWIFT', 'Culture BCC', 'Logique'];
+const LIGNE_1 = ['SQL', 'Python & pandas', 'Power BI · DAX', 'Statistiques', 'Index & transactions', 'Sauvegarde & PITR', 'Réplication', 'Linux', 'Active Directory', 'Virtualisation', 'Scripts Bash & PowerShell', 'RAID'];
+const LIGNE_2 = ['Sous-réseaux & VLSM', 'VLAN & routage', 'Fibre & 4G', 'Cryptographie', 'OWASP Top 10', 'SIEM', 'Algorithmique', 'API REST', 'Git & CI/CD', 'ITIL', 'Dépannage poste', 'Culture BCC', 'Logique'];
 
 function Ligne({ elements, inverse }: { elements: string[]; inverse?: boolean }) {
   const contenu = [...elements, ...elements];

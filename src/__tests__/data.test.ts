@@ -1,22 +1,33 @@
 import { describe, expect, it } from 'vitest';
-import {
-  banqueAptitudesLogiques,
-  banqueCultureBcc,
-  banqueTechniqueCyber,
-  banqueTechniqueData,
-  quizData,
-} from '@/data/quizData';
+import { banqueAptitudesLogiques, banqueCultureBcc, banquesTechniques, quizData } from '@/data/quizData';
 import { casPratiques } from '@/data/casesData';
 import { bccFacts, VERIFIE_LE } from '@/data/bccFacts';
 import { maxCas, maxEtape } from '@/lib/scoring';
 import { COMPOSITION, NB_CAS } from '@/lib/sampling';
+import { FILIERES, IDS_FILIERES } from '@/lib/filieres';
 
 const LETTRES = ['A', 'B', 'C', 'D'] as const;
 
 describe('banque de questions', () => {
-  it('atteint les volumes minimum', () => {
-    expect(banqueTechniqueData.length).toBeGreaterThanOrEqual(40);
-    expect(banqueTechniqueCyber.length).toBeGreaterThanOrEqual(40);
+  it.each(IDS_FILIERES)('banque technique %s : volume minimum', (f) => {
+    expect(banquesTechniques[f].length).toBeGreaterThanOrEqual(40);
+  });
+
+  it.each(FILIERES.map((f) => [f.id, f] as const))('banque technique %s : filière, préfixe et compétences', (_id, f) => {
+    const banque = banquesTechniques[f.id];
+    for (const q of banque) {
+      expect(q.filiere).toBe(f.id);
+      expect(q.section).toBe('technique');
+      expect(q.id.startsWith(`${f.prefixe}-`)).toBe(true);
+      expect(f.competences).toContain(q.competence);
+    }
+    // Chaque compétence annoncée est réellement couverte.
+    for (const c of f.competences) expect(banque.some((q) => q.competence === c)).toBe(true);
+    // Mélange de difficultés.
+    for (const d of ['facile', 'moyen', 'difficile'] as const) expect(banque.some((q) => q.difficulte === d)).toBe(true);
+  });
+
+  it('atteint les volumes minimum (banques communes)', () => {
     expect(banqueCultureBcc.length).toBeGreaterThanOrEqual(20);
     expect(banqueAptitudesLogiques.length).toBeGreaterThanOrEqual(30);
   });
@@ -41,12 +52,12 @@ describe('banque de questions', () => {
       expect(q.verifieLe).toBe(VERIFIE_LE);
       expect(q.filiere).toBe('commune');
     }
-    if (q.section === 'technique') expect(['data', 'cyber']).toContain(q.filiere);
+    if (q.section === 'technique') expect(IDS_FILIERES).toContain(q.filiere);
     else expect(q.filiere).toBe('commune');
   });
 
   it('a assez de questions par section pour un examen complet', () => {
-    expect(banqueTechniqueData.length).toBeGreaterThanOrEqual(COMPOSITION.technique);
+    for (const f of IDS_FILIERES) expect(banquesTechniques[f].length).toBeGreaterThanOrEqual(COMPOSITION.technique);
     expect(banqueCultureBcc.length).toBeGreaterThanOrEqual(COMPOSITION.culture_bcc);
     expect(banqueAptitudesLogiques.length).toBeGreaterThanOrEqual(COMPOSITION.logique);
   });
@@ -61,9 +72,10 @@ describe('banque de questions', () => {
 });
 
 describe('cas pratiques', () => {
-  it('au moins 4 cas par filière', () => {
-    expect(casPratiques.filter((c) => c.filiere === 'data').length).toBeGreaterThanOrEqual(Math.max(4, NB_CAS));
-    expect(casPratiques.filter((c) => c.filiere === 'cyber').length).toBeGreaterThanOrEqual(Math.max(4, NB_CAS));
+  it.each(FILIERES.map((f) => [f.id, f] as const))('au moins 4 cas pour la filière %s', (_id, f) => {
+    const cas = casPratiques.filter((c) => c.filiere === f.id);
+    expect(cas.length).toBeGreaterThanOrEqual(Math.max(4, NB_CAS));
+    for (const c of cas) expect(c.id.startsWith(`${f.prefixe}-CAS-`)).toBe(true);
   });
 
   it('ids uniques', () => {

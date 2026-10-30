@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Dumbbell, RotateCcw, Trophy } from 'lucide-react';
 import { useExam } from '@/context/ExamContext';
 import { quizData } from '@/data/quizData';
+import { IDS_FILIERES } from '@/lib/filieres';
 import { creerAleatoire, melanger, nouvelleGraine } from '@/lib/sampling';
 import { LIBELLES_FILIERE } from '@/lib/share';
 import type { Filiere, OptionId, QcmQuestion, Section } from '@/lib/types';
@@ -167,7 +168,7 @@ export function TrainingSession() {
       <fieldset className="mt-6">
         <legend className="text-sm font-semibold text-ink">Filière (questions techniques)</legend>
         <div className="mt-2 flex flex-wrap gap-2">
-          {(['data', 'cyber'] as const).map((f) => (
+          {IDS_FILIERES.map((f) => (
             <button key={f} type="button" aria-pressed={filiere === f} className={puce(filiere === f)} onClick={() => { setFiliere(f); setCompetences([]); }}>
               {LIBELLES_FILIERE[f]}
             </button>

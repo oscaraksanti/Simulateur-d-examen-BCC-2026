@@ -74,7 +74,7 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(function Sha
           </svg>
           <div>
             <div style={{ fontSize: 44, fontWeight: 800, letterSpacing: -1 }}>Simulateur BCC</div>
-            <div style={{ fontSize: 28, color: C.doux }}>Prépa Data &amp; Cyber · 2026</div>
+            <div style={{ fontSize: 28, color: C.doux }}>Prépa informatique · 2026</div>
           </div>
         </div>
 

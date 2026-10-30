@@ -12,14 +12,16 @@ import { LiveStats } from '@/components/landing/LiveStats';
 import { CountUp } from '@/components/landing/CountUp';
 import { Reveal } from '@/components/ui/Reveal';
 import { bccFacts, recrutement2026 } from '@/data/bccFacts';
-import { banqueCultureBcc, banqueTechniqueCyber, banqueTechniqueData, quizData } from '@/data/quizData';
+import { banqueCultureBcc, quizData } from '@/data/quizData';
 import { casPratiques } from '@/data/casesData';
+import { FILIERES } from '@/lib/filieres';
 import { OSCAR } from '@/data/resources';
 
 // Calculé au build (composant serveur) : seule la question d'essai est envoyée au navigateur.
 const nbQuestions = quizData.length;
 const nbCas = casPratiques.length;
 const nbCompetences = new Set(quizData.map((q) => q.competence)).size;
+const nbTechniques = quizData.filter((q) => q.section === 'technique').length;
 const questionEssai = banqueCultureBcc.find((q) => q.id === 'BCC-001') ?? banqueCultureBcc[0];
 
 function Surtitre({ children }: { children: React.ReactNode }) {
@@ -55,7 +57,7 @@ const faq = [
   },
   {
     q: 'Les questions sont-elles celles du vrai test ?',
-    r: 'Personne ne connaît à l’avance les questions officielles. Les questions sont originales et couvrent les compétences des domaines recrutés : data, cybersécurité, culture de la banque centrale et aptitudes logiques. Les faits sur la BCC sont sourcés et datés.',
+    r: 'Personne ne connaît à l’avance les questions officielles. Les questions sont originales et couvrent les compétences des 7 domaines recrutés (data, cybersécurité, bases de données, systèmes, réseaux, développement, support IT), la culture de la banque centrale et les aptitudes logiques. Les faits sur la BCC sont sourcés et datés.',
   },
   {
     q: 'Combien de fois dois-je passer l’examen blanc ?',
@@ -98,8 +100,9 @@ export default function Accueil() {
               Arrive au test de la BCC en l&apos;ayant déjà passé cinq fois.
             </h1>
             <p className="mt-6 max-w-[34rem] text-lg leading-relaxed text-muted sm:text-xl sm:leading-relaxed">
-              L&apos;examen blanc en <span className="text-ink">Data Analyse</span> et en <span className="text-ink">Cybersécurité</span>,
-              chronométré et corrigé question par question. Gratuit, conçu pour les candidats congolais.
+              L&apos;examen blanc des <span className="text-ink">7 domaines</span> du recrutement informatique : data, cybersécurité,
+              bases de données, systèmes, réseaux, développement et support IT. Chronométré, corrigé question par question,
+              gratuit et conçu pour les candidats congolais.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
               <Link
@@ -199,9 +202,9 @@ export default function Accueil() {
           </Reveal>
           <ul className="mt-16 grid grid-cols-1 gap-px overflow-hidden rounded-3xl bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { v: nbQuestions, l: 'questions originales', d: `${banqueTechniqueData.length} Data, ${banqueTechniqueCyber.length} Cyber, culture BCC, logique` },
-              { v: nbCas, l: 'cas pratiques', d: 'DDoS, ransomware, phishing, fraude, change, PCI-DSS…' },
-              { v: nbCompetences, l: 'compétences suivies', d: 'Du SQL à la réponse à incident NIST' },
+              { v: nbQuestions, l: 'questions originales', d: `${nbTechniques} techniques sur ${FILIERES.length} filières, plus culture BCC et logique` },
+              { v: nbCas, l: 'cas pratiques', d: 'Ransomware, fraude, base saturée, liaison coupée, double débit…' },
+              { v: nbCompetences, l: 'compétences suivies', d: 'Du SQL au routage, de l’Active Directory à ITIL' },
               { v: nbQuestions * 3, l: 'réfutations rédigées', d: 'Chaque mauvaise réponse est expliquée' },
             ].map((s, i) => (
               <li key={s.l} className="bg-[#0b1220]">
@@ -266,7 +269,7 @@ export default function Accueil() {
             </ol>
             <div className="mt-8 flex flex-wrap gap-2 border-t border-border pt-6">
               {recrutement2026.domaines.map((d) => (
-                <span key={d} className={`rounded-full border px-3 py-1 text-[13px] ${d === 'Cybersécurité' || d === 'Analyse des données' ? 'border-ink bg-ink text-bg' : 'border-border text-muted'}`}>
+                <span key={d} className="rounded-full border border-ink bg-ink px-3 py-1 text-[13px] text-bg">
                   {d}
                 </span>
               ))}

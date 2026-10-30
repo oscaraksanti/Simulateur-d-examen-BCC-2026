@@ -1,11 +1,13 @@
-# CLAUDE.md — Simulateur BCC (Prépa Data & Cyber)
+# CLAUDE.md — Simulateur BCC (Prépa informatique, 7 domaines)
 
 Document de passation pour toute IA ou développeur qui reprend le projet. À mettre à jour à chaque fin de session.
 
 ## 1. Le projet en bref
 
 Application web **open source, 100 % statique**, en **français**, qui aide les candidats congolais à préparer les tests de
-recrutement informatique de la Banque Centrale du Congo (BCC), filières **Data Analyse** et **Cybersécurité**.
+recrutement informatique de la Banque Centrale du Congo (BCC) dans ses **7 domaines** : Data Analyse, Cybersécurité,
+Bases de données, Administration systèmes, Réseaux & télécoms, Développement logiciel, Support IT (ids `data`, `cyber`,
+`bdd`, `systemes`, `reseaux`, `dev`, `support` — registre unique `src/lib/filieres.ts`).
 Dépôt : https://github.com/oscaraksanti/Simulateur-d-examen-BCC-2026 — auteur : Oscar Aksanti — marque **Datalendo** (https://datalendo.com ; ne plus utiliser « formations4data »).
 Production (Vercel, projet `sys-bcc-26` de l'équipe `oscar-d5ae`, relié au dépôt, déploiement auto sur push `main`) :
 https://simulateur-bcc.datalendo.com (sous-domaine ; DNS de datalendo.com chez Namecheap → CNAME
@@ -43,7 +45,7 @@ Miroir GitHub Pages : https://oscaraksanti.github.io/Simulateur-d-examen-BCC-202
 npm run dev          # http://localhost:3000
 npm run lint         # ESLint (doit être vide)
 npm run typecheck    # tsc --noEmit
-npm test             # Vitest : 234 tests (scoring, sampling, share, remote, intégrité des données)
+npm test             # Vitest : 575 tests (scoring, sampling, share, remote, intégrité des données des 7 filières)
 npm run build        # prebuild → scripts/generate-og.ts → next build → out/
 npm start            # sert out/ (npx serve)
 ```
@@ -59,6 +61,9 @@ Variables : `NEXT_PUBLIC_SITE_URL` (URL publique, utilisée dans les textes de p
   NE JAMAIS toucher aux schémas `public`/`datalendo` existants (682 utilisateurs Datalendo).
 - Migration : `supabase/migrations/0001_simulateur_bcc.sql` (appliquée le 29/10/2026 sous le nom `simulateur_bcc_init`).
   Tables : candidats, tentatives, feedbacks, admins, emails (journal), parametres (expediteur, repondre_a, site, whatsapp).
+- Migration `0003_sept_filieres.sql` (appliquée le 30/10/2026 : `simulateur_bcc_sept_filieres`) : contraintes `filiere`
+  élargies aux 7 ids, fonction `simulateur_bcc.libelle_filiere()` (mêmes libellés que `filieres.ts`) utilisée par les e-mails.
+  Toute nouvelle filière = nouvelle migration (contraintes + libellé) AVANT le déploiement du front.
 - API (toutes `security definer`, `search_path = ''`) : publiques `sbcc_enregistrer_candidat`, `sbcc_enregistrer_tentative`,
   `sbcc_envoyer_avis`, `sbcc_stats_publiques`, `sbcc_est_admin` ; admin (authenticated + contrôle) `sbcc_stats_admin`,
   `sbcc_admin_candidats`, `sbcc_admin_tentatives`, `sbcc_admin_avis`, `sbcc_admin_emails`, `sbcc_admin_supprimer_candidat`.
@@ -90,7 +95,7 @@ src/app/
   cas-pratiques/page.tsx→ components/cases/CasesSession
   resultats/page.tsx    → components/results/ResultsView
   entrainement/page.tsx → components/training/TrainingSession  (BONUS : séries par compétence, correction immédiate)
-  fiches/page.tsx       BONUS : mémo culture BCC, formules data, repères cyber, méthode jour J, alerte arnaques
+  fiches/page.tsx       BONUS : mémo culture BCC, formules data, repères cyber + 5 autres domaines, méthode jour J, arnaques
   not-found.tsx
 src/context/
   ExamContext.tsx       useReducer + persistance localStorage. Ne stocke QUE des ids (les banques sont importées par les
@@ -98,6 +103,8 @@ src/context/
                         DUREE_CAS_MS (20 min), OBJECTIF_SIMULATIONS (5). etapeAtteinte() pour le Stepper.
   useGarde.ts           garde de navigation client : 'candidat' | 'qcm_termine' | 'resultat' → router.replace
 src/lib/
+  filieres.ts           REGISTRE des 7 filières : id, nom, domaine, préfixe d'ids, résumé, compétences (chaînes EXACTES) ;
+                        infoFiliere(), estFiliere(), IDS_FILIERES. Icônes/teintes : components/ui/IconeFiliere.tsx
   types.ts              tous les types (QcmQuestion avec pourquoiPas + aRetenir ; CasPratique avec role/heure/enjeu ; Tentative…)
   scoring.ts            fonctions pures : note = (qcm/qcmMax)×12 + (cas/casMax)×8 arrondie au 0,5 ; étape ordre =
                         pointsMax × bien placés/total ; parSection, parCompetence (+ 'Cas pratiques'), mention, competencesFaibles
@@ -108,14 +115,17 @@ src/lib/
                         questions-vues, cas-vus, ref, theme
 src/data/
   bccFacts.ts           SOURCE UNIQUE DE VÉRITÉ (faits, tauxDirecteur2026, fluxPaiement, recrutement2026)
-  quizData.ts           185 questions : banqueTechniqueData (60), banqueTechniqueCyber (60), banqueCultureBcc (25),
-                        banqueAptitudesLogiques (40) ; questionParId()
-  casesData.ts          8 cas (DATA-CAS-01..04, CYB-CAS-01..04) ; casParId()
+  quizData.ts           485 questions : Data (60), Cyber (60), Culture BCC (25), Logique (40) + import des 5 banques de
+                        banques/ ; banquesTechniques: Record<Filiere, …>, quizData, questionParId()
+  banques/              bdd.ts, systemes.ts, reseaux.ts, dev.ts, support.ts : 60 questions chacune (BDD-, SYS-, RES-, DEV-, SUP-)
+  casesData.ts          28 cas : 8 ici (DATA-CAS-01..04, CYB-CAS-01..04) + import de cas/ ; casParId()
+  cas/                  bdd.ts, systemes.ts, reseaux.ts, dev.ts, support.ts : 4 cas chacun (<PREFIXE>-CAS-01..04)
   resources.ts          liens Oscar (YouTube @oscaraksanti, WhatsApp 243971601855)
 src/components/
   layout/   Header, Footer, DisclaimerBanner, ThemeToggle (système→clair→sombre, data-theme), Stepper, Logo (logo original)
   ui/       Button/ButtonLink, Card, Badge, ProgressBar, Timer (échéance absolue, aria-live aux paliers), RadioCard,
-            Modal (focus piégé), Toast, Reveal, CodeBlock (coloration sql/python/log sans dépendance), TexteRiche (`code`)
+            Modal (focus piégé), Toast, Reveal, CodeBlock (coloration sql/python/log/shell sans dépendance), TexteRiche (`code`),
+            IconeFiliere (icône + teinte par filière)
   onboarding/ RegistrationForm (validation inline), InscriptionBloc (+ DefiBanner, mémorisation de ?ref)
   exam/     ExamSession, ExamDashboard, SectionCard, QuestionCard, QuestionNavigator, ExplanationPanel, libelles
   cases/    CasesSession, CaseBriefing, DataTable (triable), LogViewer (filtre + surlignage IP/HTTP), DecisionStep,
@@ -143,7 +153,7 @@ scripts/generate-og.ts  public/og-image.png 1200×630 (police locale, ne casse p
 
 Le timer repose sur des timestamps (`debut`) persistés : un rechargement de page ne remet pas le chrono à zéro.
 
-## 6. Contenu (état au 29/10/2026)
+## 6. Contenu (état au 30/10/2026)
 
 | Banque | Volume | Compétences |
 |---|---|---|
@@ -151,6 +161,14 @@ Le timer repose sur des timestamps (`debut`) persistés : un rechargement de pag
 | Technique Cyber | 60 | Réseaux (8), Cryptographie (8), Sécurité applicative (OWASP) (7), IAM & contrôle d’accès (7), SIEM & analyse de logs (6), Menaces (7), Gestion d’incident (7), PCI-DSS & EMV (4), PCA & PRA (3), Messagerie financière (SWIFT) (3) |
 | Culture BCC | 25 | Cadre légal & institution (6), Gouvernance & actualité (5), Politique monétaire (6), Systèmes de paiement (5), Recrutement 2026 (3) |
 | Aptitudes logiques | 40 | Suites numériques, Logique, Pourcentages & intérêts, Lecture de tableaux & graphiques (7 chacune), Raisonnement verbal, Problèmes de rendement (6 chacune) |
+| Bases de données | 60 | SQL avancé (8), Modélisation & normalisation (7), Transactions & concurrence (8), Index & optimisation (8), Sauvegarde & restauration (8), Haute disponibilité & réplication (7), Sécurité des bases de données (7), Exploitation & supervision (7) |
+| Administration systèmes | 60 | Linux (8), Windows Server & Active Directory (8), Virtualisation & cloud (7), Stockage & sauvegarde (8), Scripts & automatisation (7), Supervision & performances (7), Durcissement & sécurité système (7), Services DNS, DHCP & messagerie (8) |
+| Réseaux & télécoms | 60 | Modèle OSI & TCP/IP (8), Adressage IP & sous-réseaux (8), Commutation & VLAN (7), Routage (8), Réseaux sans fil & mobiles (7), Transmission & télécoms (8), Services réseau (DNS, DHCP, NAT) (7), Sécurité & supervision réseau (7) |
+| Développement logiciel | 60 | Algorithmique & complexité (8), Structures de données (8), Programmation orientée objet (7), Bases de données pour développeurs (7), Web & API (8), Tests & qualité (7), Git & DevOps (7), Sécurité du code (8) |
+| Support IT | 60 | Matériel & périphériques (8), Windows & postes de travail (8), Dépannage réseau (8), Messagerie & bureautique (7), Comptes & accès (7), Gestion des incidents (ITIL) (8), Sécurité au poste de travail (7), Relation utilisateur (7) |
+
+- Nouvelles banques : 18 faciles / 30 moyennes / 12 difficiles et 15 bonnes réponses par lettre dans chaque fichier ;
+  le test exige pour chaque filière le préfixe d'id, des compétences déclarées dans `filieres.ts` et ≥ 4 cas.
 
 - Difficulté ≈ 30 % facile / 50 % moyen / 20 % difficile ; bonnes réponses réparties ~25 % par lettre (testé).
 - ⚠️ Les noms de compétences utilisent l'apostrophe typographique `’` (« Détection d’anomalies », « Gestion d’incident »,
@@ -241,9 +259,22 @@ Le timer repose sur des timestamps (`debut`) persistés : un rechargement de pag
 - Rendus delivery publiés dans `public/promo/simulateur-bcc-presentation-{9x16,16x9}.mp4` (+ `affiche.jpg`) et proposés
   sur la page de résultats (`ShareButtons`) ; l'ancienne promo muette de 25 s n'est plus servie (source gardée dans `video/`).
 
+### Session 8 — 30/10/2026 (7 domaines du recrutement)
+- Inscrits au 30/10 (≈ 01h45) : 195 candidats en ~15 h (152 Data, 43 Cyber), 75 simulations par 56 candidats, moyenne 8,3/20.
+- Les 5 autres domaines annoncés par la BCC ajoutés comme filières : `bdd`, `systemes`, `reseaux`, `dev`, `support`.
+  Registre `src/lib/filieres.ts` ; 300 questions + 20 cas rédigés (calculs, sorties de code et adresses vérifiés par script),
+  relus question par question (énoncé + bonne réponse). UI généralisée : choix de filière à 7 cartes, tableau de bord,
+  entraînement, résultats (« Changer de filière » → `/#commencer`), admin (répartition triée), fiches (repères par domaine),
+  accueil, SEO, carte de partage, OG image (« Prépa informatique · 7 domaines »). Coloration `shell` dans CodeBlock.
+- Supabase : migration 0003 appliquée (contraintes + libellés des e-mails), avant le déploiement du front.
+- Biais corrigé dans les cas pratiques (anciens et nouveaux) : la meilleure option était presque toujours la plus longue
+  (113 étapes sur 116) ; options rééquilibrées sans changer points ni fond.
+- Reste un biais modéré sur les QCM Data/Cyber d'origine (bonne réponse la plus longue dans ~46 % des cas, hasard = 25 %).
+
 ### Pistes pour la suite
 - Remplacer les placeholders de captures du README par de vraies captures.
 - Enrichir les banques (objectif : 100+ questions par filière) et ajouter des cas (2 par session de travail).
+- Rééquilibrer la longueur des options des QCM Data et Cyber d'origine (bonne réponse trop souvent la plus longue).
 - Mettre à jour `bccFacts.ts` après chaque CPM (taux directeur) en conservant source + date ; ajuster `VERIFIE_LE`.
 - Option : export PDF de la correction ; mode « examen long » (60 questions) ; e-mails de suivi (Resend) aux inscrits
   ayant coché le consentement ; sous-titres incrustés pour le film 9:16 ; musique sous licence commerciale (HeyGen).

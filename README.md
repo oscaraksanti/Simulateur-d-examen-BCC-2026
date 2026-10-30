@@ -1,8 +1,9 @@
-# Simulateur BCC — Prépa Data & Cyber
+# Simulateur BCC — Prépa informatique (7 domaines)
 
-Examen blanc **gratuit et open source** pour préparer les tests de recrutement de la Banque Centrale du Congo (BCC) dans
-les filières **Data Analyse** et **Cybersécurité** : QCM chronométrés corrigés, cas pratiques immersifs, culture BCC
-sourcée, mode entraînement et fiches de révision.
+Examen blanc **gratuit et open source** pour préparer les tests de recrutement informatique 2026 de la Banque Centrale du
+Congo (BCC) dans ses **7 domaines** : Data Analyse, Cybersécurité, Bases de données, Administration systèmes, Réseaux &
+télécoms, Développement logiciel et Support IT. QCM chronométrés corrigés, cas pratiques immersifs, culture BCC sourcée,
+mode entraînement et fiches de révision.
 
 > ⚠️ **Outil de préparation indépendant, non affilié à la Banque Centrale du Congo.**
 > Les candidatures officielles se font uniquement via le site officiel de la BCC ([bcc.cd](https://www.bcc.cd)).
@@ -33,13 +34,13 @@ sourcée, mode entraînement et fiches de révision.
 | **3. Cas pratiques** (`/cas-pratiques`) | 2 cas immersifs de la filière en 20 min : briefing « salle de crise », tableaux triables, logs surlignés, choix pondérés, glisser-déposer accessible, feedback par étape et corrigé expert. |
 | **4. Résultats** (`/resultats`) | Note /20 animée + mention, barres par section, radar des compétences (SVG maison), courbe de progression, correction détaillée (pourquoi la bonne réponse, pourquoi pas les autres), ressources d'Oscar Aksanti, partage viral et carte de score téléchargeable (1080×1350). |
 | **Entraînement** (`/entrainement`) | Séries ciblées par filière, section et compétence, correction immédiate. Lien direct depuis les « priorités de révision ». |
-| **Fiches** (`/fiches`) | Mémo culture BCC sourcé, formules data, repères cyber, méthode pour le jour J, alerte anti-arnaque. |
+| **Fiches** (`/fiches`) | Mémo culture BCC sourcé, formules data, repères des 7 domaines, méthode pour le jour J, alerte anti-arnaque. |
 | **Avis** (`/avis`) | Note de satisfaction, fonctionnalités souhaitées, message libre (aussi en fin de résultats). |
 | **Confidentialité** (`/confidentialite`) | Données collectées, finalités, droits des candidats. |
 | **Administration** (`/admin`, privé) | Inscrits, simulations, notes, compétences faibles, souhaits, avis, export CSV, suppression sur demande. |
 
 - **Production** : [simulateur-bcc.datalendo.com](https://simulateur-bcc.datalendo.com) (Vercel) — un outil [Datalendo](https://datalendo.com).
-- **Banques** : 185 questions (60 Data, 60 Cyber, 25 culture BCC, 40 logique) et 8 cas pratiques (4 par filière).
+- **Banques** : 485 questions (60 techniques par filière × 7, 25 culture BCC, 40 logique) et 28 cas pratiques (4 par filière).
 - **Tirage intelligent** : chaque simulation privilégie les questions et cas jamais vus, et alterne les compétences.
 - **Objectif 5 simulations** : suivi de progression et historique local (courbe des notes).
 - **Notation** : `note /20 = (QCM / 24) × 12 + (cas / max cas) × 8`, arrondie au 0,5. Pas de points négatifs.
@@ -75,8 +76,9 @@ npm run dev                  # http://localhost:3000
 
 ## Ajouter des questions
 
-Toutes les questions sont dans [`src/data/quizData.ts`](src/data/quizData.ts), organisées en 4 banques
-(Technique Data, Technique Cyber, Culture BCC, Aptitudes logiques). Format :
+Les filières et leurs compétences sont déclarées dans [`src/lib/filieres.ts`](src/lib/filieres.ts). Les questions
+Data, Cyber, Culture BCC et Aptitudes logiques sont dans [`src/data/quizData.ts`](src/data/quizData.ts) ; les banques des
+5 autres filières dans [`src/data/banques/`](src/data/banques/) (`bdd`, `systemes`, `reseaux`, `dev`, `support`). Format :
 
 ```ts
 {
@@ -106,7 +108,9 @@ Le test [`src/__tests__/data.test.ts`](src/__tests__/data.test.ts) vérifie auto
 `bonneReponse` valide, réfutation des 3 mauvaises options, `source`/`verifieLe` pour la culture BCC, volumes minimum et
 cohérence des cas pratiques (`pointsMax`, permutations d'ordre). Lance `npm test` avant chaque PR.
 
-Les cas pratiques sont dans [`src/data/casesData.ts`](src/data/casesData.ts) (scénarios fictifs, 10 à 20 points chacun).
+Les cas pratiques sont dans [`src/data/casesData.ts`](src/data/casesData.ts) (Data, Cyber) et [`src/data/cas/`](src/data/cas/)
+(autres filières) : scénarios fictifs, 10 à 20 points chacun. Le test vérifie aussi, pour chaque filière, le préfixe des ids,
+les compétences déclarées et au moins 4 cas.
 
 ## Collecte des données avec Supabase
 
@@ -120,7 +124,8 @@ via des fonctions `public.sbcc_*` validées ; lectures réservées aux comptes l
 Les envois depuis le navigateur passent par une file d'attente locale et sont retentés si le réseau coupe.
 
 ### Installation (nouvel environnement)
-1. Exécute [`supabase/migrations/0001_simulateur_bcc.sql`](supabase/migrations/0001_simulateur_bcc.sql) dans le SQL Editor.
+1. Exécute dans l'ordre les migrations de [`supabase/migrations/`](supabase/migrations/) (`0001` schéma et API, `0002` e-mails
+   administrables, `0003` les 7 filières) dans le SQL Editor.
 2. Donne les droits d'administration à un compte existant :
    ```sql
    insert into simulateur_bcc.admins (user_id)
@@ -193,8 +198,8 @@ src/
 ├── app/            # Routes : /, /examen, /cas-pratiques, /resultats, /entrainement, /fiches, /avis, /confidentialite, /admin
 ├── components/     # layout, ui, landing, onboarding, exam, cases, results, training, feedback, admin, illustrations
 ├── context/        # ExamContext (useReducer + localStorage) et garde de navigation
-├── data/           # quizData, casesData, bccFacts (source unique de vérité), resources
-├── lib/            # scoring, sampling (tirage seedé), share, storage, remote (Supabase), types
+├── data/           # quizData, casesData, banques/ et cas/ (5 filières), bccFacts (source unique de vérité), resources
+├── lib/            # filieres (7 domaines), scoring, sampling (tirage seedé), share, storage, remote (Supabase), types
 └── __tests__/      # Vitest
 scripts/generate-og.ts    # og-image.png 1200×630 (satori + resvg, police locale)
 supabase/migrations/      # schéma simulateur_bcc, RLS, fonctions sbcc_*, e-mails (testé sur Postgres 16)

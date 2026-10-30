@@ -2,13 +2,15 @@
 
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowRight, BrainCircuit, Briefcase, Keyboard, Landmark, Puzzle, ShieldCheck, Target, Timer as TimerIcon } from 'lucide-react';
+import { ArrowRight, Briefcase, Keyboard, Landmark, Puzzle, Target, Timer as TimerIcon } from 'lucide-react';
 import { OBJECTIF_SIMULATIONS, useExam } from '@/context/ExamContext';
+import { infoFiliere } from '@/lib/filieres';
 import { COMPOSITION, NB_CAS } from '@/lib/sampling';
 import { formatNote, LIBELLES_FILIERE } from '@/lib/share';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { ProgressBar } from '@/components/ui/ProgressBar';
+import { ICONES_FILIERE, TEINTES_FILIERE } from '@/components/ui/IconeFiliere';
 import { ProgressionChart } from '@/components/results/ProgressionChart';
 import { SectionCard } from './SectionCard';
 
@@ -37,24 +39,20 @@ export function ExamDashboard({ onDemarrer }: { onDemarrer: () => void }) {
                 : `Objectif des ${OBJECTIF_SIMULATIONS} simulations atteint 🎉 Continue pour stabiliser ta note au-dessus de 14/20.`}
           </p>
         </div>
-        <Link href="/#inscription" className="text-sm font-semibold text-primary-strong hover:underline">
+        <Link href="/#commencer" className="text-sm font-semibold text-primary-strong hover:underline">
           Changer de filière
         </Link>
       </div>
 
       <div className="mt-8 grid gap-4 md:grid-cols-3">
         <SectionCard
-          icone={candidat.filiere === 'data' ? BrainCircuit : ShieldCheck}
+          icone={ICONES_FILIERE[candidat.filiere]}
           titre={`Technique — ${LIBELLES_FILIERE[candidat.filiere]}`}
-          description={
-            candidat.filiere === 'data'
-              ? 'SQL, Python/pandas, statistiques, Power BI, qualité des données, anomalies, données monétaires.'
-              : 'Réseaux, cryptographie, OWASP, IAM, SIEM, gestion d’incident, PCI-DSS, PRA, SWIFT.'
-          }
+          description={`${infoFiliere(candidat.filiere).competences.join(', ')}.`}
           nbQuestions={COMPOSITION.technique}
           duree="15 min"
           statut="a_faire"
-          couleur={candidat.filiere === 'data' ? 'bg-primary-soft text-primary-strong' : 'bg-danger-soft text-danger'}
+          couleur={TEINTES_FILIERE[candidat.filiere]}
         />
         <SectionCard
           icone={Landmark}
